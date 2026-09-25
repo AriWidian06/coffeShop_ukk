@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pembayarans', function (Blueprint $table) {
+        Schema::create('detail_transaksis', function (Blueprint $table) {
             $table->id();
             $table->foreignId('transaksi_id')->constrained('transaksis')->onDelete('cascade');
-            $table->decimal('jumlah_bayar', 10, 2);
-            $table->ENUM('metode_pembayaran', ['cash','QRIS'])->default('cash');
-            $table->enum('status_pembayaran', ['pending', 'paid'])->default('pending');
-            $table->decimal('kembalian', 10, 2)->default(0);
-            $table->timestamp('waktu_pembayaran')->useCurrent();
-
+            $table->foreignId('produk_id')->constrained('produks')->onDelete('cascade');
+            $table->integer('QTY');
+            $table->decimal('subtotal', 10, 2);
+            $table->timestamps();
         });
     }
 
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pembayarans');
+        Schema::dropIfExists('detail_transaksis');
     }
 };

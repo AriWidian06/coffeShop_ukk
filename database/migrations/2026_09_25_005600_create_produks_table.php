@@ -6,18 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('produks', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('cascade');
+            $table->foreignId('kategori_produk_id')->constrained('kategori_produks')->onDelete('cascade');
             $table->string('nama_produk');
             $table->text('deskripsi')->nullable();
             $table->decimal('harga_jual', 10, 2);
             $table->decimal('harga_beli', 10, 2);
-            $table->ENUM('tipe', ['jual','bahan baku']);
+            $table->enum('tipe', ['jual', 'bahan baku']);
             $table->string('satuan')->default('pcs');
             $table->integer('stock')->default(0);
             $table->boolean('status_aktif')->default(true);
@@ -25,9 +24,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('produks');
