@@ -1,1 +1,23 @@
-<label>Supplier<select name="supplier_id" required>@foreach($suppliers as $supplier)<option value="{{ $supplier->id }}" @selected(old('supplier_id', $produk->supplier_id ?? '') == $supplier->id)>{{ $supplier->nama_supplier }}</option>@endforeach</select></label><label>Kategori<select name="kategori_produk_id" required>@foreach($kategoriProduks as $kategori)<option value="{{ $kategori->id }}" @selected(old('kategori_produk_id', $produk->kategori_produk_id ?? '') == $kategori->id)>{{ $kategori->nama_kategori }}</option>@endforeach</select></label><label>Nama produk<input name="nama_produk" value="{{ old('nama_produk', $produk->nama_produk ?? '') }}" required></label><label>Deskripsi<textarea name="deskripsi">{{ old('deskripsi', $produk->deskripsi ?? '') }}</textarea></label><label>Harga jual<input type="number" step="0.01" min="0" name="harga_jual" value="{{ old('harga_jual', $produk->harga_jual ?? '') }}" required></label><label>Harga beli<input type="number" step="0.01" min="0" name="harga_beli" value="{{ old('harga_beli', $produk->harga_beli ?? '') }}" required></label><label>Tipe<select name="tipe"><option value="jual">Jual</option><option value="bahan baku">Bahan baku</option></select></label><label>Satuan<input name="satuan" value="{{ old('satuan', $produk->satuan ?? 'pcs') }}" required></label><label>Stok<input type="number" min="0" name="stock" value="{{ old('stock', $produk->stock ?? 0) }}" required></label><label><input type="checkbox" name="status_aktif" value="1" @checked(old('status_aktif', $produk->status_aktif ?? true))> Aktif</label>
+<label>
+    Supplier<select name="supplier_id" required>
+        @foreach ($suppliers as $supplier)
+            <option value="{{ $supplier->id }}" @selected(old('supplier_id', $produk->supplier_id ?? '') == $supplier->id)>{{ $supplier->nama_supplier }}</option>
+        @endforeach
+    </select>
+</label><label>Kategori<select name="kategori_produk_id" required>
+        @foreach ($kategoriProduks as $kategori)
+            <option value="{{ $kategori->id }}" @selected(old('kategori_produk_id', $produk->kategori_produk_id ?? '') == $kategori->id)>{{ $kategori->nama_kategori }}</option>
+        @endforeach
+    </select></label><label>Nama produk<input name="nama_produk"
+        value="{{ old('nama_produk', $produk->nama_produk ?? '') }}" required></label><label>Deskripsi
+    <textarea name="deskripsi">{{ old('deskripsi', $produk->deskripsi ?? '') }}</textarea>
+</label><label>Harga jual<input type="number" step="0.01" min="0" name="harga_jual"
+        value="{{ old('harga_jual', $produk->harga_jual ?? '') }}" required></label><label>Harga beli<input
+        type="number" step="0.01" min="0" name="harga_beli"
+        value="{{ old('harga_beli', $produk->harga_beli ?? '') }}" required></label><label>Tipe<select name="tipe">
+        <option value="jual">Jual</option>
+        <option value="bahan baku">Bahan baku</option>
+    </select></label><label>Satuan<input name="satuan" value="{{ old('satuan', $produk->satuan ?? 'pcs') }}"
+        required></label><label>Stok<input type="number" min="0" name="stock"
+        value="{{ old('stock', $produk->stock ?? 0) }}" required></label><label><input type="checkbox"
+        name="status_aktif" value="1" @checked(old('status_aktif', $produk->status_aktif ?? true))> Aktif</label>

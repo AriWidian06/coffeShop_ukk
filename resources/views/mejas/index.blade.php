@@ -1,2 +1,25 @@
 @extends('layouts.app')
-@section('content')<div class="toolbar"><h1>Meja</h1><a class="button" href="{{ route('mejas.create') }}">Tambah</a></div><table><tr><th>Nomor</th><th>Kapasitas</th><th>Status</th><th>Aksi</th></tr>@foreach($mejas as $meja)<tr><td>{{ $meja->nomor_meja }}</td><td>{{ $meja->kapasitas }}</td><td>{{ $meja->status_aktif ? 'Aktif' : 'Tidak aktif' }}</td><td><a href="{{ route('mejas.edit', $meja) }}">Edit</a> <form class="inline" method="post" action="{{ route('mejas.destroy', $meja) }}">@csrf @method('DELETE')<button class="danger">Hapus</button></form></td></tr>@endforeach</table>{{ $mejas->links() }}@endsection
+@section('content')
+    <div class="toolbar">
+        <h1>Meja</h1><a class="button" href="{{ route('mejas.create') }}">Tambah</a>
+    </div>
+    <table>
+        <tr>
+            <th>Nomor</th>
+            <th>Kapasitas</th>
+            <th>Status</th>
+            <th>Aksi</th>
+        </tr>
+        @foreach ($mejas as $meja)
+            <tr>
+                <td>{{ $meja->nomor_meja }}</td>
+                <td>{{ $meja->kapasitas }}</td>
+                <td>{{ $meja->status_aktif ? 'Aktif' : 'Tidak aktif' }}</td>
+                <td><a href="{{ route('mejas.edit', $meja) }}">Edit</a>
+                    <form class="inline" method="post" action="{{ route('mejas.destroy', $meja) }}">@csrf
+                        @method('DELETE')<button class="danger">Hapus</button></form>
+                </td>
+            </tr>
+        @endforeach
+    </table>{{ $mejas->links() }}
+@endsection
