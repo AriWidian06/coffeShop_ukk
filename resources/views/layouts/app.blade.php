@@ -127,11 +127,22 @@
 <body>
     <nav>
         <a href="{{ route('dashboard') }}">Dashboard</a>
-        <a href="{{ route('transaksis.index') }}">Transaksi</a>
-        <a href="{{ route('produks.index') }}">Produk</a>
-        <a href="{{ route('mejas.index') }}">Meja</a>
-        <a href="{{ route('suppliers.index') }}">Supplier</a>
-        <a href="{{ route('karyawans.index') }}">Karyawan</a>
+
+        @if (auth('karyawan')->check() && in_array(auth('karyawan')->user()->role, ['manager', 'admin'], true))
+            <a href="{{ route('transaksis.index') }}">Laporan Penjualan</a>
+        @endif
+
+        @if (auth('karyawan')->check() && in_array(auth('karyawan')->user()->role, ['kasir', 'admin'], true))
+            <a href="{{ route('transaksis.create') }}">POS</a>
+        @endif
+
+        @if (auth('karyawan')->check() && auth('karyawan')->user()->role === 'admin')
+            <a href="{{ route('produks.index') }}">Produk</a>
+            <a href="{{ route('mejas.index') }}">Meja</a>
+            <a href="{{ route('suppliers.index') }}">Supplier</a>
+            <a href="{{ route('karyawans.index') }}">Karyawan</a>
+        @endif
+
         <form class="inline" method="post" action="{{ route('logout') }}">@csrf <button type="submit">Keluar</button>
         </form>
     </nav>
