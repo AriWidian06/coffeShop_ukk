@@ -3,86 +3,62 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\DetailTransaksi;
+use App\Http\Requests\StoreTransactionRequest;
 use App\Models\Produk;
 use App\Models\Transaksi;
-use Illuminate\Http\Request;
+use App\Models\DetailTransaksi;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
-class TransaksiController extends Controller
+class TransactionController extends Controller
 {
-    /**
-     * Membuat pesanan baru.
-     */
-    public function store(Request $request)
+    public function store(StoreTransactionRequest $validated)
     {
-        $validated = $request->validate([
-            'meja_id' => 'required|exists:mejas,id',
-            'karyawan_id' => 'required|exists:karyawans,id',
-            'tipe_pesanan' => 'required|in:dine-in,take-away',
-            'items' => 'required|array|min:1',
-            'items.*.produk_id' => 'required|exists:produks,id',
-            'items.*.qty' => 'required|integer|min:1',
-        ]);
+        DB::beginTransaction();
 
-        $transaksi = DB::transaction(function () use ($validated) {
-            $totalHarga = 0;
-            $detailItems = [];
-
-            foreach ($validated['items'] as $item) {
-                $produk = Produk::where('status_aktif', true)
-                    ->where('tipe', 'jual')
-                    ->lockForUpdate()
-                    ->find($item['produk_id']);
-
-                if (! $produk) {
-                    throw ValidationException::withMessages([
-                        'items' => 'Produk tidak aktif atau tidak dapat dipesan.',
-                    ]);
+        try {
+            foreach ($validated->items as $item) {
+                $produk = Produk::findOrFail($item['id_produk']);
+                if ($produk->stok < $item['qty']) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Stok produk {$produk->nama_produk} tidak mencukupi."
+                    ], 422);
                 }
-
-                if ($produk->stock < $item['qty']) {
-                    throw ValidationException::withMessages([
-                        'items' => "Stok {$produk->nama_produk} tidak mencukupi.",
-                    ]);
-                }
-
-                $subtotal = $produk->harga_jual * $item['qty'];
-                $totalHarga += $subtotal;
-
-                $detailItems[] = [
-                    'produk_id' => $produk->id,
-                    'QTY' => $item['qty'],
-                    'subtotal' => $subtotal,
-                ];
-
-                $produk->decrement('stock', $item['qty']);
             }
 
             $transaksi = Transaksi::create([
-                'meja_id' => $validated['meja_id'],
-                'karyawan_id' => $validated['karyawan_id'],
-                'tipe_pesanan' => $validated['tipe_pesanan'],
-                'total_harga' => $totalHarga,
-                'status_pesanan' => 'pending',
-                'waktu_transaksi' => now(),
+                'id_meja' => $validated->id_meja,
+                'id_karyawan' => auth()->id() ?? null,
+                'tipe_pesanan' => $validated->tipe_pesanan,
+                'total_harga' => $validated->total_harga,
+                'status_pesanan' => 'pending'
             ]);
 
-            foreach ($detailItems as $detail) {
-                $detail['transaksi_id'] = $transaksi->id;
-                DetailTransaksi::create($detail);
+            foreach ($validated->items as $item) {
+                $produk = Produk::findOrFail($item['id_produk']);
+                DetailTransaksi::create([
+                    'id_transaksi' => $transaksi->id_transaksi,
+                    'id_produk' => $item['id_produk'],
+                    'qty' => $item['qty'],
+                    'subtotal' => $produk->harga * $item['qty']
+                ]);
             }
 
-            return $transaksi;
-        });
+            DB::commit();
 
-        $transaksi->load(['meja', 'karyawan', 'detail_transaksis.produk']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Pesanan berhasil dibuat.',
+                'data' => $transaksi->load('detail_transaksi')
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Pesanan berhasil dibuat.',
-            'data' => $transaksi,
-        ], 201);
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memproses transaksi.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
