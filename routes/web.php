@@ -9,14 +9,33 @@ use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TransaksiController;
+use App\Models\Meja;
+use App\Models\KategoriProduk; 
+use App\Models\Produk;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
+// Route Welcome (Halaman Publik / Menu)
+Route::get('/', function (Request $request) {
+    // 1. Ambil meja aktif
+    $mejas = Meja::where('status_aktif', true)->orderBy('nomor_meja')->get();
+    $mejaId = $request->query('meja_id');
+    $mejaAktif = $mejaId ? $mejas->firstWhere('id', $mejaId) : null;
+
+    // 2. Ambil kategori produk
+    $kategoriProduks = KategoriProduk::orderBy('nama_kategori')->get();
+
+    // 3. Ambil produk: HANYA yang tipe 'jual' DAN status_aktif = true
+    $produks = Produk::with('kategoriProduk')
+        ->where('tipe', 'jual')
+        ->where('status_aktif', true)
+        ->orderBy('nama_produk')
+        ->get();
+
+    return view('welcome', compact('mejaAktif', 'mejas', 'kategoriProduks', 'produks'));
 });
 
 Route::get('/health', [HealthController::class, 'check']);
-
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.store');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
