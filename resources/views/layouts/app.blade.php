@@ -13,9 +13,15 @@
             background: #f6f3ee;
         }
 
+        body.cashier-desktop { min-width: 1024px; }
+
         nav {
             background: #3b2418;
             padding: 1rem;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: .25rem .55rem;
         }
 
         nav a,
@@ -27,7 +33,14 @@
             border: 0;
             cursor: pointer;
             font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            min-height: 44px;
+            padding: .45rem .5rem;
+            margin-right: 0;
         }
+
+        nav form.inline { display: inline-flex; margin: 0; }
 
         main {
             max-width: 1100px;
@@ -124,12 +137,16 @@
     </style>
 </head>
 
-<body>
+<body @class(['cashier-desktop' => auth('karyawan')->check() && auth('karyawan')->user()->role === 'kasir'])>
     <nav>
         <a href="{{ route('dashboard') }}">Dashboard</a>
 
         @if (auth('karyawan')->check() && in_array(auth('karyawan')->user()->role, ['manager', 'admin'], true))
             <a href="{{ route('transaksis.index') }}">Laporan Penjualan</a>
+        @endif
+
+        @if (auth('karyawan')->check() && auth('karyawan')->user()->role === 'kasir')
+            <a href="{{ route('transaksis.index') }}">Data Transaksi</a>
         @endif
 
         @if (auth('karyawan')->check() && in_array(auth('karyawan')->user()->role, ['kasir', 'admin'], true))

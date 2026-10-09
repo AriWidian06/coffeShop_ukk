@@ -12,6 +12,7 @@ use App\Http\Controllers\TransaksiController;
 use App\Models\Meja;
 use App\Models\KategoriProduk; 
 use App\Models\Produk;
+use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -49,7 +50,16 @@ Route::middleware('auth:karyawan')->group(function () {
         }
 
         if ($role === 'kasir') {
-            return view('dashboard.kasir');
+            $transaksiTerbaru = Transaksi::with(['meja', 'karyawan', 'detail_transaksis.produk'])
+                ->where(function ($query) {
+                    $query->where('karyawan_id', auth('karyawan')->id())
+                        ->orWhere('sumber_pesanan', 'web');
+                })
+                ->latest('waktu_transaksi')
+                ->limit(5)
+                ->get();
+
+            return view('dashboard.kasir', compact('transaksiTerbaru'));
         }
 
         return view('dashboard.admin');
@@ -65,10 +75,9 @@ Route::middleware('auth:karyawan')->group(function () {
         Route::resource('suppliers', SupplierController::class)->except('show');
     });
 
-    Route::middleware('can:view-sales-report')->group(function () {
-        Route::get('/transaksis', [TransaksiController::class, 'index'])->name('transaksis.index');
-        Route::get('/transaksis/{transaksi}', [TransaksiController::class, 'show'])->name('transaksis.show');
-    });
+    Route::get('/transaksis', [TransaksiController::class, 'index'])
+        ->middleware('can:view-transactions')
+        ->name('transaksis.index');
 
     Route::middleware('can:access-pos')->group(function () {
         Route::get('/transaksis/create', [TransaksiController::class, 'create'])->name('transaksis.create');
@@ -80,4 +89,8 @@ Route::middleware('auth:karyawan')->group(function () {
         Route::get('/transaksis/{transaksi}/receipt', [PembayaranController::class, 'printReceipt'])
             ->name('transaksis.receipt');
     });
+
+    Route::get('/transaksis/{transaksi}', [TransaksiController::class, 'show'])
+        ->middleware('can:view-transactions')
+        ->name('transaksis.show');
 });

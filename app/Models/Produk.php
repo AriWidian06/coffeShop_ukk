@@ -31,7 +31,7 @@ class Produk extends Model
         return $this->belongsTo(Supplier::class);
     }
 
-    public function kategori_produk()
+    public function kategoriProduk()
     {
         return $this->belongsTo(KategoriProduk::class, 'kategori_produk_id');
     }

@@ -66,4 +66,17 @@ class RoleDashboardAccessTest extends TestCase
             ->get('/transaksis/create')
             ->assertOk();
     }
+
+    public function test_kasir_can_view_their_transaction_list(): void
+    {
+        $kasir = new Karyawan([
+            'username' => 'kasir3',
+            'role' => 'kasir',
+            'password' => 'kasir123',
+        ]);
+
+        $this->actingAs($kasir, 'karyawan')
+            ->get('/transaksis')
+            ->assertOk();
+    }
 }

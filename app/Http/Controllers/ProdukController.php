@@ -11,7 +11,7 @@ class ProdukController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Produk::with(['supplier', 'kategori_produk']);
+        $query = Produk::with(['supplier', 'kategoriProduk']);
 
         if ($request->has('search')) {
             $query->where('nama_produk', 'like', '%' . $request->search . '%');

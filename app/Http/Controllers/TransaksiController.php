@@ -6,36 +6,67 @@ use App\Models\Transaksi;
 use App\Models\DetailTransaksi;
 use App\Models\Produk;
 use App\Models\Meja;
-use App\Models\Karyawan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class TransaksiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $transaksis = Transaksi::with(['meja', 'karyawan', 'pembayaran'])
-            ->latest('waktu_transaksi')
-            ->paginate(10);
+        $filters = $request->validate([
+            'q' => 'nullable|string|max:40',
+            'status' => 'nullable|in:pending,ready,prosesed,completed',
+        ]);
+
+        $query = Transaksi::with(['meja', 'karyawan', 'pembayaran', 'detail_transaksis.produk'])
+            ->latest('waktu_transaksi');
+
+        if (auth('karyawan')->user()->role === 'kasir') {
+            $query->where(function ($query) {
+                $query->where('karyawan_id', auth('karyawan')->id())
+                    ->orWhere('sumber_pesanan', 'web');
+            });
+        }
+
+        if (!empty($filters['q'])) {
+            $search = $filters['q'];
+            $query->where(function ($query) use ($search) {
+                if (ctype_digit($search)) {
+                    $query->where('id', (int) $search)
+                        ->orWhereHas('meja', fn ($mejaQuery) => $mejaQuery->where('nomor_meja', 'like', "%{$search}%"));
+                } else {
+                    $query->whereHas('meja', fn ($mejaQuery) => $mejaQuery->where('nomor_meja', 'like', "%{$search}%"));
+                }
+            });
+        }
+
+        if (!empty($filters['status'])) {
+            $query->where('status_pesanan', $filters['status']);
+        }
+
+        $transaksis = $query->paginate(10)->withQueryString();
 
         return view('transaksis.index', compact('transaksis'));
     }
 
     public function create()
     {
-        $mejas = Meja::where('status_aktif', true)->get();
-        $produks = Produk::where('status_aktif', true)->where('tipe', 'jual')->get();
-        $karyawans = Karyawan::all();
+        $mejas = Meja::where('status_aktif', true)->orderBy('nomor_meja')->get();
+        $produks = Produk::with('kategoriProduk')
+            ->where('status_aktif', true)
+            ->where('tipe', 'jual')
+            ->orderBy('nama_produk')
+            ->get();
 
-        return view('transaksis.create', compact('mejas', 'produks', 'karyawans'));
+        return view('transaksis.create', compact('mejas', 'produks'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'meja_id' => 'required|exists:mejas,id',
-            'karyawan_id' => 'required|exists:karyawans,id',
+            'meja_id' => 'nullable|required_if:tipe_pesanan,dine-in|exists:mejas,id',
             'tipe_pesanan' => 'required|in:dine-in,take-away',
             'items' => 'required|array|min:1',
             'items.*.produk_id' => 'required|exists:produks,id',
@@ -47,7 +78,10 @@ class TransaksiController extends Controller
             $detailItems = [];
 
             foreach ($request->items as $item) {
-                $produk = Produk::findOrFail($item['produk_id']);
+                $produk = Produk::where('status_aktif', true)
+                    ->where('tipe', 'jual')
+                    ->lockForUpdate()
+                    ->findOrFail($item['produk_id']);
 
                 if ($produk->stock < $item['qty']) {
                     throw ValidationException::withMessages([
@@ -69,7 +103,7 @@ class TransaksiController extends Controller
 
             $transaksi = Transaksi::create([
                 'meja_id' => $request->meja_id,
-                'karyawan_id' => $request->karyawan_id,
+                'karyawan_id' => auth('karyawan')->id(),
                 'tipe_pesanan' => $request->tipe_pesanan,
                 'total_harga' => $totalHarga,
                 'status_pesanan' => 'pending',
@@ -88,12 +122,16 @@ class TransaksiController extends Controller
 
     public function show(Transaksi $transaksi)
     {
+        Gate::authorize('view-transaction', $transaksi);
+
         $transaksi->load(['meja', 'karyawan', 'detail_transaksis.produk', 'pembayaran']);
         return view('transaksis.show', compact('transaksi'));
     }
 
     public function updateStatus(Request $request, Transaksi $transaksi)
     {
+        Gate::authorize('view-transaction', $transaksi);
+
         $request->validate([
             'status_pesanan' => 'required|in:pending,ready,prosesed,completed',
         ]);
@@ -105,6 +143,8 @@ class TransaksiController extends Controller
 
     public function destroy(Transaksi $transaksi)
     {
+        Gate::authorize('view-transaction', $transaksi);
+
         $transaksi->delete();
         return redirect()->route('transaksis.index')->with('success', 'Transaksi berhasil dihapus.');
     }

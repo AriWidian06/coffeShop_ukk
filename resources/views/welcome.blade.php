@@ -54,7 +54,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                         </svg>
                         <span class="hidden sm:inline">Keranjang</span>
-                        <span id="header-cart-badge" class="absolute -top-2 -right-2 w-6 h-6 bg-amber-500 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white hidden">0</span>
+                        <span id="header-cart-badge" class="absolute -top-2 -right-2 w-6 h-6 bg-amber-500 text-white text-xs font-bold rounded-full items-center justify-center border-2 border-white hidden">0</span>
                     </button>
                 </div>
             </div>
@@ -102,8 +102,6 @@
                     $categorySlug = \Illuminate\Support\Str::slug($produk->kategoriProduk->nama_kategori ?? 'lainnya', '-');
                     $dataName = strtolower($produk->nama_produk);
                     $hargaFormatted = number_format($produk->harga_jual, 0, ',', '.');
-                    $namaJs = addslashes($produk->nama_produk);
-                    $kategoriJs = addslashes($produk->kategoriProduk->nama_kategori ?? 'Lainnya');
                     $imageUrl = $produk->gambar ? asset('storage/' . $produk->gambar) : 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=600&q=80';
                 @endphp
 
@@ -111,8 +109,8 @@
                      data-category="{{ $categorySlug }}" data-name="{{ $dataName }}">
                     
                     <!-- Gambar Produk (Aspect Ratio 4:3) -->
-                    <div class="relative aspect-[4/3] bg-slate-100 overflow-hidden group">
-                        <img src="{{ $imageUrl }}" alt="{{ $produk->nama_produk }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div class="relative aspect-4/3 bg-slate-100 overflow-hidden group pointer-events-none">
+                        <img src="{{ $imageUrl }}" alt="{{ $produk->nama_produk }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none">
                     </div>
                     
                     <!-- Info Produk -->
@@ -130,8 +128,12 @@
                         <!-- Harga & Tombol Add -->
                         <div class="pt-4 border-t border-slate-100 flex items-center justify-between mt-auto">
                             <span class="font-extrabold text-primary-700 text-lg">Rp {{ $hargaFormatted }}</span>
-                            <button onclick="addToCart('{{ $namaJs }}', {{ $produk->harga_jual }}, '{{ $kategoriJs }}')" 
-                                    class="w-10 h-10 rounded-xl bg-primary-600 text-white flex items-center justify-center hover:bg-primary-700 active:scale-95 transition-all shadow-md shadow-primary-600/20">
+                                <button type="button" data-web-cart-item data-product-id="{{ $produk->id }}"
+                                    data-name="{{ $produk->nama_produk }}" data-price="{{ $produk->harga_jual }}"
+                                    data-category="{{ $produk->kategoriProduk->nama_kategori ?? 'Lainnya' }}"
+                                    data-stock="{{ $produk->stock }}" aria-label="Tambah {{ $produk->nama_produk }}"
+                                    @disabled($produk->stock < 1)
+                                    class="w-11 h-11 rounded-xl bg-primary-600 text-white flex items-center justify-center hover:bg-primary-700 active:scale-95 transition-all shadow-md shadow-primary-600/20 disabled:opacity-50 disabled:cursor-not-allowed">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                                 </svg>
@@ -193,14 +195,14 @@
                 <div class="grid grid-cols-2 gap-2">
                     <select id="order-type" onchange="toggleTableInput()" class="text-sm font-semibold bg-white border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-primary-500 focus:outline-none">
                         <option value="dine-in">Dine-in</option>
-                        <option value="takeaway">Takeaway</option>
+                        <option value="take-away">Takeaway</option>
                     </select>
-                    <select id="table-number" class="text-sm font-semibold bg-white border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-primary-500 focus:outline-none {{ $mejaAktif ? 'opacity-60 cursor-not-allowed' : '' }}" {{ $mejaAktif ? 'disabled' : '' }}>
+                    <select id="table-number" required class="text-sm font-semibold bg-white border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-primary-500 focus:outline-none {{ $mejaAktif ? 'opacity-60 cursor-not-allowed' : '' }}" {{ $mejaAktif ? 'disabled' : '' }}>
                         @if(isset($mejas) && $mejas->isEmpty())
                             <option value="">Tidak ada meja</option>
                         @elseif(isset($mejas))
                             @foreach($mejas as $meja)
-                                <option value="{{ $meja->nomor_meja }}" {{ $mejaAktif && $mejaAktif->id === $meja->id ? 'selected' : '' }}>
+                                <option value="{{ $meja->id }}" {{ $mejaAktif && $mejaAktif->id === $meja->id ? 'selected' : '' }}>
                                     Meja {{ $meja->nomor_meja }} (Kap: {{ $meja->kapasitas }})
                                 </option>
                             @endforeach
@@ -230,7 +232,8 @@
                 </div>
             </div>
 
-            <button id="checkout-btn" onclick="processOrder()" disabled
+            <p id="checkout-error" class="hidden text-sm font-semibold text-red-700" role="alert"></p>
+            <button id="checkout-btn" type="button" onclick="processOrder()" disabled
                 class="w-full py-4 rounded-2xl bg-primary-600 text-white font-bold hover:bg-primary-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-all shadow-lg shadow-primary-600/25 active:scale-95">
                 Kirim Pesanan ke Kasir
             </button>
@@ -238,7 +241,7 @@
     </aside>
 
     <!-- RECEIPT MODAL -->
-    <div id="receipt-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div id="receipt-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="bg-white max-w-sm w-full rounded-3xl border border-slate-200 p-6 shadow-2xl space-y-4">
             <div class="text-center space-y-1">
                 <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center text-3xl font-bold mb-3">✓</div>
@@ -249,6 +252,10 @@
                 <div class="flex justify-between border-b border-slate-200 pb-2">
                     <span class="font-bold">PERKOCI EATERY</span>
                     <span id="receipt-date"></span>
+                </div>
+                <div class="flex justify-between text-slate-700 font-bold">
+                    <span>NO. PESANAN</span>
+                    <span id="receipt-number"></span>
                 </div>
                 <div class="flex justify-between text-slate-700 font-bold">
                     <span id="receipt-order-type"></span>
@@ -271,6 +278,19 @@
     <script>
         let cart = [];
 
+        document.getElementById('menu-grid').addEventListener('click', (event) => {
+            const button = event.target.closest('[data-web-cart-item]');
+            if (!button || button.disabled) return;
+
+            addToCart(
+                Number(button.dataset.productId),
+                button.dataset.name,
+                Number(button.dataset.price),
+                button.dataset.category,
+                Number(button.dataset.stock)
+            );
+        });
+
         function toggleCart() {
             const drawer = document.getElementById('cart-drawer');
             const backdrop = document.getElementById('cart-drawer-backdrop');
@@ -287,32 +307,60 @@
         function toggleTableInput() {
             const type = document.getElementById('order-type').value;
             const tableSelect = document.getElementById('table-number');
-            if (type === 'takeaway') {
+            if (type === 'take-away') {
                 tableSelect.disabled = true;
                 tableSelect.classList.add('opacity-40');
             } else {
                 tableSelect.disabled = false;
                 tableSelect.classList.remove('opacity-40');
             }
+            renderCart();
         }
 
         function formatRupiah(num) {
             return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
         }
 
-        function addToCart(name, price, category) {
-            const item = cart.find(i => i.name === name);
-            if (item) { item.qty += 1; } 
-            else { cart.push({ name, price, category, qty: 1 }); }
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, character => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;',
+            })[character]);
+        }
+
+        function syncMenuStockButtons() {
+            document.querySelectorAll('[data-web-cart-item]').forEach(button => {
+                const item = cart.find(product => product.produkId === Number(button.dataset.productId));
+                button.disabled = Number(button.dataset.stock) < 1 || (item && item.qty >= item.stock);
+            });
+        }
+
+        function syncCheckoutState() {
+            const orderType = document.getElementById('order-type').value;
+            const tableId = document.getElementById('table-number').value;
+            document.getElementById('checkout-btn').disabled = cart.length === 0 || (orderType === 'dine-in' && !tableId);
+        }
+
+        function addToCart(produkId, name, price, category, stock) {
+            const item = cart.find(product => product.produkId === produkId);
+            if (item) {
+                if (item.qty >= item.stock) return;
+                item.qty += 1;
+            } else if (stock > 0) {
+                cart.push({ produkId, name, price, category, stock, qty: 1 });
+            }
             renderCart();
             updateHeaderCart();
         }
 
-        function updateQty(name, delta) {
-            const item = cart.find(i => i.name === name);
+        function updateQty(produkId, delta) {
+            const item = cart.find(product => product.produkId === produkId);
             if (!item) return;
-            item.qty += delta;
-            if (item.qty <= 0) { cart = cart.filter(i => i.name !== name); }
+            item.qty = Math.min(item.qty + delta, item.stock);
+            if (item.qty <= 0) { cart = cart.filter(product => product.produkId !== produkId); }
             renderCart();
             updateHeaderCart();
         }
@@ -323,8 +371,10 @@
             if (totalQty > 0) {
                 badge.textContent = totalQty;
                 badge.classList.remove('hidden');
+                badge.classList.add('flex');
             } else {
                 badge.classList.add('hidden');
+                badge.classList.remove('flex');
             }
         }
 
@@ -344,11 +394,11 @@
                 document.getElementById('summary-subtotal').textContent = 'Rp 0';
                 document.getElementById('summary-tax').textContent = 'Rp 0';
                 document.getElementById('summary-total').textContent = 'Rp 0';
-                checkoutBtn.disabled = true;
+                syncMenuStockButtons();
+                syncCheckoutState();
                 return;
             }
 
-            checkoutBtn.disabled = false;
             let html = '';
             let subtotal = 0;
 
@@ -358,14 +408,14 @@
                 html += `
                     <div class="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200">
                         <div class="flex-1 min-w-0 pr-3">
-                            <h4 class="font-bold text-slate-900 text-sm truncate">${item.name}</h4>
+                            <h4 class="font-bold text-slate-900 text-sm truncate">${escapeHtml(item.name)}</h4>
                             <span class="text-xs text-slate-500">${formatRupiah(item.price)}</span>
                         </div>
                         <div class="flex items-center gap-3">
                             <div class="flex items-center border border-slate-300 rounded-lg bg-white overflow-hidden">
-                                <button onclick="updateQty('${item.name}', -1)" class="px-3 py-1.5 hover:bg-slate-50 font-bold text-slate-700">-</button>
+                                <button type="button" aria-label="Kurangi ${escapeHtml(item.name)}" onclick="updateQty(${item.produkId}, -1)" class="min-w-11 min-h-11 px-3 py-1.5 hover:bg-slate-50 font-bold text-slate-700">-</button>
                                 <span class="px-2 font-bold text-slate-900 text-sm">${item.qty}</span>
-                                <button onclick="updateQty('${item.name}', 1)" class="px-3 py-1.5 hover:bg-slate-50 font-bold text-slate-700">+</button>
+                                <button type="button" aria-label="Tambah ${escapeHtml(item.name)}" onclick="updateQty(${item.produkId}, 1)" ${item.qty >= item.stock ? 'disabled' : ''} class="min-w-11 min-h-11 px-3 py-1.5 hover:bg-slate-50 font-bold text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed">+</button>
                             </div>
                             <span class="text-sm font-bold text-slate-900 w-20 text-right">${formatRupiah(total)}</span>
                         </div>
@@ -379,37 +429,83 @@
             document.getElementById('summary-subtotal').textContent = formatRupiah(subtotal);
             document.getElementById('summary-tax').textContent = formatRupiah(tax);
             document.getElementById('summary-total').textContent = formatRupiah(grandTotal);
+            syncMenuStockButtons();
+            syncCheckoutState();
         }
 
-        function processOrder() {
+        async function processOrder() {
             if (cart.length === 0) return;
+
             const orderType = document.getElementById('order-type').value;
-            const tableNumber = document.getElementById('table-number').value;
+            const tableSelect = document.getElementById('table-number');
             const notes = document.getElementById('order-notes').value.trim();
-            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            const grandTotal = subtotal + Math.round(subtotal * 0.1);
+            const checkout = document.getElementById('checkout-btn');
+            const error = document.getElementById('checkout-error');
+            error.classList.add('hidden');
+            checkout.disabled = true;
+            checkout.textContent = 'Mengirim pesanan...';
 
-            document.getElementById('receipt-date').textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('receipt-order-type').textContent = orderType === 'dine-in' ? 'Dine-in' : 'Takeaway';
-            document.getElementById('receipt-target').textContent = orderType === 'dine-in' ? tableNumber : 'BAWA PULANG';
+            try {
+                const response = await fetch('/api/transaksis', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        meja_id: orderType === 'dine-in' ? Number(tableSelect.value) : null,
+                        tipe_pesanan: orderType,
+                        catatan: notes || null,
+                        items: cart.map(item => ({ produk_id: item.produkId, qty: item.qty })),
+                    }),
+                });
+                const result = await response.json().catch(() => ({}));
 
-            let itemsList = '';
-            cart.forEach(item => {
-                itemsList += `<div class="flex justify-between"><span>${item.qty}x ${item.name}</span><span>${formatRupiah(item.price * item.qty)}</span></div>`;
-            });
-            document.getElementById('receipt-items-list').innerHTML = itemsList;
-            document.getElementById('receipt-grand-total').textContent = formatRupiah(grandTotal);
+                if (!response.ok) {
+                    const validationMessage = Object.values(result.errors || {}).flat()[0];
+                    throw new Error(validationMessage || result.message || 'Pesanan gagal dikirim. Coba lagi.');
+                }
 
-            const notesDisplay = document.getElementById('receipt-notes-display');
-            if (notes) { notesDisplay.textContent = 'Catatan: "' + notes + '"'; notesDisplay.classList.remove('hidden'); } 
-            else { notesDisplay.classList.add('hidden'); }
+                const order = result.data;
+                document.getElementById('receipt-date').textContent = new Date(order.waktu_transaksi).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('receipt-number').textContent = `#${order.id}`;
+                document.getElementById('receipt-order-type').textContent = orderType === 'dine-in' ? 'Dine-in' : 'Takeaway';
+                document.getElementById('receipt-target').textContent = orderType === 'dine-in'
+                    ? tableSelect.options[tableSelect.selectedIndex].textContent.trim()
+                    : 'BAWA PULANG';
 
-            toggleCart();
-            document.getElementById('receipt-modal').classList.remove('hidden');
+                let itemsList = '';
+                cart.forEach(item => {
+                    itemsList += `<div class="flex justify-between"><span>${item.qty}x ${escapeHtml(item.name)}</span><span>${formatRupiah(item.price * item.qty)}</span></div>`;
+                });
+                document.getElementById('receipt-items-list').innerHTML = itemsList;
+                document.getElementById('receipt-grand-total').textContent = formatRupiah(order.total_harga);
+
+                const notesDisplay = document.getElementById('receipt-notes-display');
+                if (notes) {
+                    notesDisplay.textContent = 'Catatan: "' + notes + '"';
+                    notesDisplay.classList.remove('hidden');
+                } else {
+                    notesDisplay.classList.add('hidden');
+                }
+
+                toggleCart();
+                const receiptModal = document.getElementById('receipt-modal');
+                receiptModal.classList.remove('hidden');
+                receiptModal.classList.add('flex');
+            } catch (requestError) {
+                error.textContent = requestError.message;
+                error.classList.remove('hidden');
+            } finally {
+                checkout.textContent = 'Kirim Pesanan ke Kasir';
+                syncCheckoutState();
+            }
         }
 
         function closeReceipt() {
-            document.getElementById('receipt-modal').classList.add('hidden');
+            const receiptModal = document.getElementById('receipt-modal');
+            receiptModal.classList.add('hidden');
+            receiptModal.classList.remove('flex');
             cart = [];
             document.getElementById('order-notes').value = '';
             renderCart();
@@ -464,6 +560,7 @@
         }
 
         // Initialize
+        document.getElementById('table-number').addEventListener('change', syncCheckoutState);
         renderCart();
         updateHeaderCart();
     </script>

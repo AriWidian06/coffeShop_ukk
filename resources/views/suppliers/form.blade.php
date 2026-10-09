@@ -1,4 +1,11 @@
-<label>Nama supplier<input name="nama_supplier" value="{{ old('nama_supplier', $supplier->nama_supplier ?? '') }}"
-        required></label><label>Alamat
+<label>Nama Supplier
+    <input name="nama_supplier" value="{{ old('nama_supplier', $supplier->nama_supplier ?? '') }}" required>
+</label>
+
+<label>Alamat
     <textarea name="alamat" required>{{ old('alamat', $supplier->alamat ?? '') }}</textarea>
-</label><label>Telepon<input name="no_telp" value="{{ old('no_telp', $supplier->no_telp ?? '') }}" required></label>
+</label>
+
+<label>Nomor Telepon
+    <input name="no_telp" value="{{ old('no_telp', $supplier->no_telp ?? '') }}" required>
+</label>

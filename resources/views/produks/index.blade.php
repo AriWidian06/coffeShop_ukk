@@ -23,7 +23,7 @@
         @foreach ($produks as $produk)
             <tr>
                 <td>{{ $produk->nama_produk }}</td>
-                <td>{{ $produk->kategori_produk->nama_kategori ?? '-' }}</td>
+                <td>{{ $produk->kategoriProduk->nama_kategori ?? '-' }}</td>
                 <td>Rp {{ number_format($produk->harga_jual, 0, ',', '.') }}</td>
                 <td>{{ $produk->stock }}</td>
                 <td><a href="{{ route('produks.edit', $produk) }}">Edit</a>

@@ -22,13 +22,16 @@ class KaryawanController extends Controller
     {
         $validated = $request->validate([
             'nama_karyawan' => 'required|string|max:255',
-            'jabatan' => 'required|string|max:100',
             'no_telepon' => 'nullable|string|max:20',
             'alamat' => 'nullable|string',
             'role' => 'required|in:admin,kasir,manager',
             'username' => 'required|string|max:100|unique:karyawans,username',
             'password' => 'required|string|min:6',
         ]);
+
+        // Set jabatan based on role to maintain data consistency
+        $roleLabels = ['admin' => 'Admin', 'kasir' => 'Kasir', 'manager' => 'Manager'];
+        $validated['jabatan'] = $roleLabels[$validated['role']] ?? 'Karyawan';
 
         Karyawan::create($validated);
 
@@ -44,13 +47,16 @@ class KaryawanController extends Controller
     {
         $validated = $request->validate([
             'nama_karyawan' => 'required|string|max:255',
-            'jabatan' => 'required|string|max:100',
             'no_telepon' => 'nullable|string|max:20',
             'alamat' => 'nullable|string',
             'role' => 'required|in:admin,kasir,manager',
             'username' => 'required|string|max:100|unique:karyawans,username,' . $karyawan->id,
             'password' => 'nullable|string|min:6',
         ]);
+
+        // Update jabatan based on role
+        $roleLabels = ['admin' => 'Admin', 'kasir' => 'Kasir', 'manager' => 'Manager'];
+        $validated['jabatan'] = $roleLabels[$validated['role']] ?? 'Karyawan';
 
         if (empty($validated['password'])) {
             unset($validated['password']);
