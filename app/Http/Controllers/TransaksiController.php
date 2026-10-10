@@ -71,10 +71,11 @@ class TransaksiController extends Controller
             'items' => 'required|array|min:1',
             'items.*.produk_id' => 'required|exists:produks,id',
             'items.*.qty' => 'required|integer|min:1',
+            'items.*.customization' => 'nullable|string|max:250',
         ]);
 
         return DB::transaction(function () use ($request) {
-            $totalHarga = 0;
+            $subtotalHarga = 0;
             $detailItems = [];
 
             foreach ($request->items as $item) {
@@ -90,16 +91,20 @@ class TransaksiController extends Controller
                 }
 
                 $subtotal = $produk->harga_jual * $item['qty'];
-                $totalHarga += $subtotal;
+                $subtotalHarga += $subtotal;
 
                 $detailItems[] = [
                     'produk_id' => $produk->id,
                     'QTY' => $item['qty'],
                     'subtotal' => $subtotal,
+                    'customization' => $item['customization'] ?? null,
                 ];
 
                 $produk->decrement('stock', $item['qty']);
             }
+
+            $pajak = round($subtotalHarga * 0.1, 2);
+            $totalHarga = $subtotalHarga + $pajak;
 
             $transaksi = Transaksi::create([
                 'meja_id' => $request->meja_id,

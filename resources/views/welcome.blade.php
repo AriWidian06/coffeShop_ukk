@@ -11,12 +11,10 @@
 </head>
 <body class="antialiased text-slate-800 bg-slate-50">
 
-    <!-- Header Desktop/Mobile Responsive -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex items-center justify-between gap-4">
                 
-                <!-- Logo -->
                 <a href="/" class="flex items-center gap-3 shrink-0">
                     <div class="w-10 h-10 rounded-xl bg-primary-600 text-white flex items-center justify-center shadow-md">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -30,7 +28,6 @@
                     </div>
                 </a>
 
-                <!-- Search Bar (Desktop: Tengah, Mobile: Bawah) -->
                 <div class="hidden md:flex flex-1 max-w-xl relative">
                     <input type="text" id="menu-search" onkeyup="filterMenu()" 
                         placeholder="Cari kopi, pastry, atau manual brew..."
@@ -40,7 +37,6 @@
                     </svg>
                 </div>
 
-                <!-- Right Actions: Meja & Cart -->
                 <div class="flex items-center gap-3">
                     @if(isset($mejaAktif))
                         <span class="hidden sm:flex px-3 py-2 bg-primary-50 text-primary-700 text-xs font-bold rounded-xl border border-primary-200 items-center gap-2">
@@ -59,7 +55,6 @@
                 </div>
             </div>
 
-            <!-- Mobile Search (Hanya muncul di layar kecil) -->
             <div class="mt-3 md:hidden relative">
                 <input type="text" id="menu-search-mobile" onkeyup="filterMenu()" 
                     placeholder="Cari menu..."
@@ -71,10 +66,8 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        <!-- Category Pills -->
         <div class="mb-8">
             <div class="flex items-center gap-3 overflow-x-auto hide-scrollbar pb-2">
                 <button onclick="setCategory('semua')" class="category-btn active px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all bg-primary-600 text-white shadow-md shadow-primary-600/20">
@@ -89,10 +82,9 @@
             </div>
         </div>
 
-        <!-- Section Header -->
         <div class="mb-6">
-            <h2 class="text-2xl font-bold text-slate-900">Katalog Pilihan</h2>
-            <p class="text-slate-500">Disangrai teliti di roastery harian Perkoci</p>
+            <h2 class="text-2xl font-bold text-slate-900">Menu</h2>
+            <p class="text-slate-500">Menu yang ada di Bagi Kopi eatery</p>
         </div>
 
         <!-- Menu Grid (Responsive: 1 kolom mobile, 2 tablet, 3 laptop, 4 desktop besar) -->
@@ -105,17 +97,20 @@
                     $imageUrl = $produk->gambar ? asset('storage/' . $produk->gambar) : 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=600&q=80';
                 @endphp
 
-                <div class="menu-card product-card bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-primary-200 overflow-hidden flex flex-col" 
-                     data-category="{{ $categorySlug }}" data-name="{{ $dataName }}">
+                <article class="menu-card product-card bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-primary-200 overflow-hidden flex flex-col"
+                    data-category="{{ $categorySlug }}" data-name="{{ $dataName }}"
+                    data-product-id="{{ $produk->id }}" data-product-name="{{ $produk->nama_produk }}"
+                    data-product-description="{{ $produk->deskripsi ?? '' }}"
+                    data-product-category="{{ $produk->kategoriProduk->nama_kategori ?? 'Umum' }}"
+                    data-product-price="{{ $produk->harga_jual }}" data-product-stock="{{ $produk->stock }}"
+                    data-product-image="{{ $imageUrl }}">
                     
-                    <!-- Gambar Produk (Aspect Ratio 4:3) -->
-                    <div class="relative aspect-4/3 bg-slate-100 overflow-hidden group pointer-events-none">
-                        <img src="{{ $imageUrl }}" alt="{{ $produk->nama_produk }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none">
-                    </div>
-                    
-                    <!-- Info Produk -->
-                    <div class="p-5 flex flex-col flex-1">
-                        <div class="mb-4 flex-1">
+                    <button type="button" data-product-open aria-label="Lihat detail {{ $produk->nama_produk }}"
+                        class="product-detail-trigger text-left">
+                        <div class="relative aspect-4/3 bg-slate-100 overflow-hidden group pointer-events-none">
+                            <img src="{{ $imageUrl }}" alt="{{ $produk->nama_produk }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none">
+                        </div>
+                        <div class="p-5">
                             <span class="text-[10px] font-bold uppercase tracking-wider text-primary-600 bg-primary-50 px-2 py-1 rounded-md mb-2 inline-block">
                                 {{ $produk->kategoriProduk->nama_kategori ?? 'Umum' }}
                             </span>
@@ -124,23 +119,18 @@
                                 {{ $produk->deskripsi ?? 'Produk berkualitas dari Perkoci Eatery.' }}
                             </p>
                         </div>
-                        
-                        <!-- Harga & Tombol Add -->
-                        <div class="pt-4 border-t border-slate-100 flex items-center justify-between mt-auto">
+                    </button>
+
+                    <div class="px-5 pb-5 flex flex-col flex-1">
+                        <div class="pt-4 border-t border-slate-100 flex items-center justify-between gap-3 mt-auto">
                             <span class="font-extrabold text-primary-700 text-lg">Rp {{ $hargaFormatted }}</span>
-                                <button type="button" data-web-cart-item data-product-id="{{ $produk->id }}"
-                                    data-name="{{ $produk->nama_produk }}" data-price="{{ $produk->harga_jual }}"
-                                    data-category="{{ $produk->kategoriProduk->nama_kategori ?? 'Lainnya' }}"
-                                    data-stock="{{ $produk->stock }}" aria-label="Tambah {{ $produk->nama_produk }}"
-                                    @disabled($produk->stock < 1)
-                                    class="w-11 h-11 rounded-xl bg-primary-600 text-white flex items-center justify-center hover:bg-primary-700 active:scale-95 transition-all shadow-md shadow-primary-600/20 disabled:opacity-50 disabled:cursor-not-allowed">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-                                </svg>
+                            <button type="button" data-product-open @disabled($produk->stock < 1)
+                                class="product-customize-button min-h-11 rounded-xl bg-primary-600 px-4 py-2 text-white text-sm font-bold hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                                Pilih & kustomisasi
                             </button>
                         </div>
                     </div>
-                </div>
+                </article>
             @empty
                 <div class="col-span-full text-center py-20">
                     <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -165,6 +155,102 @@
             <p class="text-slate-500">Coba gunakan kata kunci lain</p>
         </div>     
     </main>
+
+    <style>
+        .product-detail-trigger { display: block; width: 100%; padding: 0; border: 0; background: #fff; color: inherit; font: inherit; cursor: pointer; }
+        .product-detail-trigger:focus-visible, .product-customize-button:focus-visible, .product-dialog button:focus-visible, .product-dialog textarea:focus-visible { outline: 3px solid #2563eb; outline-offset: 3px; }
+        .product-customize-button { flex: 0 0 auto; cursor: pointer; }
+        .product-dialog { position: fixed; inset: 0; width: min(760px, calc(100vw - 32px)); height: fit-content; max-width: none; max-height: min(90dvh, 820px); margin: auto; padding: 0; overflow-x: hidden; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; color: #0f172a; box-shadow: 0 20px 60px rgba(15, 23, 42, .28); }
+        .product-dialog::backdrop { background: rgba(25, 18, 14, .62); backdrop-filter: blur(2px); }
+        .product-dialog-shell { position: relative; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); min-height: 450px; }
+        .product-dialog-image-wrap { min-height: 100%; background: #f1f5f9; pointer-events: none; }
+        .product-dialog-image { display: block; width: 100%; height: 100%; min-height: 450px; object-fit: cover; pointer-events: none; }
+        .product-dialog-content { display: flex; flex-direction: column; padding: 2rem; }
+        .product-dialog-close { position: absolute; z-index: 1; top: 12px; right: 12px; min-height: 44px; padding: .5rem .75rem; border: 1px solid #64748b; border-radius: 4px; background: #fff; color: #0f172a; font: inherit; font-weight: 700; cursor: pointer; }
+        .product-dialog-category { margin: 0 0 .45rem; color: #1d4ed8; font-size: .82rem; font-weight: 700; }
+        .product-dialog-content h2 { margin: 0; color: #0f172a; font-size: 1.55rem; line-height: 1.25; overflow-wrap: anywhere; }
+        .product-dialog-description { min-height: 3rem; margin: .7rem 0 1rem; color: #475569; line-height: 1.55; white-space: pre-line; }
+        .product-dialog-facts { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; padding: .8rem 0; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; }
+        .product-dialog-facts strong { color: #1d4ed8; font-size: 1.2rem; white-space: nowrap; }
+        .product-dialog-facts span { color: #475569; font-size: .82rem; text-align: right; }
+        .product-customization-options { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0 .35rem; padding: 0; border: 0; }
+        .product-customization-options legend { width: 100%; margin-bottom: .35rem; color: #334155; font-size: .9rem; font-weight: 700; }
+        .product-customization-choice { display: flex; align-items: center; margin: 0; cursor: pointer; }
+        .product-customization-choice input { position: absolute; opacity: 0; width: 0; height: 0; }
+        .product-customization-choice span { display: inline-block; padding: .4rem .8rem; border: 1px solid #cbd5e1; border-radius: 20px; color: #475569; font-size: .8rem; font-weight: 500; transition: all 0.2s; }
+        .product-customization-choice input:checked + span { background: #2563eb; color: #fff; border-color: #2563eb; box-shadow: 0 2px 4px rgba(37, 99, 235, .2); }
+        .product-customization-choice:hover span { border-color: #2563eb; color: #2563eb; }
+        .product-customization-choice input:checked:hover + span { background: #1d4ed8; }
+        .product-custom-note-label { display: block; margin: .75rem 0 .4rem; color: #334155; font-size: .9rem; font-weight: 700; }
+        .product-dialog textarea { width: 100%; min-height: 92px; resize: vertical; padding: .7rem .8rem; border: 1px solid #94a3b8; border-radius: 4px; background: #fff; color: #0f172a; font: inherit; line-height: 1.45; }
+        .product-dialog-hint { margin: .35rem 0 0; color: #475569; font-size: .78rem; }
+        .product-dialog-footer { display: flex; align-items: center; gap: .75rem; margin-top: auto; padding-top: 1.25rem; }
+        .product-dialog-quantity { display: flex; flex: 0 0 auto; align-items: center; gap: .55rem; }
+        .product-dialog-quantity button { width: 44px; height: 44px; border: 1px solid #94a3b8; border-radius: 4px; background: #fff; color: #0f172a; font: inherit; font-size: 1.1rem; font-weight: 700; cursor: pointer; }
+        .product-dialog-quantity output { min-width: 1.4rem; text-align: center; font-weight: 700; }
+        .product-dialog-add { min-height: 44px; flex: 1 1 auto; padding: .65rem .85rem; border: 1px solid #2563eb; border-radius: 4px; background: #2563eb; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+        .product-dialog-add:disabled { cursor: not-allowed; opacity: .55; }
+        .cart-item-customization { display: block; margin-top: .35rem; color: #59483c; font-size: .78rem; white-space: pre-line; }
+        @media (max-width: 620px) {
+            .product-dialog { width: calc(100vw - 20px); max-height: calc(100dvh - 20px); }
+            .product-dialog-shell { grid-template-columns: minmax(0, 1fr); }
+            .product-dialog-image-wrap, .product-dialog-image { height: 190px; min-height: 190px; max-height: 190px; }
+            .product-dialog-content { padding: 1rem 1.1rem 1.2rem; }
+            .product-dialog-description { min-height: 0; }
+            .product-dialog-footer { position: sticky; bottom: -1.2rem; margin: 1rem -1.1rem -1.2rem; padding: .8rem 1.1rem calc(.8rem + env(safe-area-inset-bottom)); border-top: 1px solid #cbd5e1; background: #fff; }
+        }
+        @media (max-width: 370px) {
+            .product-dialog-footer { align-items: stretch; flex-direction: column; }
+            .product-dialog-quantity { justify-content: center; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .product-card, .product-card *, #cart-drawer, #cart-drawer-backdrop { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+        }
+    </style>
+
+    <dialog id="product-dialog" class="product-dialog" aria-labelledby="dialog-product-name">
+        <div class="product-dialog-shell">
+            <button type="button" id="product-dialog-close" class="product-dialog-close" data-dialog-close aria-label="Tutup detail produk">Tutup</button>
+            <div class="product-dialog-image-wrap">
+                <img id="dialog-product-image" class="product-dialog-image" alt="">
+            </div>
+            <div class="product-dialog-content">
+                <p id="dialog-product-category" class="product-dialog-category"></p>
+                <h2 id="dialog-product-name"></h2>
+                <p id="dialog-product-description" class="product-dialog-description"></p>
+                <div class="product-dialog-facts">
+                    <strong id="dialog-product-price"></strong>
+                    <span id="dialog-product-stock"></span>
+                </div>
+                <fieldset id="drink-customization-options" class="product-customization-options" hidden>
+                    <legend>Penyesuaian minuman</legend>
+                    <label class="product-customization-choice">
+                        <input type="checkbox" name="drink_customization" value="Es sedikit">
+                        <span>Es sedikit</span>
+                    </label>
+                    <label class="product-customization-choice">
+                        <input type="checkbox" name="drink_customization" value="Gula aren dipisah">
+                        <span>Gula aren dipisah</span>
+                    </label>
+                    <label class="product-customization-choice">
+                        <input type="checkbox" name="drink_customization" value="Sirup dipisah">
+                        <span>Sirup dipisah</span>
+                    </label>
+                </fieldset>
+                <label class="product-custom-note-label" for="dialog-product-note">Catatan tambahan (opsional)</label>
+                <textarea id="dialog-product-note" maxlength="180" rows="3" placeholder="Tulis permintaan lain untuk kasir"></textarea>
+                <p class="product-dialog-hint">Pilihan dan catatan diteruskan ke kasir untuk item ini.</p>
+                <div class="product-dialog-footer">
+                    <div class="product-dialog-quantity" aria-label="Jumlah produk">
+                        <button type="button" data-dialog-quantity="-1" aria-label="Kurangi jumlah">-</button>
+                        <output id="dialog-product-quantity" aria-live="polite">1</output>
+                        <button type="button" data-dialog-quantity="1" aria-label="Tambah jumlah">+</button>
+                    </div>
+                    <button type="button" class="product-dialog-add" id="dialog-add-product">Tambah ke keranjang</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
 
     <!-- Cart Drawer (Slide Over) -->
     <div id="cart-drawer-backdrop" onclick="toggleCart()" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden transition-opacity duration-300"></div>
@@ -277,19 +363,110 @@
     <!-- CLIENT JAVASCRIPT LOGIC -->
     <script>
         let cart = [];
+        let nextCartLineId = 1;
+        let activeProduct = null;
+        let activeProductTrigger = null;
 
         document.getElementById('menu-grid').addEventListener('click', (event) => {
-            const button = event.target.closest('[data-web-cart-item]');
-            if (!button || button.disabled) return;
+            const trigger = event.target.closest('[data-product-open]');
+            if (!trigger || trigger.disabled) return;
 
-            addToCart(
-                Number(button.dataset.productId),
-                button.dataset.name,
-                Number(button.dataset.price),
-                button.dataset.category,
-                Number(button.dataset.stock)
-            );
+            const card = trigger.closest('.menu-card');
+            activeProductTrigger = trigger;
+            activeProduct = {
+                produkId: Number(card.dataset.productId),
+                name: card.dataset.productName,
+                description: card.dataset.productDescription || 'Deskripsi belum tersedia.',
+                category: card.dataset.productCategory,
+                price: Number(card.dataset.productPrice),
+                stock: Number(card.dataset.productStock),
+                qty: 1,
+            };
+
+            document.getElementById('dialog-product-image').src = card.dataset.productImage;
+            document.getElementById('dialog-product-image').alt = activeProduct.name;
+            document.getElementById('dialog-product-category').textContent = activeProduct.category;
+            document.getElementById('dialog-product-name').textContent = activeProduct.name;
+            document.getElementById('dialog-product-description').textContent = activeProduct.description;
+            document.getElementById('dialog-product-price').textContent = formatRupiah(activeProduct.price);
+            document.getElementById('dialog-product-stock').textContent = `Stok ${activeProduct.stock}`;
+            document.getElementById('dialog-product-note').value = '';
+            document.querySelectorAll('input[name="drink_customization"]').forEach(option => {
+                option.checked = false;
+            });
+            document.getElementById('drink-customization-options').hidden = !activeProduct.category.toLowerCase().includes('minuman');
+            document.getElementById('dialog-product-quantity').value = '1';
+            document.getElementById('dialog-product-quantity').textContent = '1';
+            updateDialogQuantityControls();
+            document.getElementById('product-dialog').showModal();
+            document.getElementById('product-dialog-close').focus();
         });
+
+        const productDialog = document.getElementById('product-dialog');
+
+        function closeProductDialog() {
+            if (productDialog.open) productDialog.close();
+            activeProductTrigger?.focus();
+        }
+
+        document.querySelectorAll('[data-dialog-close]').forEach(button => {
+            button.addEventListener('click', closeProductDialog);
+        });
+
+        document.querySelectorAll('[data-dialog-quantity]').forEach(button => {
+            button.addEventListener('click', () => {
+                if (!activeProduct) return;
+                const productQtyInCart = cart
+                    .filter(item => item.produkId === activeProduct.produkId)
+                    .reduce((sum, item) => sum + item.qty, 0);
+                const available = activeProduct.stock - productQtyInCart;
+                activeProduct.qty = Math.max(1, Math.min(available, activeProduct.qty + Number(button.dataset.dialogQuantity)));
+                document.getElementById('dialog-product-quantity').value = String(activeProduct.qty);
+                document.getElementById('dialog-product-quantity').textContent = String(activeProduct.qty);
+                updateDialogQuantityControls();
+            });
+        });
+
+        document.getElementById('dialog-add-product').addEventListener('click', () => {
+            if (!activeProduct) return;
+            const customization = [
+                ...Array.from(document.querySelectorAll('input[name="drink_customization"]:checked'), option => option.value),
+                document.getElementById('dialog-product-note').value.trim(),
+            ].filter(Boolean).join(', ');
+            addToCart(activeProduct, activeProduct.qty, customization);
+            closeProductDialog();
+        });
+
+        productDialog.addEventListener('click', event => {
+            if (event.target === event.currentTarget) closeProductDialog();
+        });
+
+        productDialog.addEventListener('cancel', event => {
+            event.preventDefault();
+            closeProductDialog();
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && productDialog.open) {
+                event.preventDefault();
+                closeProductDialog();
+            }
+        }, true);
+
+        productDialog.addEventListener('close', () => {
+            activeProduct = null;
+        });
+
+        function updateDialogQuantityControls() {
+            if (!activeProduct) return;
+            const inCart = cart
+                .filter(item => item.produkId === activeProduct.produkId)
+                .reduce((sum, item) => sum + item.qty, 0);
+            const available = activeProduct.stock - inCart;
+            document.querySelector('[data-dialog-quantity="-1"]').disabled = activeProduct.qty <= 1;
+            document.querySelector('[data-dialog-quantity="1"]').disabled = activeProduct.qty >= available;
+            document.getElementById('dialog-add-product').disabled = available < 1 || activeProduct.qty < 1;
+        }
 
         function toggleCart() {
             const drawer = document.getElementById('cart-drawer');
@@ -332,9 +509,12 @@
         }
 
         function syncMenuStockButtons() {
-            document.querySelectorAll('[data-web-cart-item]').forEach(button => {
-                const item = cart.find(product => product.produkId === Number(button.dataset.productId));
-                button.disabled = Number(button.dataset.stock) < 1 || (item && item.qty >= item.stock);
+            document.querySelectorAll('.menu-card [data-product-open]').forEach(button => {
+                const card = button.closest('.menu-card');
+                const inCart = cart
+                    .filter(product => product.produkId === Number(card.dataset.productId))
+                    .reduce((sum, product) => sum + product.qty, 0);
+                button.disabled = Number(card.dataset.productStock) <= inCart;
             });
         }
 
@@ -344,23 +524,41 @@
             document.getElementById('checkout-btn').disabled = cart.length === 0 || (orderType === 'dine-in' && !tableId);
         }
 
-        function addToCart(produkId, name, price, category, stock) {
-            const item = cart.find(product => product.produkId === produkId);
+        function addToCart(product, quantity, customization) {
+            const inCart = cart
+                .filter(item => item.produkId === product.produkId)
+                .reduce((sum, item) => sum + item.qty, 0);
+            const available = product.stock - inCart;
+            const addQuantity = Math.min(quantity, available);
+            if (addQuantity < 1) return;
+
+            const item = cart.find(item => item.produkId === product.produkId && item.customization === customization);
             if (item) {
-                if (item.qty >= item.stock) return;
-                item.qty += 1;
-            } else if (stock > 0) {
-                cart.push({ produkId, name, price, category, stock, qty: 1 });
+                item.qty += addQuantity;
+            } else {
+                cart.push({
+                    cartLineId: nextCartLineId++,
+                    produkId: product.produkId,
+                    name: product.name,
+                    price: product.price,
+                    category: product.category,
+                    stock: product.stock,
+                    qty: addQuantity,
+                    customization,
+                });
             }
             renderCart();
             updateHeaderCart();
         }
 
-        function updateQty(produkId, delta) {
-            const item = cart.find(product => product.produkId === produkId);
+        function updateQty(cartLineId, delta) {
+            const item = cart.find(product => product.cartLineId === cartLineId);
             if (!item) return;
-            item.qty = Math.min(item.qty + delta, item.stock);
-            if (item.qty <= 0) { cart = cart.filter(product => product.produkId !== produkId); }
+            const otherQuantity = cart
+                .filter(product => product.produkId === item.produkId && product.cartLineId !== item.cartLineId)
+                .reduce((sum, product) => sum + product.qty, 0);
+            item.qty = Math.min(item.qty + delta, item.stock - otherQuantity);
+            if (item.qty <= 0) { cart = cart.filter(product => product.cartLineId !== cartLineId); }
             renderCart();
             updateHeaderCart();
         }
@@ -410,12 +608,13 @@
                         <div class="flex-1 min-w-0 pr-3">
                             <h4 class="font-bold text-slate-900 text-sm truncate">${escapeHtml(item.name)}</h4>
                             <span class="text-xs text-slate-500">${formatRupiah(item.price)}</span>
+                            ${item.customization ? `<span class="cart-item-customization">${escapeHtml(item.customization)}</span>` : ''}
                         </div>
                         <div class="flex items-center gap-3">
                             <div class="flex items-center border border-slate-300 rounded-lg bg-white overflow-hidden">
-                                <button type="button" aria-label="Kurangi ${escapeHtml(item.name)}" onclick="updateQty(${item.produkId}, -1)" class="min-w-11 min-h-11 px-3 py-1.5 hover:bg-slate-50 font-bold text-slate-700">-</button>
+                                <button type="button" aria-label="Kurangi ${escapeHtml(item.name)}" data-cart-quantity="-1" data-cart-line="${item.cartLineId}" class="min-w-11 min-h-11 px-3 py-1.5 hover:bg-slate-50 font-bold text-slate-700">-</button>
                                 <span class="px-2 font-bold text-slate-900 text-sm">${item.qty}</span>
-                                <button type="button" aria-label="Tambah ${escapeHtml(item.name)}" onclick="updateQty(${item.produkId}, 1)" ${item.qty >= item.stock ? 'disabled' : ''} class="min-w-11 min-h-11 px-3 py-1.5 hover:bg-slate-50 font-bold text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed">+</button>
+                                <button type="button" aria-label="Tambah ${escapeHtml(item.name)}" data-cart-quantity="1" data-cart-line="${item.cartLineId}" ${item.qty >= item.stock ? 'disabled' : ''} class="min-w-11 min-h-11 px-3 py-1.5 hover:bg-slate-50 font-bold text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed">+</button>
                             </div>
                             <span class="text-sm font-bold text-slate-900 w-20 text-right">${formatRupiah(total)}</span>
                         </div>
@@ -423,6 +622,9 @@
             });
 
             container.innerHTML = html;
+            container.querySelectorAll('[data-cart-quantity]').forEach(button => {
+                button.addEventListener('click', () => updateQty(Number(button.dataset.cartLine), Number(button.dataset.cartQuantity)));
+            });
             const tax = Math.round(subtotal * 0.1);
             const grandTotal = subtotal + tax;
 
@@ -456,7 +658,11 @@
                         meja_id: orderType === 'dine-in' ? Number(tableSelect.value) : null,
                         tipe_pesanan: orderType,
                         catatan: notes || null,
-                        items: cart.map(item => ({ produk_id: item.produkId, qty: item.qty })),
+                        items: cart.map(item => ({
+                            produk_id: item.produkId,
+                            qty: item.qty,
+                            customization: item.customization || null,
+                        })),
                     }),
                 });
                 const result = await response.json().catch(() => ({}));
@@ -476,7 +682,7 @@
 
                 let itemsList = '';
                 cart.forEach(item => {
-                    itemsList += `<div class="flex justify-between"><span>${item.qty}x ${escapeHtml(item.name)}</span><span>${formatRupiah(item.price * item.qty)}</span></div>`;
+                    itemsList += `<div class="flex justify-between gap-3"><span>${item.qty}x ${escapeHtml(item.name)}${item.customization ? `<br><small>${escapeHtml(item.customization)}</small>` : ''}</span><span>${formatRupiah(item.price * item.qty)}</span></div>`;
                 });
                 document.getElementById('receipt-items-list').innerHTML = itemsList;
                 document.getElementById('receipt-grand-total').textContent = formatRupiah(order.total_harga);
@@ -487,6 +693,12 @@
                     notesDisplay.classList.remove('hidden');
                 } else {
                     notesDisplay.classList.add('hidden');
+                }
+
+                const itemCustomizations = cart.map(item => item.customization).filter(Boolean);
+                if (itemCustomizations.length) {
+                    notesDisplay.textContent = [notes ? `Catatan pesanan: ${notes}` : '', ...itemCustomizations.map((value, index) => `Kustomisasi item ${index + 1}: ${value}`)].filter(Boolean).join(' | ');
+                    notesDisplay.classList.remove('hidden');
                 }
 
                 toggleCart();
@@ -508,6 +720,7 @@
             receiptModal.classList.remove('flex');
             cart = [];
             document.getElementById('order-notes').value = '';
+            nextCartLineId = 1;
             renderCart();
             updateHeaderCart();
         }

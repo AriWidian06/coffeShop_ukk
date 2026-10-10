@@ -28,6 +28,7 @@
         .cashier-table td { padding: .85rem .75rem; border-bottom: 1px solid #e7ded5; vertical-align: top; }
         .cashier-table tbody tr:last-child td { border-bottom: 0; }
         .cashier-muted { display: block; margin-top: .25rem; color: #59483c; font-size: .82rem; }
+        .badge-customization { display: inline-block; padding: 2px 6px; background: #f5f0e8; border: 1px solid #e7ded5; color: #59483c; font-size: .7rem; border-radius: 4px; font-style: italic; margin-left: 4px; vertical-align: middle; }
         .cashier-status { display: inline-flex; min-height: 28px; align-items: center; padding: .25rem .5rem; border: 1px solid #8b7563; border-radius: 4px; color: #443226; font-size: .8rem; font-weight: 700; white-space: nowrap; }
         .cashier-empty { padding: 2.5rem 1rem; border: 1px solid #d8cbbf; background: #fffdfa; text-align: center; }
         .cashier-empty h3 { margin: 0 0 .5rem; }
@@ -90,9 +91,16 @@
                                         </span>
                                         <span class="cashier-muted">
                                             @foreach ($transaksi->detail_transaksis->take(2) as $detail)
-                                                {{ $detail->produk->nama_produk ?? 'Produk dihapus' }} x {{ $detail->QTY }}@if (!$loop->last), @endif
+                                                {{ $detail->produk->nama_produk ?? 'Produk dihapus' }} x {{ $detail->QTY }}
+                                                @if ($detail->customization)
+                                                    <span class="badge-customization">{{ $detail->customization }}</span>
+                                                @endif
+                                                @if (!$loop->last), @endif
                                             @endforeach
                                         </span>
+                                        @if ($transaksi->catatan)
+                                            <span class="cashier-muted">Catatan: {{ $transaksi->catatan }}</span>
+                                        @endif
                                     </td>
                                     <td>{{ $transaksi->sumber_pesanan === 'web' ? 'Web kafe' : 'POS' }}</td>
                                     <td>Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</td>

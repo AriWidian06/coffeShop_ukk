@@ -1,6 +1,8 @@
 @extends('layouts.app')
 @section('content')
     @php
+        $subtotalItems = (float) $transaksi->detail_transaksis->sum('subtotal');
+        $pajakLayanan = max(0, (float) $transaksi->total_harga - $subtotalItems);
         $statusLabels = [
             'pending' => 'Menunggu',
             'ready' => 'Siap',
@@ -24,6 +26,9 @@
         .detail-facts div:last-child { border-right: 0; }
         .detail-facts dt { color: #59483c; font-size: .78rem; }
         .detail-facts dd { margin: .25rem 0 0; font-weight: 700; overflow-wrap: anywhere; }
+        .detail-order-note { margin: -0.35rem 0 1.35rem; padding: .8rem 1rem; border: 1px solid #cbd5e1; border-left: 4px solid #2563eb; background: #fff; }
+        .detail-order-note strong { display: block; margin-bottom: .25rem; color: #334155; font-size: .82rem; }
+        .detail-order-note p { margin: 0; color: #0f172a; white-space: pre-line; }
         .detail-items-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
         .detail-items-heading h2, .detail-action h2 { margin: 0; font-size: 1.1rem; }
         .detail-items-heading span { color: #59483c; font-size: .85rem; }
@@ -34,8 +39,10 @@
         .detail-table tbody tr:last-child td { border-bottom: 0; }
         .detail-qty { width: 7rem; }
         .detail-money { text-align: right !important; white-space: nowrap; }
-        .detail-total { display: flex; justify-content: flex-end; gap: 2rem; padding: 1rem .75rem; border-top: 1px solid #d8cbbf; background: #fffdfa; }
-        .detail-total strong { font-size: 1.15rem; }
+        .detail-totals { display: grid; gap: .45rem; padding: 1rem .75rem; border-top: 1px solid #d8cbbf; background: #fffdfa; }
+        .detail-total-line { display: flex; justify-content: space-between; gap: 1rem; color: #59483c; }
+        .detail-total-line.is-grand { margin-top: .35rem; padding-top: .75rem; border-top: 1px solid #d8cbbf; color: #30231b; font-size: 1.05rem; font-weight: 700; }
+        .detail-total-line.is-grand strong { font-size: 1.15rem; }
         .detail-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin-top: 1.4rem; }
         .detail-action { padding-top: 1rem; border-top: 2px solid #8b7563; }
         .detail-action p { margin: .45rem 0 .8rem; color: #59483c; font-size: .88rem; }
@@ -47,6 +54,7 @@
         .detail-payment-state { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem 1.5rem; max-width: 650px; padding: .8rem 0; }
         .detail-payment-state span { display: block; color: #59483c; font-size: .8rem; }
         .detail-payment-state strong { display: block; margin-top: .2rem; }
+        .badge-customization { display: inline-block; padding: 2px 6px; background: #f5f0e8; border: 1px solid #e7ded5; color: #59483c; font-size: .7rem; border-radius: 4px; font-style: italic; margin-left: 4px; vertical-align: middle; }
         .detail-detail-actions { display: flex; align-items: center; gap: .75rem; margin-top: 1.25rem; }
         .transaction-detail :focus-visible { outline: 3px solid #8b4a20; outline-offset: 2px; }
         @media (max-width: 760px) {
@@ -95,6 +103,13 @@
             </div>
         </dl>
 
+        @if ($transaksi->catatan)
+            <aside class="detail-order-note" aria-label="Catatan pesanan">
+                <strong>Catatan pesanan</strong>
+                <p>{{ $transaksi->catatan }}</p>
+            </aside>
+        @endif
+
         <section aria-labelledby="detail-items-title">
             <div class="detail-items-heading">
                 <h2 id="detail-items-title">Item pesanan</h2>
@@ -112,7 +127,12 @@
                     <tbody>
                         @forelse ($transaksi->detail_transaksis as $detail)
                             <tr>
-                                <td>{{ $detail->produk->nama_produk ?? 'Produk dihapus' }}</td>
+                                <td>
+                                    {{ $detail->produk->nama_produk ?? 'Produk dihapus' }}
+                                    @if ($detail->customization)
+                                        <span class="badge-customization">{{ $detail->customization }}</span>
+                                    @endif
+                                </td>
                                 <td>{{ $detail->QTY }}</td>
                                 <td class="detail-money">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</td>
                             </tr>
@@ -123,9 +143,19 @@
                         @endforelse
                     </tbody>
                 </table>
-                <div class="detail-total">
-                    <span>Total transaksi</span>
-                    <strong>Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</strong>
+                <div class="detail-totals">
+                    <div class="detail-total-line">
+                        <span>Subtotal</span>
+                        <span>Rp {{ number_format($subtotalItems, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="detail-total-line">
+                        <span>Pajak & layanan</span>
+                        <span>Rp {{ number_format($pajakLayanan, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="detail-total-line is-grand">
+                        <span>Total transaksi</span>
+                        <strong>Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</strong>
+                    </div>
                 </div>
             </div>
         </section>

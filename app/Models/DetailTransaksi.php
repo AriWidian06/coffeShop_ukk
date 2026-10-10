@@ -16,6 +16,7 @@ class DetailTransaksi extends Model
 		'produk_id',
 		'QTY',
 		'subtotal',
+		'customization',
 	];
 
 	protected $casts = [

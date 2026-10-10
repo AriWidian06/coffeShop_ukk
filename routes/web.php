@@ -16,17 +16,14 @@ use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// Route Welcome (Halaman Publik / Menu)
+
 Route::get('/', function (Request $request) {
-    // 1. Ambil meja aktif
     $mejas = Meja::where('status_aktif', true)->orderBy('nomor_meja')->get();
     $mejaId = $request->query('meja_id');
     $mejaAktif = $mejaId ? $mejas->firstWhere('id', $mejaId) : null;
 
-    // 2. Ambil kategori produk
     $kategoriProduks = KategoriProduk::orderBy('nama_kategori')->get();
 
-    // 3. Ambil produk: HANYA yang tipe 'jual' DAN status_aktif = true
     $produks = Produk::with('kategoriProduk')
         ->where('tipe', 'jual')
         ->where('status_aktif', true)

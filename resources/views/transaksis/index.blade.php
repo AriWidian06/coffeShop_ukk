@@ -34,6 +34,7 @@
         .transactions-table tbody tr:last-child td { border-bottom: 0; }
         .transaction-id { color: #30231b; font-weight: 700; text-decoration: none; }
         .transaction-meta, .transaction-items { display: block; margin-top: .25rem; color: #59483c; font-size: .82rem; }
+        .badge-customization { display: inline-block; padding: 2px 6px; background: #f5f0e8; border: 1px solid #e7ded5; color: #59483c; font-size: .7rem; border-radius: 4px; font-style: italic; margin-left: 4px; vertical-align: middle; }
         .transaction-total { white-space: nowrap; font-weight: 700; }
         .transaction-state { display: inline-flex; min-height: 28px; align-items: center; padding: .25rem .5rem; border: 1px solid #8b7563; border-radius: 4px; color: #443226; font-size: .8rem; font-weight: 700; white-space: nowrap; }
         .transaction-state.is-paid { border-color: #58705a; color: #29472d; }
@@ -134,7 +135,11 @@
                                     </span>
                                     <span class="transaction-items">
                                         @foreach ($transaksi->detail_transaksis->take(2) as $detail)
-                                            {{ $detail->produk->nama_produk ?? 'Produk dihapus' }} x {{ $detail->QTY }}@if (!$loop->last), @endif
+                                            {{ $detail->produk->nama_produk ?? 'Produk dihapus' }} x {{ $detail->QTY }}
+                                            @if ($detail->customization)
+                                                <span class="badge-customization">{{ $detail->customization }}</span>
+                                            @endif
+                                            @if (!$loop->last), @endif
                                         @endforeach
                                         @if ($transaksi->detail_transaksis->count() > 2)
                                             dan {{ $transaksi->detail_transaksis->count() - 2 }} produk lain

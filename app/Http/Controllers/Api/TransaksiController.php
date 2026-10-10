@@ -19,20 +19,24 @@ class TransaksiController extends Controller
             'tipe_pesanan' => 'required|in:dine-in,take-away',
             'catatan' => 'nullable|string|max:500',
             'items' => 'required|array|min:1',
-            'items.*.produk_id' => 'required|integer|distinct|exists:produks,id',
+            'items.*.produk_id' => 'required|integer|exists:produks,id',
             'items.*.qty' => 'required|integer|min:1',
+            'items.*.customization' => 'nullable|string|max:250',
         ]);
 
         $result = DB::transaction(function () use ($validated) {
             $subtotal = 0;
             $items = [];
+            $productsById = [];
+            $quantitiesByProduct = [];
 
             foreach ($validated['items'] as $item) {
-                $produk = Produk::query()
+                $produkId = $item['produk_id'];
+                $produk = $productsById[$produkId] ??= Produk::query()
                     ->where('status_aktif', true)
                     ->where('tipe', 'jual')
                     ->lockForUpdate()
-                    ->find($item['produk_id']);
+                    ->find($produkId);
 
                 if (!$produk) {
                     throw ValidationException::withMessages([
@@ -40,19 +44,24 @@ class TransaksiController extends Controller
                     ]);
                 }
 
-                if ($produk->stock < $item['qty']) {
-                    throw ValidationException::withMessages([
-                        'items' => "Stok {$produk->nama_produk} tidak mencukupi.",
-                    ]);
-                }
-
                 $lineTotal = round((float) $produk->harga_jual * $item['qty'], 2);
                 $subtotal += $lineTotal;
+                $quantitiesByProduct[$produkId] = ($quantitiesByProduct[$produkId] ?? 0) + $item['qty'];
                 $items[] = [
                     'produk' => $produk,
                     'qty' => $item['qty'],
                     'subtotal' => $lineTotal,
+                    'customization' => $item['customization'] ?? null,
                 ];
+            }
+
+            foreach ($quantitiesByProduct as $produkId => $quantity) {
+                $produk = $productsById[$produkId];
+                if ($produk->stock < $quantity) {
+                    throw ValidationException::withMessages([
+                        'items' => "Stok {$produk->nama_produk} tidak mencukupi.",
+                    ]);
+                }
             }
 
             $pajak = round($subtotal * 0.1, 2);
@@ -67,13 +76,17 @@ class TransaksiController extends Controller
                 'waktu_transaksi' => now(),
             ]);
 
+            foreach ($quantitiesByProduct as $produkId => $quantity) {
+                $productsById[$produkId]->decrement('stock', $quantity);
+            }
+
             foreach ($items as $item) {
-                $item['produk']->decrement('stock', $item['qty']);
                 DetailTransaksi::create([
                     'transaksi_id' => $transaksi->id,
                     'produk_id' => $item['produk']->id,
                     'QTY' => $item['qty'],
                     'subtotal' => $item['subtotal'],
+                    'customization' => $item['customization'] ?? null,
                 ]);
             }
 
