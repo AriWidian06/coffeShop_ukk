@@ -26,7 +26,7 @@
 
     <!-- Form Content -->
     <main class="p-6 max-w-4xl mx-auto">
-        <form method="post" action="{{ route('produks.store') }}" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
+        <form method="post" action="{{ route('produks.store') }}" enctype="multipart/form-data" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
             @csrf
             @include('produks.form')
             

@@ -54,7 +54,7 @@ class TransaksiController extends Controller
     public function create()
     {
         $mejas = Meja::where('status_aktif', true)->orderBy('nomor_meja')->get();
-        $produks = Produk::with('kategoriProduk')
+        $produks = Produk::with(['kategoriProduk', 'opsis'])
             ->where('status_aktif', true)
             ->where('tipe', 'jual')
             ->orderBy('nama_produk')

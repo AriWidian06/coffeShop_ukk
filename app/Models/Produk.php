@@ -11,12 +11,14 @@ class Produk extends Model
         'kategori_produk_id',
         'nama_produk',
         'deskripsi',
+        'gambar',
         'harga_jual',
         'harga_beli',
         'tipe',
         'satuan',
         'stock',
         'status_aktif',
+        'is_customizable',
     ];
 
     protected $casts = [
@@ -24,6 +26,7 @@ class Produk extends Model
         'harga_beli' => 'decimal:2',
         'stock' => 'integer',
         'status_aktif' => 'boolean',
+        'is_customizable' => 'boolean',
     ];
 
     public function supplier()
@@ -46,5 +49,10 @@ class Produk extends Model
         return $this->belongsToMany(Transaksi::class, 'detail_transaksis', 'produk_id', 'transaksi_id')
             ->withPivot('QTY', 'subtotal')
             ->withTimestamps();
+    }
+
+    public function opsis()
+    {
+        return $this->hasMany(ProdukOpsi::class);
     }
 }
