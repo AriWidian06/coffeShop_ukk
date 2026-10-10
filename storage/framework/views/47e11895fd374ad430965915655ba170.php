@@ -1,21 +1,4 @@
 <?php $__env->startSection('content'); ?>
-    <h1>Dashboard Admin</h1>
-    <p>Kelola data umum, produk, meja, supplier, dan karyawan.</p>
-
-    <div style="display:grid; gap:1rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 1.5rem;">
-        <a class="button" href="<?php echo e(route('karyawans.index')); ?>">Karyawan</a>
-        <a class="button" href="<?php echo e(route('produks.index')); ?>">Produk</a>
-        <a class="button" href="<?php echo e(route('mejas.index')); ?>">Meja</a>
-        <a class="button" href="<?php echo e(route('suppliers.index')); ?>">Supplier</a>
-        <a class="button" href="<?php echo e(route('kategori_produks.index')); ?>">Kategori Produk</a>
-
-    </div>
-
-    <div style="margin-top:2rem; background:#fff; padding:1rem; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
-        <h2>Admin Panel</h2>
-        <p>Admin memiliki akses penuh ke pengelolaan sistem.</p>
-    </div>
-<?php $__env->stopSection(); ?>
 <div class="min-h-screen bg-slate-50">
     
     <!-- TOP HEADER -->
@@ -449,5 +432,4 @@
     </main>
 </div>
 <?php $__env->stopSection(); ?>
-
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /home/codex/Projects/coffeShop_ukk/resources/views/dashboard/admin.blade.php ENDPATH**/ ?>
