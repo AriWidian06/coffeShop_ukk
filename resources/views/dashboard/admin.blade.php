@@ -1,13 +1,15 @@
-<?php $__env->startSection('content'); ?>
+@extends('layouts.app')
+
+@section('content')
     <h1>Dashboard Admin</h1>
     <p>Kelola data umum, produk, meja, supplier, dan karyawan.</p>
 
     <div style="display:grid; gap:1rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 1.5rem;">
-        <a class="button" href="<?php echo e(route('karyawans.index')); ?>">Karyawan</a>
-        <a class="button" href="<?php echo e(route('produks.index')); ?>">Produk</a>
-        <a class="button" href="<?php echo e(route('mejas.index')); ?>">Meja</a>
-        <a class="button" href="<?php echo e(route('suppliers.index')); ?>">Supplier</a>
-        <a class="button" href="<?php echo e(route('kategori_produks.index')); ?>">Kategori Produk</a>
+        <a class="button" href="{{ route('karyawans.index') }}">Karyawan</a>
+        <a class="button" href="{{ route('produks.index') }}">Produk</a>
+        <a class="button" href="{{ route('mejas.index') }}">Meja</a>
+        <a class="button" href="{{ route('suppliers.index') }}">Supplier</a>
+        <a class="button" href="{{ route('kategori_produks.index') }}">Kategori Produk</a>
 
     </div>
 
@@ -15,7 +17,7 @@
         <h2>Admin Panel</h2>
         <p>Admin memiliki akses penuh ke pengelolaan sistem.</p>
     </div>
-<?php $__env->stopSection(); ?>
+@endsection
 <div class="min-h-screen bg-slate-50">
     
     <!-- TOP HEADER -->
@@ -34,7 +36,7 @@
                         <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <span class="text-sm font-semibold text-slate-700"><?php echo e(now()->format('d M Y')); ?></span>
+                        <span class="text-sm font-semibold text-slate-700">{{ now()->format('d M Y') }}</span>
                     </div>
                     <button class="px-4 py-2 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,7 +59,7 @@
                 <div class="flex items-start justify-between mb-4">
                     <div>
                         <p class="text-primary-100 text-xs font-bold uppercase tracking-wider mb-1">Total Penjualan Hari Ini</p>
-                        <h3 class="text-3xl font-bold">Rp <?php echo e(number_format($totalPenjualan ?? 14850000, 0, ',', '.')); ?></h3>
+                        <h3 class="text-3xl font-bold">Rp {{ number_format($totalPenjualan ?? 14850000, 0, ',', '.') }}</h3>
                     </div>
                     <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,7 +78,7 @@
                 <div class="flex items-start justify-between mb-4">
                     <div>
                         <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Total Pesanan Selesai</p>
-                        <h3 class="text-3xl font-bold text-slate-900"><?php echo e($totalPesanan ?? 142); ?> <span class="text-sm font-normal text-slate-500">Tiket</span></h3>
+                        <h3 class="text-3xl font-bold text-slate-900">{{ $totalPesanan ?? 142 }} <span class="text-sm font-normal text-slate-500">Tiket</span></h3>
                     </div>
                     <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,7 +100,7 @@
                 <div class="flex items-start justify-between mb-4">
                     <div>
                         <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Status Meja Terisi</p>
-                        <h3 class="text-3xl font-bold text-slate-900"><?php echo e($mejaTerisi ?? 18); ?> <span class="text-sm font-normal text-slate-500">/ <?php echo e($totalMeja ?? 24); ?> Meja</span></h3>
+                        <h3 class="text-3xl font-bold text-slate-900">{{ $mejaTerisi ?? 18 }} <span class="text-sm font-normal text-slate-500">/ {{ $totalMeja ?? 24 }} Meja</span></h3>
                     </div>
                     <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,10 +111,10 @@
                 <div class="space-y-2">
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-slate-600">Tingkat Okupansi</span>
-                        <span class="font-bold text-slate-900"><?php echo e($okupansi ?? 75); ?>%</span>
+                        <span class="font-bold text-slate-900">{{ $okupansi ?? 75 }}%</span>
                     </div>
                     <div class="w-full bg-slate-200 rounded-full h-2">
-                        <div class="bg-amber-500 h-2 rounded-full" style="width: <?php echo e($okupansi ?? 75); ?>%"></div>
+                        <div class="bg-amber-500 h-2 rounded-full" style="width: {{ $okupansi ?? 75 }}%"></div>
                     </div>
                 </div>
             </div>
@@ -122,7 +124,7 @@
                 <div class="flex items-start justify-between mb-4">
                     <div>
                         <p class="text-red-600 text-xs font-bold uppercase tracking-wider mb-1">Peringatan Inventori</p>
-                        <h3 class="text-3xl font-bold text-red-600"><?php echo e($stokHabis ?? 3); ?> <span class="text-sm font-normal text-slate-500">Bahan Baku</span></h3>
+                        <h3 class="text-3xl font-bold text-red-600">{{ $stokHabis ?? 3 }} <span class="text-sm font-normal text-slate-500">Bahan Baku</span></h3>
                     </div>
                     <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,7 +134,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="bg-red-100 text-red-700 px-3 py-1 rounded-lg text-xs font-bold">Perlu Reorder</span>
-                    <a href="<?php echo e(route('suppliers.index')); ?>" class="text-xs font-semibold text-primary-600 hover:text-primary-700">Detail Stok →</a>
+                    <a href="{{ route('suppliers.index') }}" class="text-xs font-semibold text-primary-600 hover:text-primary-700">Detail Stok →</a>
                 </div>
             </div>
         </div>
@@ -265,7 +267,7 @@
                     <h3 class="font-bold text-slate-900 text-lg">Daftar Pesanan Terkini</h3>
                     <p class="text-xs text-slate-500">Aktivitas pesanan pelanggan masuk dan status dapur live</p>
                 </div>
-                <a href="<?php echo e(route('transaksis.index')); ?>" class="text-xs font-bold text-primary-600 hover:text-primary-700 bg-primary-50 px-3 py-1.5 rounded-lg">
+                <a href="{{ route('transaksis.index') }}" class="text-xs font-bold text-primary-600 hover:text-primary-700 bg-primary-50 px-3 py-1.5 rounded-lg">
                     Lihat Semua KDS
                 </a>
             </div>
@@ -448,6 +450,4 @@
         </div>
     </main>
 </div>
-<?php $__env->stopSection(); ?>
-
-<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH /home/codex/Projects/coffeShop_ukk/resources/views/dashboard/admin.blade.php ENDPATH**/ ?>
+@endsection
