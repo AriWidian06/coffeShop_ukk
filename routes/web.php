@@ -70,6 +70,8 @@ Route::middleware('auth:karyawan')->group(function () {
         Route::resource('mejas', MejaController::class)->except('show');
         Route::resource('produks', ProdukController::class)->except('show');
         Route::resource('suppliers', SupplierController::class)->except('show');
+        Route::resource('kategori_produks', KategoriProdukController::class)->except('show');
+
     });
 
     Route::get('/transaksis', [TransaksiController::class, 'index'])
