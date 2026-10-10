@@ -284,7 +284,7 @@
         </div>
 
         <!-- Bottom Banner -->
-        <div class="mt-6 bg-gradient-to-r from-primary-50 to-blue-50 border border-primary-200 rounded-2xl p-6 flex items-center justify-between">
+        <div class="mt-6 bg-linear-to-r from-primary-50 to-blue-50 border border-primary-200 rounded-2xl p-6 flex items-center justify-between">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
