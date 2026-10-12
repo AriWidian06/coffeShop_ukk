@@ -22,6 +22,8 @@ class TransaksiController extends Controller
             'items.*.produk_id' => 'required|integer|exists:produks,id',
             'items.*.qty' => 'required|integer|min:1',
             'items.*.customization' => 'nullable|string|max:250',
+            'items.*.option_ids' => 'nullable|array',
+            'items.*.option_ids.*' => 'integer|exists:produk_opsis,id',
         ]);
 
         $result = DB::transaction(function () use ($validated) {
@@ -44,7 +46,14 @@ class TransaksiController extends Controller
                     ]);
                 }
 
-                $lineTotal = round((float) $produk->harga_jual * $item['qty'], 2);
+                // Hitung harga tambahan dari opsi kustomisasi
+                $extraPrice = 0;
+                if (!empty($item['option_ids'])) {
+                    $optionsTotal = \App\Models\ProdukOpsi::whereIn('id', $item['option_ids'])->sum('harga_tambahan');
+                    $extraPrice = (float) $optionsTotal;
+                }
+
+                $lineTotal = round(((float) $produk->harga_jual + $extraPrice) * $item['qty'], 2);
                 $subtotal += $lineTotal;
                 $quantitiesByProduct[$produkId] = ($quantitiesByProduct[$produkId] ?? 0) + $item['qty'];
                 $items[] = [

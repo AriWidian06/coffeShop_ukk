@@ -55,12 +55,12 @@ Route::middleware('auth:karyawan')->group(function () {
 
         if ($role === 'kasir') {
             // PERBAIKAN POTENSIAL: Gunakan 'created_at' jika kolom 'waktu_transaksi' tidak ada di migration
-            $transaksiTerbaru = Transaksi::with(['meja', 'karyawan', 'detailTransaksi.produk'])
+            $transaksiTerbaru = Transaksi::with(['meja', 'karyawan', 'detail_transaksis.produk'])
                 ->where(function ($query) {
                     $query->where('karyawan_id', auth('karyawan')->id())
                           ->orWhere('sumber_pesanan', 'web');
                 })
-                ->latest('created_at') // <-- Diubah ke created_at (standar Laravel)
+                ->latest('waktu_transaksi') // Perbaikan: Gunakan kolom waktu_transaksi sesuai migrasi
                 ->limit(5)
                 ->get();
 

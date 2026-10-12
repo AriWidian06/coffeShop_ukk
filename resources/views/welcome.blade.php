@@ -403,7 +403,7 @@
                         const label = document.createElement('label');
                         label.className = 'product-customization-choice';
                         const priceText = option.harga_tambahan > 0 ? ` (+${formatRupiah(option.harga_tambahan)})` : '';
-                        label.innerHTML = ` <input type="checkbox" name="drink_customization" value="${option.nama_opsi}${priceText}"> <span>${option.nama_opsi}${priceText}</span> `;
+                        label.innerHTML = ` <input type="checkbox" name="drink_customization" value="${option.id}" data-option-name="${option.nama_opsi}${priceText}"> <span>${option.nama_opsi}${priceText}</span> `;
                         optionsContainer.appendChild(label);
                     });
                 } else {
@@ -444,11 +444,12 @@
 
         document.getElementById('dialog-add-product').addEventListener('click', () => {
             if (!activeProduct) return;
-            const customization = [
-                ...Array.from(document.querySelectorAll('input[name="drink_customization"]:checked'), option => option.value),
+            const customizationValues = Array.from(document.querySelectorAll('input[name="drink_customization"]:checked'), option => option.value);
+            const customizationText = [
+                ...Array.from(document.querySelectorAll('input[name="drink_customization"]:checked'), option => option.dataset.optionName),
                 document.getElementById('dialog-product-note').value.trim(),
             ].filter(Boolean).join(', ');
-            addToCart(activeProduct, activeProduct.qty, customization);
+            addToCart(activeProduct, activeProduct.qty, customizationText, customizationValues);
             closeProductDialog();
         });
 
@@ -539,7 +540,7 @@
             document.getElementById('checkout-btn').disabled = cart.length === 0 || (orderType === 'dine-in' && !tableId);
         }
 
-        function addToCart(product, quantity, customization) {
+        function addToCart(product, quantity, customization, optionIds = []) {
             const inCart = cart
                 .filter(item => item.produkId === product.produkId)
                 .reduce((sum, item) => sum + item.qty, 0);
@@ -547,15 +548,12 @@
             const addQuantity = Math.min(quantity, available);
             if (addQuantity < 1) return;
 
-            // HITUNG HARGA TAMBAHAN DARI OPSI
+            // HITUNG HARGA TAMBAHAN BERDASARKAN ID OPSI (SINKRON DENGAN BACKEND)
             let extraPrice = 0;
-            if (product.options && product.options.length > 0) {
-                const selectedOptions = Array.from(document.querySelectorAll('input[name="drink_customization"]:checked'));
-                selectedOptions.forEach(checkbox => {
-                    const optionName = checkbox.value.split(' (+')[0];
-                    const optionData = product.options.find(o => o.nama_opsi === optionName);
-                    if (optionData) {
-                        extraPrice += Number(optionData.harga_tambahan);
+            if (optionIds && optionIds.length > 0 && product.options) {
+                product.options.forEach(option => {
+                    if (optionIds.includes(String(option.id))) {
+                        extraPrice += Number(option.harga_tambahan);
                     }
                 });
             }
@@ -575,6 +573,7 @@
                     stock: product.stock,
                     qty: addQuantity,
                     customization,
+                    optionIds,
                 });
             }
             renderCart();
@@ -692,6 +691,7 @@
                             produk_id: item.produkId,
                             qty: item.qty,
                             customization: item.customization || null,
+                            option_ids: item.optionIds || [],
                         })),
                     }),
                 });
