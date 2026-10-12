@@ -103,6 +103,8 @@
                     data-product-description="{{ $produk->deskripsi ?? '' }}"
                     data-product-category="{{ $produk->kategoriProduk->nama_kategori ?? 'Umum' }}"
                     data-product-price="{{ $produk->harga_jual }}" data-product-stock="{{ $produk->stock }}"
+                    data-product-customizable="{{ $produk->is_customizable ? 'true' : 'false' }}"
+                    data-product-options="{{ json_encode($produk->opsis) }}"
                     data-product-image="{{ $imageUrl }}">
                     
                     <button type="button" data-product-open aria-label="Lihat detail {{ $produk->nama_produk }}"
@@ -222,21 +224,10 @@
                     <strong id="dialog-product-price"></strong>
                     <span id="dialog-product-stock"></span>
                 </div>
-                <fieldset id="drink-customization-options" class="product-customization-options" hidden>
-                    <legend>Penyesuaian minuman</legend>
-                    <label class="product-customization-choice">
-                        <input type="checkbox" name="drink_customization" value="Es sedikit">
-                        <span>Es sedikit</span>
-                    </label>
-                    <label class="product-customization-choice">
-                        <input type="checkbox" name="drink_customization" value="Gula aren dipisah">
-                        <span>Gula aren dipisah</span>
-                    </label>
-                    <label class="product-customization-choice">
-                        <input type="checkbox" name="drink_customization" value="Sirup dipisah">
-                        <span>Sirup dipisah</span>
-                    </label>
-                </fieldset>
+                    <fieldset id="drink-customization-options" class="product-customization-options" hidden>
+                        <legend id="customization-legend">Penyesuaian</legend>
+                        <!-- Options will be injected by JS -->
+                    </fieldset>
                 <label class="product-custom-note-label" for="dialog-product-note">Catatan tambahan (opsional)</label>
                 <textarea id="dialog-product-note" maxlength="180" rows="3" placeholder="Tulis permintaan lain untuk kasir"></textarea>
                 <p class="product-dialog-hint">Pilihan dan catatan diteruskan ke kasir untuk item ini.</p>
@@ -380,6 +371,8 @@
                 category: card.dataset.productCategory,
                 price: Number(card.dataset.productPrice),
                 stock: Number(card.dataset.productStock),
+                isCustomizable: card.dataset.productCustomizable === 'true',
+                options: JSON.parse(card.dataset.productOptions || '[]'),
                 qty: 1,
             };
 
@@ -394,7 +387,29 @@
             document.querySelectorAll('input[name="drink_customization"]').forEach(option => {
                 option.checked = false;
             });
-            document.getElementById('drink-customization-options').hidden = !activeProduct.category.toLowerCase().includes('minuman');
+            const optionsContainer = document.getElementById('drink-customization-options');
+            const legend = document.getElementById('customization-legend');
+
+            document.getElementById('drink-customization-options').hidden = !activeProduct.isCustomizable;
+
+            if (!optionsContainer.hidden) {
+                Array.from(optionsContainer.children).forEach(child => {
+                    if (child.tagName !== 'LEGEND') child.remove();
+                });
+
+                if (activeProduct.options && activeProduct.options.length > 0) {
+                    legend.textContent = 'Penyesuaian ' + activeProduct.category;
+                    activeProduct.options.forEach(option => {
+                        const label = document.createElement('label');
+                        label.className = 'product-customization-choice';
+                        const priceText = option.harga_tambahan > 0 ? ` (+${formatRupiah(option.harga_tambahan)})` : '';
+                        label.innerHTML = ` <input type="checkbox" name="drink_customization" value="${option.nama_opsi}${priceText}"> <span>${option.nama_opsi}${priceText}</span> `;
+                        optionsContainer.appendChild(label);
+                    });
+                } else {
+                    legend.textContent = 'Penyesuaian';
+                }
+            }
             document.getElementById('dialog-product-quantity').value = '1';
             document.getElementById('dialog-product-quantity').textContent = '1';
             updateDialogQuantityControls();
@@ -532,6 +547,21 @@
             const addQuantity = Math.min(quantity, available);
             if (addQuantity < 1) return;
 
+            // HITUNG HARGA TAMBAHAN DARI OPSI
+            let extraPrice = 0;
+            if (product.options && product.options.length > 0) {
+                const selectedOptions = Array.from(document.querySelectorAll('input[name="drink_customization"]:checked'));
+                selectedOptions.forEach(checkbox => {
+                    const optionName = checkbox.value.split(' (+')[0];
+                    const optionData = product.options.find(o => o.nama_opsi === optionName);
+                    if (optionData) {
+                        extraPrice += Number(optionData.harga_tambahan);
+                    }
+                });
+            }
+
+            const finalPrice = product.price + extraPrice;
+
             const item = cart.find(item => item.produkId === product.produkId && item.customization === customization);
             if (item) {
                 item.qty += addQuantity;
@@ -540,7 +570,7 @@
                     cartLineId: nextCartLineId++,
                     produkId: product.produkId,
                     name: product.name,
-                    price: product.price,
+                    price: finalPrice,
                     category: product.category,
                     stock: product.stock,
                     qty: addQuantity,

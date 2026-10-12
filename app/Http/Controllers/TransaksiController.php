@@ -90,8 +90,25 @@ class TransaksiController extends Controller
                     ]);
                 }
 
-                $subtotal = $produk->harga_jual * $item['qty'];
+                // --- PERBAIKAN HITUNG HARGA KOSTUMISASI ---
+                $extraPrice = 0;
+                if (!empty($item['customization'])) {
+                    // Pisahkan opsi yang dipilih (misal: "nuklir (+5000), rudal (+3000)")
+                    $selectedOptions = explode(', ', $item['customization']);
+                    foreach ($selectedOptions as $optText) {
+                        // Cari opsi di database yang namanya ada di dalam teks pilihan
+                        $opsi = \App\Models\ProdukOpsi::where('produk_id', $produk->id)
+                            ->where('nama_opsi', 'like', '%' . $optText . '%')
+                            ->first();
+                        if ($opsi) {
+                            $extraPrice += $opsi->harga_tambahan;
+                        }
+                    }
+                }
+
+                $subtotal = ($produk->harga_jual + $extraPrice) * $item['qty'];
                 $subtotalHarga += $subtotal;
+                // ------------------------------------------
 
                 $detailItems[] = [
                     'produk_id' => $produk->id,

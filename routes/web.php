@@ -26,7 +26,7 @@ Route::get('/', function (Request $request) {
 
     $kategoriProduks = KategoriProduk::orderBy('nama_kategori')->get();
 
-    $produks = Produk::with('kategoriProduk')
+    $produks = Produk::with(['kategoriProduk', 'opsis'])
         ->where('tipe', 'jual')
         ->where('status_aktif', true)
         ->orderBy('nama_produk')
