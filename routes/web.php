@@ -67,7 +67,59 @@ Route::middleware('auth:karyawan')->group(function () {
             return view('dashboard.kasir', compact('transaksiTerbaru'));
         }
 
-        return view('dashboard.admin');
+        if ($role === 'admin') {
+            $today = now()->toDateString();
+
+            $totalPenjualan = Transaksi::whereDate('waktu_transaksi', $today)->sum('total_harga');
+            $totalPesanan = Transaksi::whereDate('waktu_transaksi', $today)
+                                    ->where('status_pesanan', 'selesai')->count();
+
+            $totalMeja = Meja::count();
+            $mejaTerisi = Transaksi::where('status_pesanan', 'pending')
+                                    ->whereNotNull('meja_id')
+                                    ->distinct('meja_id')
+                                    ->count();
+            $okupansi = $totalMeja > 0 ? round(($mejaTerisi / $totalMeja) * 100) : 0;
+
+            $stokHabis = Produk::where('stock', '<', 10)->count();
+
+            $transaksiTerbaru = Transaksi::with(['meja', 'karyawan', 'detail_transaksis.produk'])
+                                    ->latest('waktu_transaksi')
+                                    ->limit(5)
+                                    ->get();
+
+            $karyawans = \App\Models\Karyawan::all();
+
+            // Data untuk Chart Penjualan per Jam
+            $salesByHour = Transaksi::whereDate('waktu_transaksi', $today)
+                ->selectRaw('HOUR(waktu_transaksi) as hour, SUM(total_harga) as total')
+                ->groupBy('hour')
+                ->orderBy('hour')
+                ->get()
+                ->pluck('total', 'hour');
+
+            // Data Kategori Terlaris
+            $topCategories = \App\Models\DetailTransaksi::join('produks', 'detail_transaksis.produk_id', '=', 'produks.id')
+                ->join('kategori_produks', 'produks.kategori_produk_id', '=', 'kategori_produks.id')
+                ->selectRaw('kategori_produks.nama_kategori, SUM(detail_transaksis.QTY) as total_qty, SUM(detail_transaksis.subtotal) as total_revenue')
+                ->groupBy('kategori_produks.nama_kategori')
+                ->orderByDesc('total_qty')
+                ->limit(4)
+                ->get();
+
+            return view('dashboard.admin', compact(
+                'totalPenjualan',
+                'totalPesanan',
+                'totalMeja',
+                'mejaTerisi',
+                'okupansi',
+                'stokHabis',
+                'transaksiTerbaru',
+                'karyawans',
+                'salesByHour',
+                'topCategories'
+            ));
+        }
     })->name('dashboard');
 
     // Admin Panel (CRUD Utama)

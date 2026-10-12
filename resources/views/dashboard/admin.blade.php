@@ -42,7 +42,7 @@
                 <div class="flex items-start justify-between mb-4">
                     <div>
                         <p class="text-primary-100 text-xs font-bold uppercase tracking-wider mb-1">Total Penjualan Hari Ini</p>
-                        <h3 class="text-3xl font-bold">Rp {{ number_format($totalPenjualan ?? 14850000, 0, ',', '.') }}</h3>
+                        <h3 class="text-3xl font-bold">Rp {{ number_format($totalPenjualan, 0, ',', '.') }}</h3>
                     </div>
                     <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,8 +51,8 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2 text-sm">
-                    <span class="bg-white/20 px-2 py-1 rounded-lg font-semibold">+12.4%</span>
-                    <span class="text-primary-100">vs kemarin</span>
+                    <span class="bg-white/20 px-2 py-1 rounded-lg font-semibold">Hari Ini</span>
+                    <span class="text-primary-100">Real-time</span>
                 </div>
             </div>
 
@@ -61,7 +61,7 @@
                 <div class="flex items-start justify-between mb-4">
                     <div>
                         <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Total Pesanan Selesai</p>
-                        <h3 class="text-3xl font-bold text-slate-900">{{ $totalPesanan ?? 142 }} <span class="text-sm font-normal text-slate-500">Tiket</span></h3>
+                        <h3 class="text-3xl font-bold text-slate-900">{{ $totalPesanan }} <span class="text-sm font-normal text-slate-500">Tiket</span></h3>
                     </div>
                     <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,8 +73,8 @@
                     <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span class="text-slate-600">Waktu Saji Rata-rata</span>
-                    <span class="font-bold text-blue-600">8.5 Menit</span>
+                    <span class="text-slate-600">Total Transaksi</span>
+                    <span class="font-bold text-blue-600">{{ $totalPesanan }} Tiket</span>
                 </div>
             </div>
 
@@ -83,7 +83,7 @@
                 <div class="flex items-start justify-between mb-4">
                     <div>
                         <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Status Meja Terisi</p>
-                        <h3 class="text-3xl font-bold text-slate-900">{{ $mejaTerisi ?? 18 }} <span class="text-sm font-normal text-slate-500">/ {{ $totalMeja ?? 24 }} Meja</span></h3>
+                        <h3 class="text-3xl font-bold text-slate-900">{{ $mejaTerisi }} <span class="text-sm font-normal text-slate-500">/ {{ $totalMeja }} Meja</span></h3>
                     </div>
                     <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,10 +94,10 @@
                 <div class="space-y-2">
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-slate-600">Tingkat Okupansi</span>
-                        <span class="font-bold text-slate-900">{{ $okupansi ?? 75 }}%</span>
+                        <span class="font-bold text-slate-900">{{ $okupansi }}%</span>
                     </div>
                     <div class="w-full bg-slate-200 rounded-full h-2">
-                        <div class="bg-amber-500 h-2 rounded-full" style="width: {{ $okupansi ?? 75 }}%"></div>
+                        <div class="bg-amber-500 h-2 rounded-full" style="width: {{ $okupansi }}%"></div>
                     </div>
                 </div>
             </div>
@@ -107,7 +107,7 @@
                 <div class="flex items-start justify-between mb-4">
                     <div>
                         <p class="text-red-600 text-xs font-bold uppercase tracking-wider mb-1">Peringatan Inventori</p>
-                        <h3 class="text-3xl font-bold text-red-600">{{ $stokHabis ?? 3 }} <span class="text-sm font-normal text-slate-500">Bahan Baku</span></h3>
+                        <h3 class="text-3xl font-bold text-red-600">{{ $stokHabis }} <span class="text-sm font-normal text-slate-500">Bahan Baku</span></h3>
                     </div>
                     <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,40 +139,53 @@
                 
                 <!-- Simple Bar Chart Representation -->
                 <div class="flex items-end justify-between gap-4 h-48 px-4">
-                    <div class="flex-1 flex flex-col items-center gap-2">
-                        <div class="w-full bg-primary-200 rounded-t-xl" style="height: 40%"></div>
-                        <span class="text-xs text-slate-600 font-semibold">Pagi<br>07-11</span>
-                    </div>
-                    <div class="flex-1 flex flex-col items-center gap-2">
-                        <div class="w-full bg-primary-600 rounded-t-xl" style="height: 100%"></div>
-                        <span class="text-xs text-primary-700 font-bold">Siang (Peak)<br>11-15</span>
-                    </div>
-                    <div class="flex-1 flex flex-col items-center gap-2">
-                        <div class="w-full bg-primary-400 rounded-t-xl" style="height: 75%"></div>
-                        <span class="text-xs text-slate-600 font-semibold">Sore<br>15-18</span>
-                    </div>
-                    <div class="flex-1 flex flex-col items-center gap-2">
-                        <div class="w-full bg-primary-100 rounded-t-xl" style="height: 25%"></div>
-                        <span class="text-xs text-slate-600 font-semibold">Malam<br>18-22</span>
-                    </div>
+                    @php
+                        $hours = [
+                            ['label' => 'Pagi', 'time' => '07-11', 'hours' => range(7, 11)],
+                            ['label' => 'Siang (Peak)', 'time' => '11-15', 'hours' => range(11, 15)],
+                            ['label' => 'Sore', 'time' => '15-18', 'hours' => range(15, 18)],
+                            ['label' => 'Malam', 'time' => '18-22', 'hours' => range(18, 22)],
+                        ];
+                        $maxSales = max(0, ...$salesByHour->values()->toArray());
+                    @endphp
+                    @foreach($hours as $period)
+                        @php
+                            $periodTotal = 0;
+                            foreach($period['hours'] as $h) {
+                                $periodTotal += $salesByHour[$h] ?? 0;
+                            }
+                            $height = $maxSales > 0 ? ($periodTotal / $maxSales) * 100 : 0;
+                            $isPeak = $period['label'] === 'Siang (Peak)';
+                        @endphp
+                        <div class="flex-1 flex flex-col items-center gap-2">
+                            <div class="w-full {{ $isPeak ? 'bg-primary-600' : 'bg-primary-200' }} rounded-t-xl transition-all duration-500" style="height: {{ $height }}%"></div>
+                            <span class="text-xs {{ $isPeak ? 'text-primary-700 font-bold' : 'text-slate-600 font-semibold' }}">
+                                {{ $period['label'] }}<br>{{ $period['time'] }}
+                            </span>
+                        </div>
+                    @endforeach
                 </div>
 
                 <div class="grid grid-cols-4 gap-4 mt-6 pt-4 border-t border-slate-200">
                     <div>
-                        <p class="text-xs text-slate-500">Puncak Transaksi</p>
-                        <p class="text-sm font-bold text-slate-900">12:30 - 13:30 WIB</p>
+                        <p class="text-xs text-slate-500">Total Omzet</p>
+                        <p class="text-sm font-bold text-slate-900">Rp {{ number_format($totalPenjualan, 0, ',', '.') }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-slate-500">Avg Ticket Size</p>
-                        <p class="text-sm font-bold text-slate-900">Rp 104.500</p>
+                        <p class="text-sm font-bold text-slate-900">
+                            Rp {{ $totalPesanan > 0 ? number_format($totalPenjualan / $totalPesanan, 0, ',', '.') : 0 }}
+                        </p>
                     </div>
                     <div>
                         <p class="text-xs text-slate-500">Tipe Order</p>
-                        <p class="text-sm font-bold text-slate-900">68% Dine-in</p>
+                        <p class="text-sm font-bold text-slate-900">
+                            {{ $transaksiTerbaru->count() > 0 ? round(($transaksiTerbaru->whereNotNull('meja_id')->count() / $transaksiTerbaru->count()) * 100) : 0 }}% Dine-in
+                        </p>
                     </div>
                     <div>
-                        <p class="text-xs text-slate-500">Metode Terbanyak</p>
-                        <p class="text-sm font-bold text-slate-900">QRIS (74%)</p>
+                        <p class="text-xs text-slate-500">Total Pesanan</p>
+                        <p class="text-sm font-bold text-slate-900">{{ $totalPesanan }} Tiket</p>
                     </div>
                 </div>
             </div>
@@ -199,64 +212,42 @@
                 </div>
 
                 <div class="space-y-3">
+                    @forelse($topCategories as $category)
                     <div class="flex items-center justify-between text-sm">
                         <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-primary-600"></span>
-                            <span class="text-slate-700">Signature Espresso</span>
+                            <span class="w-2 h-2 rounded-full {{ $loop->first ? 'bg-primary-600' : ($loop->iteration == 2 ? 'bg-primary-400' : ($loop->iteration == 3 ? 'bg-primary-300' : 'bg-slate-300')) }}"></span>
+                            <span class="text-slate-700">{{ $category->nama_kategori }}</span>
                         </div>
                         <div class="text-right">
-                            <span class="block font-bold text-slate-900">Rp 6.682K</span>
-                            <span class="text-xs font-bold text-primary-600">45%</span>
+                            <span class="block font-bold text-slate-900">Rp {{ number_format($category->total_revenue, 0, ',', '.') }}</span>
+                            <span class="text-xs font-bold text-primary-600">
+                                {{ $topCategories->sum('total_qty') > 0 ? round(($category->total_qty / $topCategories->sum('total_qty')) * 100) : 0 }}%
+                            </span>
                         </div>
                     </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-primary-400"></span>
-                            <span class="text-slate-700">Manual Brew</span>
-                        </div>
-                        <div class="text-right">
-                            <span class="block font-bold text-slate-900">Rp 3.712K</span>
-                            <span class="text-xs font-bold text-primary-600">25%</span>
-                        </div>
+                    @empty
+                    <div class="text-center text-xs text-slate-500 py-4">
+                        Belum ada data kategori terlaris.
                     </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-primary-300"></span>
-                            <span class="text-slate-700">Pastry</span>
-                        </div>
-                        <div class="text-right">
-                            <span class="block font-bold text-slate-900">Rp 2.970K</span>
-                            <span class="text-xs font-bold text-primary-600">20%</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-slate-300"></span>
-                            <span class="text-slate-700">Whole Beans</span>
-                        </div>
-                        <div class="text-right">
-                            <span class="block font-bold text-slate-900">Rp 1.485K</span>
-                            <span class="text-xs font-bold text-primary-600">10%</span>
-                        </div>
-                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>
 
         <!-- RECENT ORDERS TABLE -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="p-6 border-b border-slate-200 flex items-center justify-between">
+            <div class="p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h3 class="font-bold text-slate-900 text-lg">Daftar Pesanan Terkini</h3>
                     <p class="text-xs text-slate-500">Aktivitas pesanan pelanggan masuk dan status dapur live</p>
                 </div>
-                <a href="{{ route('transaksis.index') }}" class="text-xs font-bold text-primary-600 hover:text-primary-700 bg-primary-50 px-3 py-1.5 rounded-lg">
+                <a href="{{ route('transaksis.index') }}" class="text-center text-xs font-bold text-primary-600 hover:text-primary-700 bg-primary-50 px-3 py-1.5 rounded-lg">
                     Lihat Semua KDS
                 </a>
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full">
+                <table class="w-full min-w-[800px]">
                     <thead class="bg-slate-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">No. Meja</th>
@@ -268,91 +259,62 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200">
+                        @forelse($transaksiTerbaru as $transaksi)
                         <tr class="hover:bg-slate-50">
                             <td class="px-6 py-4">
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-primary-50 text-primary-700 text-xs font-bold">Meja 04</span>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="text-sm font-bold text-slate-900">#ORD-9021</div>
-                                <div class="text-xs text-slate-500">14:28 WIB • QR Order</div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="text-sm font-semibold text-slate-900">2x Kopi Susu Aren Gula Melaka, 1x Butter Croissant</div>
-                                <div class="text-xs text-slate-500 mt-1">Catatan: Less ice, oat milk substitution</div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <span class="text-sm font-bold text-slate-900">Rp 118.000</span>
-                            </td>
-                            <td class="px-6 py-4">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
-                                    Sedang Diracik
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg {{ $transaksi->meja ? 'bg-primary-50 text-primary-700' : 'bg-slate-100 text-slate-700' }} text-xs font-bold">
+                                    {{ $transaksi->meja ? 'Meja ' . $transaksi->meja->nomor_meja : 'Take away' }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-right">
-                                <button class="text-xs font-semibold text-primary-600 hover:text-primary-700 bg-primary-50 hover:bg-primary-100 px-3 py-1.5 rounded-lg transition">
-                                    Detail Tiket
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="hover:bg-slate-50">
                             <td class="px-6 py-4">
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold">Meja 11</span>
+                                <div class="text-sm font-bold text-slate-900">#ORD-{{ $transaksi->id }}</div>
+                                <div class="text-xs text-slate-500">{{ $transaksi->waktu_transaksi->format('H:i') }} WIB • {{ $transaksi->sumber_pesanan }}</div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="text-sm font-bold text-slate-900">#ORD-9020</div>
-                                <div class="text-xs text-slate-500">14:22 WIB • Kasir POS</div>
+                                <div class="text-sm font-semibold text-slate-900">
+                                    @foreach($transaksi->detail_transaksis as $detail)
+                                        {{ $detail->QTY }}x {{ $detail->produk->nama_produk }}{{ !$loop->last ? ', ' : '' }}
+                                    @endforeach
+                                </div>
+                                @if($transaksi->catatan)
+                                    <div class="text-xs text-slate-500 mt-1">Catatan: {{ $transaksi->catatan }}</div>
+                                @endif
                             </td>
                             <td class="px-6 py-4">
-                                <div class="text-sm font-semibold text-slate-900">1x V60 Gayo Anaerob Natural, 1x Cinnamon Roll</div>
-                                <div class="text-xs text-slate-500 mt-1">Roaster: Batch #GAYO-102</div>
+                                <span class="text-sm font-bold text-slate-900">Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</span>
                             </td>
                             <td class="px-6 py-4">
-                                <span class="text-sm font-bold text-slate-900">Rp 82.000</span>
-                            </td>
-                            <td class="px-6 py-4">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Selesai
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-right">
-                                <button class="text-xs font-semibold text-primary-600 hover:text-primary-700 bg-primary-50 hover:bg-primary-100 px-3 py-1.5 rounded-lg transition">
-                                    Detail Tiket
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="hover:bg-slate-50">
-                            <td class="px-6 py-4">
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-primary-50 text-primary-700 text-xs font-bold">Meja 02</span>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="text-sm font-bold text-slate-900">#ORD-9019</div>
-                                <div class="text-xs text-slate-500">14:15 WIB • QR Order</div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="text-sm font-semibold text-slate-900">1x Flat White, 1x Magic Double Ristretto</div>
-                                <div class="text-xs text-slate-500 mt-1">Dine-in Bar Counter</div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <span class="text-sm font-bold text-slate-900">Rp 76.000</span>
-                            </td>
-                            <td class="px-6 py-4">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
-                                    Sedang Diracik
-                                </span>
+                                @if($transaksi->status_pesanan === 'pending')
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
+                                        Sedang Diracik
+                                    </span>
+                                @elseif($transaksi->status_pesanan === 'selesai')
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Selesai
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 text-slate-700 text-xs font-bold">
+                                        {{ ucfirst($transaksi->status_pesanan) }}
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <button class="text-xs font-semibold text-primary-600 hover:text-primary-700 bg-primary-50 hover:bg-primary-100 px-3 py-1.5 rounded-lg transition">
+                                <a href="{{ route('transaksis.show', $transaksi->id) }}" class="text-xs font-semibold text-primary-600 hover:text-primary-700 bg-primary-50 hover:bg-primary-100 px-3 py-1.5 rounded-lg transition">
                                     Detail Tiket
-                                </button>
+                                </a>
                             </td>
                         </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6" class="px-6 py-10 text-center text-slate-500 text-sm">
+                                Belum ada pesanan masuk hari ini.
+                            </td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -374,63 +336,36 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                @foreach($karyawans as $karyawan)
                 <div class="p-4 rounded-xl border border-slate-200 hover:border-primary-300 hover:shadow-md transition-all">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm">DS</div>
-                        <div>
-                            <h4 class="font-bold text-slate-900 text-sm">Dimas Satria</h4>
-                            <p class="text-xs text-slate-500">Head Barista • Espresso</p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm">
+                                {{ strtoupper(substr($karyawan->nama, 0, 2)) }}
+                            </div>
+                            <div class="text-left">
+                                <h4 class="font-bold text-slate-900 text-sm">{{ $karyawan->nama }}</h4>
+                                <p class="text-xs text-slate-500">{{ $karyawan->jabatan ?? 'Karyawan' }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-xs">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <span class="text-slate-600">Aktif</span>
                         </div>
                     </div>
-                    <div class="flex items-center gap-1.5 text-xs">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <span class="text-slate-600"><strong>54 Pesanan Selesai</strong></span>
-                    </div>
                 </div>
-
-                <div class="p-4 rounded-xl border border-slate-200 hover:border-primary-300 hover:shadow-md transition-all">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-sm">RA</div>
-                        <div>
-                            <h4 class="font-bold text-slate-900 text-sm">Rania Amalia</h4>
-                            <p class="text-xs text-slate-500">Barista Slow Bar • Manual</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-1.5 text-xs">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <span class="text-slate-600"><strong>32 Pour-over Selesai</strong></span>
-                    </div>
-                </div>
-
-                <div class="p-4 rounded-xl border border-slate-200 hover:border-primary-300 hover:shadow-md transition-all">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-full bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold text-sm">FW</div>
-                        <div>
-                            <h4 class="font-bold text-slate-900 text-sm">Fajar Wicaksono</h4>
-                            <p class="text-xs text-slate-500">Kasir POS & Order Taker</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-1.5 text-xs">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <span class="text-slate-600"><strong>Rp 8.920K Diterima</strong></span>
-                    </div>
-                </div>
-
-                <div class="p-4 rounded-xl border border-slate-200 hover:border-primary-300 hover:shadow-md transition-all">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">KL</div>
-                        <div>
-                            <h4 class="font-bold text-slate-900 text-sm">Kevin Lestari</h4>
-                            <p class="text-xs text-slate-500">Floor Runner & Table Bus</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-1.5 text-xs">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <span class="text-slate-600"><strong>Turnover: 12 Menit</strong></span>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </main>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    // Auto-refresh halaman setiap 30 detik agar data tetap sinkron dengan database
+    setInterval(function() {
+        window.location.reload();
+    }, 30000);
+</script>
+@endpush
