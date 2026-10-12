@@ -1,6 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.kasir')
 
 @section('content')
+<div class="min-h-screen bg-slate-50">
     @php
         $statusLabels = [
             'pending' => 'Menunggu',
@@ -9,109 +10,170 @@
             'completed' => 'Selesai',
         ];
     @endphp
-    <style>
-        main:has(.cashier-dashboard) { max-width: 1320px; }
-        .cashier-dashboard { color: #30231b; }
-        .cashier-dashboard-head, .cashier-latest-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-        .cashier-dashboard-head { margin-bottom: 1.5rem; }
-        .cashier-dashboard-head h1 { margin: 0; font-size: 1.75rem; }
-        .cashier-dashboard-head p { margin: .35rem 0 0; color: #59483c; }
-        .cashier-dashboard-actions { display: flex; gap: .65rem; }
-        .cashier-action { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; padding: .6rem .9rem; border: 1px solid #3b2418; border-radius: 4px; background: #3b2418; color: #fff; font-weight: 700; text-decoration: none; }
-        .cashier-action.is-secondary { background: #fffdfa; color: #30231b; }
-        .cashier-latest-head { margin-bottom: .75rem; }
-        .cashier-latest-head h2 { margin: 0; font-size: 1.2rem; }
-        .cashier-latest-head a, .cashier-detail { color: #3b2418; font-weight: 700; }
-        .cashier-table-wrap { overflow-x: auto; border: 1px solid #d8cbbf; background: #fffdfa; }
-        .cashier-table { width: 100%; min-width: 760px; margin: 0; border-collapse: collapse; }
-        .cashier-table th { padding: .8rem .75rem; background: #eee7df; color: #443226; font-size: .78rem; text-align: left; }
-        .cashier-table td { padding: .85rem .75rem; border-bottom: 1px solid #e7ded5; vertical-align: top; }
-        .cashier-table tbody tr:last-child td { border-bottom: 0; }
-        .cashier-muted { display: block; margin-top: .25rem; color: #59483c; font-size: .82rem; }
-        .badge-customization { display: inline-block; padding: 2px 6px; background: #f5f0e8; border: 1px solid #e7ded5; color: #59483c; font-size: .7rem; border-radius: 4px; font-style: italic; margin-left: 4px; vertical-align: middle; }
-        .cashier-status { display: inline-flex; min-height: 28px; align-items: center; padding: .25rem .5rem; border: 1px solid #8b7563; border-radius: 4px; color: #443226; font-size: .8rem; font-weight: 700; white-space: nowrap; }
-        .cashier-empty { padding: 2.5rem 1rem; border: 1px solid #d8cbbf; background: #fffdfa; text-align: center; }
-        .cashier-empty h3 { margin: 0 0 .5rem; }
-        .cashier-empty p { margin: 0 0 1rem; color: #59483c; }
-        .cashier-dashboard a:focus-visible { outline: 3px solid #8b4a20; outline-offset: 2px; }
-    </style>
 
-    <section class="cashier-dashboard">
-        <header class="cashier-dashboard-head">
+    <!-- TOP HEADER -->
+    <header class="kasir-header">
+        <div class="flex items-center justify-between mb-4">
             <div>
-                <h1>Dashboard Kasir</h1>
-                <p>Pesanan POS dan web kafe untuk ditangani.</p>
-            </div>
-            <div class="cashier-dashboard-actions">
-                <a class="cashier-action" href="{{ route('transaksis.create') }}">POS</a>
-                <a class="cashier-action is-secondary" href="{{ route('transaksis.index') }}">Data Transaksi</a>
-            </div>
-        </header>
-
-        <section aria-labelledby="cashier-latest-title">
-            <div class="cashier-latest-head">
-                <h2 id="cashier-latest-title">Transaksi terbaru</h2>
-                <a href="{{ route('transaksis.index') }}">Lihat semua</a>
-            </div>
-
-            @if ($transaksiTerbaru->isEmpty())
-                <div class="cashier-empty">
-                    <h3>Belum ada transaksi</h3>
-                    <p>Pesanan POS dan web kafe akan muncul di sini.</p>
-                    <a class="cashier-action" href="{{ route('transaksis.create') }}">Buat pesanan</a>
+                <div class="flex items-center gap-3 mb-2">
+                    <h1 class="text-2xl font-bold text-slate-900">Dashboard Kasir</h1>
+                    <span class="kasir-badge active">
+                        <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                        Mode Operasional Cepat Aktif
+                    </span>
                 </div>
-            @else
-                <div class="cashier-table-wrap">
-                    <table class="cashier-table">
+                <p class="text-sm text-slate-500">Pesanan POS dan web kafe untuk ditangani.</p>
+            </div>
+            <div class="kasir-info-bar">
+                <div class="kasir-badge">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Shift 1 (07:00 - 15:00)
+                </div>
+                <div class="kasir-badge">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Kasir: {{ auth('karyawan')->user()->nama_karyawan }}
+                </div>
+                <div class="kasir-badge">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {{ now()->format('H:i') }} WIB
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="flex items-center gap-3">
+            <a href="{{ route('transaksis.create') }}" class="px-4 py-2.5 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Buat Pesanan Baru
+            </a>
+            <a href="{{ route('transaksis.index') }}" class="px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-50 transition-all flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Lihat Semua Transaksi
+            </a>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="p-6">
+        @if ($transaksiTerbaru->isEmpty())
+            <!-- Empty State -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-12 text-center">
+                <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Belum ada transaksi</h3>
+                <p class="text-sm text-slate-500 mb-6">Pesanan POS dan web kafe akan muncul di sini.</p>
+                <a href="{{ route('transaksis.create') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Buat Pesanan Pertama
+                </a>
+            </div>
+        @else
+            <!-- Transactions Table -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+                    <h2 class="font-bold text-slate-900 text-lg">Transaksi Terbaru</h2>
+                    <a href="{{ route('transaksis.index') }}" class="text-sm font-semibold text-primary-600 hover:text-primary-700">Lihat semua →</a>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="transaction-table">
                         <thead>
                             <tr>
-                                <th>Transaksi</th>
-                                <th>Pesanan</th>
+                                <th>ID Transaksi</th>
+                                <th>Detail Pesanan</th>
                                 <th>Sumber</th>
-                                <th>Total</th>
-                                <th>Status</th>
-                                <th>Detail</th>
+                                <th class="text-right">Total</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-right">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="divide-y divide-slate-100">
                             @foreach ($transaksiTerbaru as $transaksi)
                                 <tr>
                                     <td>
-                                        #{{ $transaksi->id }}
-                                        <span class="cashier-muted">{{ $transaksi->waktu_transaksi?->format('d/m/Y H:i') }}</span>
+                                        <div class="font-bold text-slate-900 text-sm">#{{ $transaksi->id }}</div>
+                                        <div class="text-xs text-slate-500 mt-1">{{ $transaksi->waktu_transaksi?->format('d/m/Y H:i') }}</div>
                                     </td>
                                     <td>
-                                        {{ $transaksi->tipe_pesanan === 'take-away' ? 'Bawa pulang' : 'Makan di tempat' }}
-                                        <span class="cashier-muted">
-                                            @if ($transaksi->meja)
-                                                Meja {{ $transaksi->meja->nomor_meja }}
-                                            @else
-                                                Tanpa meja
-                                            @endif
-                                        </span>
-                                        <span class="cashier-muted">
+                                        <div class="text-sm font-semibold text-slate-900">
+                                            {{ $transaksi->tipe_pesanan === 'take-away' ? 'Bawa Pulang' : 'Makan di Tempat' }}
+                                        </div>
+                                        <div class="text-xs text-slate-500 mt-1">
+                                            {{ $transaksi->meja ? 'Meja ' . $transaksi->meja->nomor_meja : 'Tanpa meja' }}
+                                        </div>
+                                        <div class="text-xs text-slate-600 mt-2 space-y-1">
                                             @foreach ($transaksi->detail_transaksis->take(2) as $detail)
-                                                {{ $detail->produk->nama_produk ?? 'Produk dihapus' }} x {{ $detail->QTY }}
-                                                @if ($detail->customization)
-                                                    <span class="badge-customization">{{ $detail->customization }}</span>
-                                                @endif
-                                                @if (!$loop->last), @endif
+                                                <div class="flex items-center gap-1.5">
+                                                    <span class="w-1 h-1 rounded-full bg-slate-400"></span>
+                                                    <span>{{ $detail->produk->nama_produk ?? 'Produk dihapus' }} x{{ $detail->QTY ?? $detail->qty }}</span>
+                                                    @if ($detail->customization)
+                                                        <span class="px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[10px] rounded border border-slate-200 italic">{{ $detail->customization }}</span>
+                                                    @endif
+                                                </div>
                                             @endforeach
-                                        </span>
-                                        @if ($transaksi->catatan)
-                                            <span class="cashier-muted">Catatan: {{ $transaksi->catatan }}</span>
+                                            @if ($transaksi->detail_transaksis->count() > 2)
+                                                <div class="text-slate-500 italic">+ {{ $transaksi->detail_transaksis->count() - 2 }} produk lain</div>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if ($transaksi->sumber_pesanan === 'web')
+                                            <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-xs font-bold">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
+                                                Web
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-purple-50 text-purple-700 rounded-md text-xs font-bold">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                                POS
+                                            </span>
                                         @endif
                                     </td>
-                                    <td>{{ $transaksi->sumber_pesanan === 'web' ? 'Web kafe' : 'POS' }}</td>
-                                    <td>Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</td>
-                                    <td><span class="cashier-status">{{ $statusLabels[$transaksi->status_pesanan] ?? $transaksi->status_pesanan }}</span></td>
-                                    <td><a class="cashier-detail" href="{{ route('transaksis.show', $transaksi) }}">Detail Transaksi</a></td>
+                                    <td class="text-right">
+                                        <div class="font-bold text-slate-900 text-sm">Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</div>
+                                    </td>
+                                    <td class="text-center">
+                                        @php
+                                            $statusColors = [
+                                                'pending' => 'bg-amber-50 text-amber-700 border-amber-200',
+                                                'ready' => 'bg-blue-50 text-blue-700 border-blue-200',
+                                                'prosesed' => 'bg-purple-50 text-purple-700 border-purple-200',
+                                                'completed' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                                            ];
+                                            $statusClass = $statusColors[$transaksi->status_pesanan] ?? 'bg-slate-50 text-slate-700 border-slate-200';
+                                        @endphp
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border {{ $statusClass }}">
+                                            {{ $statusLabels[$transaksi->status_pesanan] ?? $transaksi->status_pesanan }}
+                                        </span>
+                                    </td>
+                                    <td class="text-right">
+                                        <a href="{{ route('transaksis.show', $transaksi) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-50 text-primary-700 rounded-lg text-xs font-bold hover:bg-primary-100 transition">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                            Detail
+                                        </a>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-            @endif
-        </section>
-    </section>
+            </div>
+        @endif
+    </main>
+</div>
 @endsection

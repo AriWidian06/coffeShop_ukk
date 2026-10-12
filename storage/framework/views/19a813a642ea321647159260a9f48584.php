@@ -30,7 +30,7 @@
                     </div>
                     <div>
                         <h1 class="font-bold text-slate-900 text-sm leading-tight">BAGI KOPI</h1>
-                        <p class="text-[9px] text-slate-500 font-semibold uppercase tracking-wider">HQ • <?php echo e(auth('karyawan')->user()->role); ?></p>
+                        <p class="text-[9px] text-slate-500 font-semibold uppercase tracking-wider">HQ • <?php echo e(auth('karyawan')->user()?->role); ?></p>
                     </div>
                 </div>
             </div>
@@ -46,7 +46,7 @@
                     <span>Dashboard</span>
                 </a>
 
-                <?php if(auth('karyawan')->user()->role === 'admin'): ?>
+                <?php if(auth('karyawan')->user()?->role === 'admin'): ?>
                     <a href="<?php echo e(route('produks.index')); ?>" class="sidebar-link <?php echo e(request()->routeIs('produks.*') ? 'active' : 'inactive'); ?>">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -84,7 +84,7 @@
                     </a>
                 <?php endif; ?>
 
-                <?php if(in_array(auth('karyawan')->user()->role, ['manager', 'admin', 'kasir'], true)): ?>
+                <?php if(in_array(auth('karyawan')->user()?->role, ['manager', 'admin', 'kasir'], true)): ?>
                     <p class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mt-6 mb-2">Transaksi</p>
                     
                     <a href="<?php echo e(route('transaksis.create')); ?>" class="sidebar-link <?php echo e(request()->routeIs('transaksis.create') ? 'active' : 'inactive'); ?>">
@@ -94,7 +94,7 @@
                         <span>POS (Kasir)</span>
                     </a>
 
-                    <?php if(in_array(auth('karyawan')->user()->role, ['manager', 'admin'], true)): ?>
+                    <?php if(in_array(auth('karyawan')->user()?->role, ['manager', 'admin'], true)): ?>
                         <a href="<?php echo e(route('transaksis.index')); ?>" class="sidebar-link <?php echo e(request()->routeIs('transaksis.index') ? 'active' : 'inactive'); ?>">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -109,12 +109,12 @@
             <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 bg-white">
                 <div class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 cursor-pointer">
                     <div class="w-9 h-9 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-bold text-sm">
-                        <?php echo e(substr(auth('karyawan')->user()->nama_karyawan, 0, 1)); ?>
+                        <?php echo e(substr(auth('karyawan')->user()?->nama_karyawan ?? 'U', 0, 1)); ?>
 
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-semibold text-slate-900 truncate"><?php echo e(auth('karyawan')->user()->nama_karyawan); ?></p>
-                        <p class="text-xs text-slate-500 capitalize"><?php echo e(auth('karyawan')->user()->role); ?></p>
+                        <p class="text-sm font-semibold text-slate-900 truncate"><?php echo e(auth('karyawan')->user()?->nama_karyawan ?? 'Guest'); ?></p>
+                        <p class="text-xs text-slate-500 capitalize"><?php echo e(auth('karyawan')->user()?->role ?? 'Guest'); ?></p>
                     </div>
                 </div>
                 <form method="POST" action="<?php echo e(route('logout')); ?>" class="mt-2">

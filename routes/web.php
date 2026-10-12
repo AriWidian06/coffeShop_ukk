@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\KategoriProdukController;
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\LaporanController; // <-- Controller untuk Ekspor
 use App\Http\Controllers\MejaController;
 use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\ProdukController;
@@ -12,7 +14,6 @@ use App\Http\Controllers\TransaksiController;
 use App\Models\Meja;
 use App\Models\KategoriProduk; 
 use App\Models\Produk;
-use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -45,36 +46,13 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // ==========================================
 Route::middleware('auth:karyawan')->group(function () {
     
-    // Dashboard berdasarkan Role
-    Route::get('/dashboard', function () {
-        $role = auth('karyawan')->user()->role;
+    // Dashboard berdasarkan Role (Admin / Manager / Kasir)
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        if ($role === 'manager') {
-            return view('dashboard.manager');
-        }
-
-        if ($role === 'kasir') {
-            // PERBAIKAN POTENSIAL: Gunakan 'created_at' jika kolom 'waktu_transaksi' tidak ada di migration
-            $transaksiTerbaru = Transaksi::with(['meja', 'karyawan', 'detailTransaksi.produk'])
-                ->where(function ($query) {
-                    $query->where('karyawan_id', auth('karyawan')->id())
-                          ->orWhere('sumber_pesanan', 'web');
-                })
-                ->latest('created_at') // <-- Diubah ke created_at (standar Laravel)
-                ->limit(5)
-                ->get();
-
-            return view('dashboard.kasir', compact('transaksiTerbaru'));
-        }
-
-        return view('dashboard.admin');
-    })->name('dashboard');
-
-    // Admin Panel (CRUD Utama)
+    // Admin Panel (CRUD Utama - Hanya Admin)
     Route::middleware('can:access-admin-panel')->group(function () {
         Route::resource('karyawans', KaryawanController::class)->except('show');
         
-        // PERBAIKAN: Hanya definisikan SEKALI dengan kebab-case dan parameter mapping
         Route::resource('kategori-produks', KategoriProdukController::class)
             ->parameters(['kategori-produks' => 'kategoriProduk'])
             ->except('show');
@@ -84,7 +62,7 @@ Route::middleware('auth:karyawan')->group(function () {
         Route::resource('suppliers', SupplierController::class)->except('show');
     });
 
-    // Transaksi & POS
+    // Transaksi & POS (Kasir & Admin)
     Route::middleware('can:access-pos')->group(function () {
         Route::get('/transaksis/create', [TransaksiController::class, 'create'])->name('transaksis.create');
         Route::post('/transaksis', [TransaksiController::class, 'store'])->name('transaksis.store');
@@ -95,12 +73,13 @@ Route::middleware('auth:karyawan')->group(function () {
         Route::get('/transaksis/{transaksi}/receipt', [PembayaranController::class, 'printReceipt'])->name('transaksis.receipt');
     });
 
-    // Route Show untuk Transaksi (Diletakkan PALING BAWAH agar tidak bentrok dengan /create)
-    Route::get('/transaksis', [TransaksiController::class, 'index'])
-        ->middleware('can:view-transactions')
-        ->name('transaksis.index');
-
-    Route::get('/transaksis/{transaksi}', [TransaksiController::class, 'show'])
-        ->middleware('can:view-transactions')
-        ->name('transaksis.show');
+    // Laporan & Ekspor (Manager & Admin)
+    Route::middleware('can:view-transactions')->group(function () {
+        // Lihat daftar transaksi
+        Route::get('/transaksis', [TransaksiController::class, 'index'])->name('transaksis.index');
+        Route::get('/transaksis/{transaksi}', [TransaksiController::class, 'show'])->name('transaksis.show');
+        
+        // FITUR EKSPOR LAPORAN CSV BARU
+        Route::get('/laporan/export', [LaporanController::class, 'export'])->name('laporan.export');
+    });
 });
