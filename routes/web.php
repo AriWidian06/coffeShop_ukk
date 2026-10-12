@@ -16,7 +16,9 @@ use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-
+// ==========================================
+// 1. PUBLIC ROUTES (Tanpa Login)
+// ==========================================
 Route::get('/', function (Request $request) {
     $mejas = Meja::where('status_aktif', true)->orderBy('nomor_meja')->get();
     $mejaId = $request->query('meja_id');
@@ -31,14 +33,19 @@ Route::get('/', function (Request $request) {
         ->get();
 
     return view('welcome', compact('mejaAktif', 'mejas', 'kategoriProduks', 'produks'));
-});
+})->name('welcome'); 
 
 Route::get('/health', [HealthController::class, 'check']);
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.store');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// ==========================================
+// 2. AUTHENTICATED ROUTES (Wajib Login)
+// ==========================================
 Route::middleware('auth:karyawan')->group(function () {
+    
+    // Dashboard berdasarkan Role
     Route::get('/dashboard', function () {
         $role = auth('karyawan')->user()->role;
 
@@ -47,12 +54,13 @@ Route::middleware('auth:karyawan')->group(function () {
         }
 
         if ($role === 'kasir') {
-            $transaksiTerbaru = Transaksi::with(['meja', 'karyawan', 'detail_transaksis.produk'])
+            // PERBAIKAN POTENSIAL: Gunakan 'created_at' jika kolom 'waktu_transaksi' tidak ada di migration
+            $transaksiTerbaru = Transaksi::with(['meja', 'karyawan', 'detailTransaksi.produk'])
                 ->where(function ($query) {
                     $query->where('karyawan_id', auth('karyawan')->id())
-                        ->orWhere('sumber_pesanan', 'web');
+                          ->orWhere('sumber_pesanan', 'web');
                 })
-                ->latest('waktu_transaksi')
+                ->latest('created_at') // <-- Diubah ke created_at (standar Laravel)
                 ->limit(5)
                 ->get();
 
@@ -62,32 +70,35 @@ Route::middleware('auth:karyawan')->group(function () {
         return view('dashboard.admin');
     })->name('dashboard');
 
+    // Admin Panel (CRUD Utama)
     Route::middleware('can:access-admin-panel')->group(function () {
         Route::resource('karyawans', KaryawanController::class)->except('show');
+        
+        // PERBAIKAN: Hanya definisikan SEKALI dengan kebab-case dan parameter mapping
         Route::resource('kategori-produks', KategoriProdukController::class)
             ->parameters(['kategori-produks' => 'kategoriProduk'])
             ->except('show');
+            
         Route::resource('mejas', MejaController::class)->except('show');
         Route::resource('produks', ProdukController::class)->except('show');
         Route::resource('suppliers', SupplierController::class)->except('show');
-        Route::resource('kategori_produks', KategoriProdukController::class)->except('show');
-
     });
 
-    Route::get('/transaksis', [TransaksiController::class, 'index'])
-        ->middleware('can:view-transactions')
-        ->name('transaksis.index');
-
+    // Transaksi & POS
     Route::middleware('can:access-pos')->group(function () {
         Route::get('/transaksis/create', [TransaksiController::class, 'create'])->name('transaksis.create');
         Route::post('/transaksis', [TransaksiController::class, 'store'])->name('transaksis.store');
         Route::delete('/transaksis/{transaksi}', [TransaksiController::class, 'destroy'])->name('transaksis.destroy');
-        Route::patch('/transaksis/{transaksi}/status', [TransaksiController::class, 'updateStatus'])
-            ->name('transaksis.status');
+        Route::patch('/transaksis/{transaksi}/status', [TransaksiController::class, 'updateStatus'])->name('transaksis.status');
+        
         Route::post('/pembayarans', [PembayaranController::class, 'store'])->name('pembayarans.store');
-        Route::get('/transaksis/{transaksi}/receipt', [PembayaranController::class, 'printReceipt'])
-            ->name('transaksis.receipt');
+        Route::get('/transaksis/{transaksi}/receipt', [PembayaranController::class, 'printReceipt'])->name('transaksis.receipt');
     });
+
+    // Route Show untuk Transaksi (Diletakkan PALING BAWAH agar tidak bentrok dengan /create)
+    Route::get('/transaksis', [TransaksiController::class, 'index'])
+        ->middleware('can:view-transactions')
+        ->name('transaksis.index');
 
     Route::get('/transaksis/{transaksi}', [TransaksiController::class, 'show'])
         ->middleware('can:view-transactions')
