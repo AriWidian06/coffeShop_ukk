@@ -110,3 +110,264 @@
 .toggle-switch.disabled::after {
     @apply translate-x-1;
 }
+
+/* ... (kode yang sudah ada biarkan) ... */
+
+/* Login Page Custom Styles */
+.login-gradient-bg {
+    background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 50%, #93C5FD 100%);
+}
+
+.login-blue-panel {
+    background: linear-gradient(135deg, #1E40AF 0%, #2563EB 50%, #3B82F6 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.login-blue-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.4;
+}
+
+.login-card-shadow {
+    box-shadow: 0 25px 50px -12px rgba(30, 64, 175, 0.25), 0 0 0 1px rgba(255,255,255,0.1);
+}
+
+.input-icon-wrapper {
+    position: relative;
+}
+
+.input-icon-wrapper input {
+    padding-left: 2.75rem;
+}
+
+.input-icon-wrapper .input-icon {
+    position: absolute;
+    left: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94A3B8;
+    pointer-events: none;
+}
+
+/* Password toggle */
+.password-toggle {
+    position: absolute;
+    right: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94A3B8;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.password-toggle:hover {
+    color: #475569;
+}
+
+/* Smooth fade in animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-animate {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Category Page Custom Styles */
+.category-table {
+    @apply w-full border-collapse;
+}
+
+.category-table th {
+    @apply px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase bg-slate-50 border-b border-slate-200;
+}
+
+.category-table td {
+    @apply px-6 py-4 text-sm border-b border-slate-100 text-slate-700;
+}
+
+.category-table tr:hover {
+    @apply bg-slate-50 transition-colors;
+}
+
+.form-input {
+    @apply w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:bg-white transition-all;
+}
+
+.form-label {
+    @apply block text-sm font-bold text-slate-700 mb-2;
+}
+
+/* ... (biarkan semua kode sebelumnya tetap ada) ... */
+
+/* Table & Meja Page Custom Styles */
+.meja-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.meja-card {
+    @apply bg-white rounded-2xl border border-slate-200 shadow-sm p-6 transition-all hover:shadow-md;
+}
+
+.meja-card.active {
+    @apply border-primary-200 shadow-md;
+}
+
+.meja-card.inactive {
+    @apply opacity-75 bg-slate-50;
+}
+
+.meja-header {
+    @apply flex items-center justify-between mb-4;
+}
+
+.meja-number {
+    @apply text-lg font-bold text-slate-900;
+}
+
+.meja-status {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold;
+}
+
+.meja-status.occupied {
+    @apply bg-blue-50 text-blue-700;
+}
+
+.meja-status.available {
+    @apply bg-emerald-50 text-emerald-700;
+}
+
+.meja-status.inactive {
+    @apply bg-red-50 text-red-700;
+}
+
+.qr-code-container {
+    @apply flex flex-col items-center justify-center p-4 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300;
+}
+
+.qr-code {
+    @apply w-32 h-32 bg-white p-2 rounded-lg shadow-sm;
+}
+
+/* Toggle Switch Modern */
+.toggle-switch-modern {
+    @apply relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+}
+
+.toggle-switch-modern.enabled {
+    @apply bg-primary-600;
+}
+
+.toggle-switch-modern.disabled {
+    @apply bg-slate-300;
+}
+
+.toggle-switch-modern::after {
+    content: '';
+    @apply absolute h-4 w-4 rounded-full bg-white shadow-sm transition-transform;
+}
+
+.toggle-switch-modern.enabled::after {
+    @apply translate-x-6;
+}
+
+.toggle-switch-modern.disabled::after {
+    @apply translate-x-1;
+}
+
+/* Filter Pills */
+.filter-area-pill {
+    @apply px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all border;
+}
+
+.filter-area-pill.active {
+    @apply bg-primary-600 text-white border-primary-600 shadow-md shadow-primary-600/20;
+}
+
+.filter-area-pill.inactive {
+    @apply bg-white text-slate-600 border-slate-200 hover:bg-slate-50;
+}
+
+/* Stat Cards for Meja */
+.stat-card-meja {
+    @apply bg-white rounded-2xl p-5 border border-slate-200 shadow-sm;
+}
+
+.stat-card-meja.blue {
+    @apply border-primary-200 bg-primary-50;
+}
+
+.stat-card-meja.green {
+    @apply border-emerald-200 bg-emerald-50;
+}
+
+.stat-card-meja.red {
+    @apply border-red-200 bg-red-50;
+}
+
+/* ... (biarkan semua kode sebelumnya tetap ada) ... */
+
+/* Supplier Page Custom Styles */
+.supplier-table {
+    @apply w-full border-collapse;
+}
+
+.supplier-table th {
+    @apply px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase bg-slate-50 border-b border-slate-200;
+}
+
+.supplier-table td {
+    @apply px-6 py-4 text-sm border-b border-slate-100 text-slate-700;
+}
+
+.supplier-table tr:hover {
+    @apply bg-slate-50 transition-colors;
+}
+
+.form-input {
+    @apply w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:bg-white transition-all;
+}
+
+.form-label {
+    @apply block text-sm font-bold text-slate-700 mb-2;
+}
+
+/* ... (biarkan semua kode sebelumnya tetap ada) ... */
+
+/* Karyawan Page Custom Styles */
+.karyawan-table {
+    @apply w-full border-collapse;
+}
+
+.karyawan-table th {
+    @apply px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase bg-slate-50 border-b border-slate-200;
+}
+
+.karyawan-table td {
+    @apply px-6 py-4 text-sm border-b border-slate-100 text-slate-700;
+}
+
+.karyawan-table tr:hover {
+    @apply bg-slate-50 transition-colors;
+}
+
+.form-input {
+    @apply w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:bg-white transition-all;
+}
+
+.form-label {
+    @apply block text-sm font-bold text-slate-700 mb-2;
+}
