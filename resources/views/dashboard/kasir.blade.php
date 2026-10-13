@@ -28,8 +28,8 @@
 <div class="h-screen flex flex-col bg-slate-50 overflow-hidden">
 
     {{-- ═══════════════════════════════════════════════════════════════
-         TOP BAR — Terminal title, shift info, kasir, time, tab buttons
-    ═══════════════════════════════════════════════════════════════ --}}
+        TOP BAR — Terminal title, shift info, kasir, time, tab buttons
+        ═══════════════════════════════════════════════════════════════ --}}
     <header class="bg-white border-b border-slate-200 flex-shrink-0 z-20">
         <div class="px-5 py-3 flex items-center justify-between">
             <div class="flex items-center gap-3">
