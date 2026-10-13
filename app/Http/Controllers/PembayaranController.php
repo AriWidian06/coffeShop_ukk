@@ -21,6 +21,12 @@ class PembayaranController extends Controller
         Gate::authorize('view-transaction', $transaksi);
 
         if ($request->jumlah_bayar < $transaksi->total_harga) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Jumlah pembayaran kurang dari total tagihan!'
+                ], 422);
+            }
             return back()->withErrors(['jumlah_bayar' => 'Jumlah pembayaran kurang dari total harga!']);
         }
 
@@ -36,6 +42,20 @@ class PembayaranController extends Controller
         ]);
 
         $transaksi->update(['status_pesanan' => 'completed']);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pembayaran berhasil dikonfirmasi.',
+                'kembalian' => $kembalian,
+                'transaksi_id' => $transaksi->id,
+                'receipt_url' => route('transaksis.receipt', $transaksi->id),
+            ]);
+        }
+
+        if ($request->filled('redirect_to')) {
+            return redirect($request->redirect_to)->with('success', 'Pembayaran berhasil dikonfirmasi.');
+        }
 
         return redirect()->route('transaksis.show', $transaksi->id)
             ->with('success', 'Pembayaran berhasil dikonfirmasi.');

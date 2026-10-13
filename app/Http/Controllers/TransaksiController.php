@@ -51,7 +51,7 @@ class TransaksiController extends Controller
         return view('transaksis.index', compact('transaksis'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $mejas = Meja::where('status_aktif', true)->orderBy('nomor_meja')->get();
         $produks = Produk::with(['kategoriProduk', 'opsis'])
@@ -60,7 +60,18 @@ class TransaksiController extends Controller
             ->orderBy('nama_produk')
             ->get();
 
-        return view('transaksis.create', compact('mejas', 'produks'));
+        $selectedMejaId = $request->query('meja_id');
+
+        $activeOrders = Transaksi::with(['karyawan', 'detail_transaksis.produk'])
+            ->whereIn('status_pesanan', ['pending', 'ready', 'prosesed'])
+            ->whereNotNull('meja_id')
+            ->latest('waktu_transaksi')
+            ->get()
+            ->keyBy('meja_id');
+
+        $mejaStatus = $activeOrders->keys()->toArray();
+
+        return view('transaksis.create', compact('mejas', 'produks', 'selectedMejaId', 'mejaStatus', 'activeOrders'));
     }
 
     public function store(Request $request)
@@ -137,6 +148,22 @@ class TransaksiController extends Controller
                 DetailTransaksi::create($detail);
             }
 
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'transaksi' => $transaksi->load(['meja', 'detail_transaksis.produk']),
+                    'message' => 'Transaksi berhasil dibuat.',
+                ]);
+            }
+
+            if ($request->filled('redirect_to')) {
+                return redirect($request->redirect_to)->with('success', 'Transaksi berhasil dibuat.');
+            }
+
+            if (auth('karyawan')->check() && auth('karyawan')->user()->role === 'kasir') {
+                return redirect()->route('dashboard')->with('success', 'Transaksi berhasil dibuat.');
+            }
+
             return redirect()->route('transaksis.show', $transaksi->id)
                 ->with('success', 'Transaksi berhasil dibuat.');
         });
@@ -160,7 +187,34 @@ class TransaksiController extends Controller
 
         $transaksi->update(['status_pesanan' => $request->status_pesanan]);
 
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'status_pesanan' => $transaksi->status_pesanan,
+                'message' => 'Status pesanan #' . $transaksi->id . ' berhasil diperbarui.',
+            ]);
+        }
+
         return back()->with('success', 'Status pesanan berhasil diperbarui.');
+    }
+
+    public function activeOrdersJson()
+    {
+        $activeOrders = Transaksi::with(['meja', 'karyawan', 'detail_transaksis.produk', 'pembayaran'])
+            ->whereIn('status_pesanan', ['pending', 'ready', 'prosesed'])
+            ->latest('waktu_transaksi')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'orders' => $activeOrders,
+            'counts' => [
+                'total' => $activeOrders->count(),
+                'pending' => $activeOrders->where('status_pesanan', 'pending')->count(),
+                'prosesed' => $activeOrders->where('status_pesanan', 'prosesed')->count(),
+                'ready' => $activeOrders->where('status_pesanan', 'ready')->count(),
+            ],
+        ]);
     }
 
     public function destroy(Transaksi $transaksi)

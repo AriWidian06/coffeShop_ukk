@@ -153,6 +153,7 @@
                 <!-- Simple Bar Chart Representation -->
                 <div class="flex items-end justify-between gap-2 h-48 px-4">
                     @php
+                        $transaksiPerJam = $transaksiPerJam ?? collect();
                         $hours = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
                         $maxTransaksi = $transaksiPerJam->max('jumlah') ?: 1;
                     @endphp
@@ -254,7 +255,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if($produkTerlaris)
+                        @php
+                            $produkTerlaris = $produkTerlaris ?? collect();
+                        @endphp
+                        @forelse($produkTerlaris as $item)
                         <tr class="border-b border-slate-100 hover:bg-slate-50">
                             <td class="py-4 px-4">
                                 <div class="flex items-center gap-3">
@@ -264,21 +268,21 @@
                                         </svg>
                                     </div>
                                     <div>
-                                        <p class="font-bold text-slate-900 text-sm">{{ $produkTerlaris->produk->nama_produk }}</p>
-                                        <p class="text-xs text-slate-500">SKU: {{ $produkTerlaris->produk->sku ?? 'N/A' }}</p>
+                                        <p class="font-bold text-slate-900 text-sm">{{ $item->produk->nama_produk ?? 'Produk dihapus' }}</p>
+                                        <p class="text-xs text-slate-500">SKU: {{ $item->produk->sku ?? 'N/A' }}</p>
                                     </div>
                                 </div>
                             </td>
                             <td class="py-4 px-4">
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-primary-50 text-primary-700 text-xs font-bold">
-                                    {{ $produkTerlaris->produk->kategoriProduk->nama_kategori ?? 'N/A' }}
+                                    {{ $item->produk->kategoriProduk->nama_kategori ?? 'N/A' }}
                                 </span>
                             </td>
                             <td class="py-4 px-4 text-right">
-                                <span class="font-bold text-slate-900">{{ $produkTerlaris->total_qty }} pcs</span>
+                                <span class="font-bold text-slate-900">{{ $item->total_qty }} pcs</span>
                             </td>
                             <td class="py-4 px-4 text-right">
-                                <span class="font-bold text-slate-900">Rp {{ number_format($produkTerlaris->total_qty * $produkTerlaris->produk->harga_jual, 0, ',', '.') }}</span>
+                                <span class="font-bold text-slate-900">Rp {{ number_format($item->total_qty * ($item->produk->harga ?? 0), 0, ',', '.') }}</span>
                             </td>
                             <td class="py-4 px-4 text-center">
                                 <span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-600">
@@ -289,13 +293,13 @@
                                 </span>
                             </td>
                         </tr>
-                        @else
+                        @empty
                         <tr>
                             <td colspan="5" class="py-8 text-center text-slate-500 text-sm">
                                 Belum ada data penjualan hari ini
                             </td>
                         </tr>
-                        @endif
+                        @endforelse
                     </tbody>
                 </table>
             </div>

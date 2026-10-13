@@ -47,25 +47,28 @@
             <nav class="p-4 space-y-1 overflow-y-auto h-[calc(100vh-16rem)]">
                 <p class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Menu Utama</p>
                 
-                <a href="{{ route('transaksis.create') }}" class="sidebar-link {{ request()->routeIs('transaksis.create') ? 'active' : 'inactive' }}">
+                <a href="{{ route('dashboard') }}#kasir" id="sidebar-nav-menu" class="sidebar-link {{ request()->is('dashboard*') || request()->routeIs('transaksis.create') ? 'active' : 'inactive' }}" onclick="if(window.switchTab){ event.preventDefault(); window.switchTab('kasir'); } else if(window.switchPosView){ event.preventDefault(); window.switchPosView('menu'); }">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                     </svg>
                     <span>Kasir & Menu</span>
                 </a>
 
-                <a href="{{ route('mejas.index') }}" class="sidebar-link {{ request()->routeIs('mejas.*') ? 'active' : 'inactive' }}">
+                <a href="{{ route('dashboard') }}#meja" id="sidebar-nav-denah" class="sidebar-link inactive" onclick="if(window.switchTab){ event.preventDefault(); window.switchTab('meja'); } else if(window.switchPosView){ event.preventDefault(); window.switchPosView('denah'); }">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                     <span>Denah Meja</span>
                 </a>
 
-                <a href="#" class="sidebar-link inactive">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                    <span>Pesanan Aktif</span>
+                <a href="{{ route('dashboard') }}#transaksi" id="sidebar-nav-pesanan" class="sidebar-link inactive flex items-center justify-between" onclick="if(window.switchTab){ event.preventDefault(); window.switchTab('transaksi'); }">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        <span>Pesanan Aktif</span>
+                    </div>
+                    <span id="sidebar-pesanan-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white hidden">0</span>
                 </a>
 
                 <a href="{{ route('transaksis.index') }}" class="sidebar-link {{ request()->routeIs('transaksis.index') ? 'active' : 'inactive' }}">

@@ -278,9 +278,23 @@
                         @if(isset($mejas) && $mejas->isEmpty())
                             <option value="">Tidak ada meja</option>
                         @elseif(isset($mejas))
+                            @php
+                                $mejaTerisi = $mejaTerisi ?? collect();
+                                $semuaTerisi = $mejaAktif === null
+                                    && $mejas->count() > 0
+                                    && $mejas->every(fn ($m) => $mejaTerisi->contains($m->id));
+                            @endphp
+                            @if($semuaTerisi)
+                                <option value="">Semua meja sudah terisi</option>
+                            @endif
                             @foreach($mejas as $meja)
-                                <option value="{{ $meja->id }}" {{ $mejaAktif && $mejaAktif->id === $meja->id ? 'selected' : '' }}>
-                                    Meja {{ $meja->nomor_meja }} (Kap: {{ $meja->kapasitas }})
+                                @php
+                                    $dipakai = $mejaTerisi->contains($meja->id);
+                                    $dipilihSendiri = isset($mejaAktif) && $mejaAktif->id === $meja->id;
+                                    $terisi = $dipakai && !$dipilihSendiri;
+                                @endphp
+                                <option value="{{ $meja->id }}" {{ $dipilihSendiri ? 'selected' : '' }}{{ $terisi ? ' disabled' : '' }}>
+                                    Meja {{ $meja->nomor_meja }} (Kap: {{ $meja->kapasitas }}){{ $terisi ? ' — Terisi' : '' }}
                                 </option>
                             @endforeach
                         @endif

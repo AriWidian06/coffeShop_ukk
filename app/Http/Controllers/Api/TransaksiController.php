@@ -25,6 +25,21 @@ class TransaksiController extends Controller
         ]);
 
         $result = DB::transaction(function () use ($validated) {
+            // Tolak meja yang sudah punya pesanan aktif (diproses kasir)
+            if (!empty($validated['meja_id'])) {
+                $mejaTerisi = Transaksi::query()
+                    ->where('meja_id', $validated['meja_id'])
+                    ->whereIn('status_pesanan', ['pending', 'ready', 'prosesed'])
+                    ->lockForUpdate()
+                    ->first() !== null;
+
+                if ($mejaTerisi) {
+                    throw ValidationException::withMessages([
+                        'meja_id' => 'Meja ini sudah memiliki pesanan aktif. Silakan pilih meja lain.',
+                    ]);
+                }
+            }
+
             $subtotal = 0;
             $items = [];
             $productsById = [];
@@ -44,7 +59,21 @@ class TransaksiController extends Controller
                     ]);
                 }
 
-                $lineTotal = round((float) $produk->harga_jual * $item['qty'], 2);
+                // Hitung harga tambahan kostumisasi (opsi) agar sama dengan keranjang
+                $extraPrice = 0;
+                if (!empty($item['customization'])) {
+                    foreach (explode(', ', $item['customization']) as $optText) {
+                        $optName = explode(' (+', $optText)[0];
+                        $opsi = \App\Models\ProdukOpsi::where('produk_id', $produk->id)
+                            ->where('nama_opsi', 'like', '%' . $optName . '%')
+                            ->first();
+                        if ($opsi) {
+                            $extraPrice += $opsi->harga_tambahan;
+                        }
+                    }
+                }
+
+                $lineTotal = round(((float) $produk->harga_jual + $extraPrice) * $item['qty'], 2);
                 $subtotal += $lineTotal;
                 $quantitiesByProduct[$produkId] = ($quantitiesByProduct[$produkId] ?? 0) + $item['qty'];
                 $items[] = [
