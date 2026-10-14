@@ -244,4 +244,10 @@ Route::middleware('auth:karyawan')->group(function () {
         // FITUR EKSPOR LAPORAN CSV BARU
         Route::get('/laporan/export', [LaporanController::class, 'export'])->name('laporan.export');
     });
+
+    // Rute khusus Kasir untuk pembayaran QRIS
+    Route::middleware(['auth:karyawan'])->prefix('kasir')->name('kasir.')->group(function () {
+        Route::get('/transaksi/{id}/qris', [TransaksiController::class, 'showQrisPayment'])->name('payment.qris');
+        Route::post('/transaksi/{id}/qris/process', [TransaksiController::class, 'processQrisPayment'])->name('payment.qris.process');
+    });
 });

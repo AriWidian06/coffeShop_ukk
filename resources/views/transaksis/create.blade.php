@@ -29,7 +29,7 @@
                             Station #01
                         </span>
                     </div>
-                    <p class="text-sm text-slate-500">Pilih menu, atur jumlah, lalu simpan pesanan.</p>
+                    <p class="text-sm text-slate-500">Pilih menu, atur kustomisasi, lalu simpan pesanan.</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <div class="px-3 py-2 bg-slate-50 rounded-lg border border-slate-200">
@@ -100,11 +100,68 @@
         </div>
     </div>
 
+    <!-- PRODUCT CUSTOMIZATION MODAL (Gaya Web Pelanggan) -->
+    <div id="product-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full mx-4 overflow-hidden border border-slate-200 flex flex-col md:flex-row max-h-[90vh]">
+            <!-- Left: Image -->
+            <div class="md:w-1/2 bg-slate-100 relative min-h-[220px] md:min-h-full">
+                <img id="modal-product-img" src="" alt="" class="w-full h-full object-cover hidden">
+                <div id="modal-product-placeholder" class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-100 to-primary-200 text-primary-400">
+                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
+                    </svg>
+                </div>
+            </div>
+            <!-- Right: Details & Options -->
+            <div class="md:w-1/2 p-6 flex flex-col justify-between overflow-y-auto">
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span id="modal-product-category" class="text-xs font-bold text-primary-600 uppercase tracking-wider">Kategori</span>
+                        <button type="button" id="modal-close-btn" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center font-bold">✕</button>
+                    </div>
+                    <h3 id="modal-product-name" class="text-xl font-bold text-slate-900 mb-1">Nama Produk</h3>
+                    <p id="modal-product-desc" class="text-xs text-slate-500 mb-4 line-clamp-2">Deskripsi produk...</p>
+                    
+                    <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100">
+                        <span id="modal-product-price" class="text-lg font-black text-primary-600">Rp 0</span>
+                        <span id="modal-product-stock" class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Stok: 0</span>
+                    </div>
+
+                    <!-- Dynamic Options -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-slate-700 mb-2">Penyesuaian / Opsi Menu</label>
+                        <div id="modal-options-container" class="grid grid-cols-2 gap-2">
+                            <!-- Injected via JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Custom Notes -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Catatan tambahan (opsional)</label>
+                        <textarea id="modal-product-notes" rows="2" placeholder="Tulis permintaan lain untuk kasir..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"></textarea>
+                    </div>
+                </div>
+
+                <!-- Quantity & Add to Cart -->
+                <div class="pt-4 border-t border-slate-100 flex items-center gap-3">
+                    <div class="flex items-center border border-slate-200 rounded-xl overflow-hidden bg-slate-50">
+                        <button type="button" id="modal-qty-minus" class="px-3 py-2 text-slate-600 hover:bg-slate-200 font-bold">−</button>
+                        <span id="modal-qty-val" class="w-8 text-center font-bold text-sm text-slate-900">1</span>
+                        <button type="button" id="modal-qty-plus" class="px-3 py-2 text-slate-600 hover:bg-slate-200 font-bold">+</button>
+                    </div>
+                    <button type="button" id="modal-add-btn" class="flex-1 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold text-sm shadow-md shadow-primary-600/20 transition flex items-center justify-center gap-2">
+                        Tambah ke keranjang
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- MAIN CONTENT -->
     <main class="p-6">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <!-- SECTION KIRI: KATALOG MENU & DENAH MEJA (2/3 lebar) -->
+            <!-- SECTION KIRI: KATALOG MENU & DENAH MEJA -->
             <section class="lg:col-span-2">
 
                 <!-- 1. VIEW KATALOG MENU -->
@@ -142,44 +199,44 @@
                     @else
                         <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4" data-pos-products>
                             @foreach ($produks as $produk)
-                                <article class="pos-product-card" data-pos-product data-search="{{ strtolower($produk->nama_produk . ' ' . ($produk->kategoriProduk->nama_kategori ?? '')) }}" data-category="{{ strtolower($produk->kategoriProduk->nama_kategori ?? '') }}">
-                                    @if($produk->gambar)
-                                        <img src="{{ asset('storage/' . $produk->gambar) }}" alt="{{ $produk->nama_produk }}" class="pos-product-card-img">
-                                    @else
-                                        <div class="w-full h-32 bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center border-b border-slate-100">
-                                            <svg class="w-12 h-12 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
-                                            </svg>
-                                        </div>
-                                    @endif
-                                    <div class="p-3">
-                                        <div class="flex items-center justify-between mb-1">
-                                            <span class="text-[10px] font-bold text-primary-600 uppercase tracking-wider">{{ $produk->kategoriProduk->nama_kategori ?? 'Menu' }}</span>
-                                            @if($produk->stock < 5)
-                                                <span class="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">Stok: {{ $produk->stock }}</span>
-                                            @else
-                                                <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Stok: {{ $produk->stock }}</span>
-                                            @endif
-                                        </div>
-                                        <h2 class="font-bold text-slate-900 text-sm mb-1 line-clamp-2 min-h-[2.5rem]">{{ $produk->nama_produk }}</h2>
-                                        <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
-                                            <span class="font-bold text-primary-600 text-sm">Rp {{ number_format($produk->harga_jual, 0, ',', '.') }}</span>
-                                            <button
-                                                class="pos-add-btn w-7 h-7 rounded-lg bg-primary-600 text-white flex items-center justify-center hover:bg-primary-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                                                type="button"
-                                                data-add-product
-                                                data-id="{{ $produk->id }}"
-                                                data-name="{{ $produk->nama_produk }}"
-                                                data-price="{{ (float) $produk->harga_jual }}"
-                                                data-stock="{{ $produk->stock }}"
-                                                aria-label="Tambah {{ $produk->nama_produk }}"
-                                                @disabled($produk->stock < 1)
-                                            >
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                <article class="pos-product-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col justify-between hover:border-primary-400 hover:shadow-md transition cursor-pointer" 
+                                         data-pos-product 
+                                         data-search="{{ strtolower($produk->nama_produk . ' ' . ($produk->kategoriProduk->nama_kategori ?? '')) }}" 
+                                         data-category="{{ strtolower($produk->kategoriProduk->nama_kategori ?? '') }}"
+                                         data-id="{{ $produk->id }}"
+                                         data-name="{{ $produk->nama_produk }}"
+                                         data-price="{{ (float) $produk->harga_jual }}"
+                                         data-stock="{{ $produk->stock }}"
+                                         data-desc="{{ $produk->deskripsi ?? 'Tidak ada deskripsi.' }}"
+                                         data-category-name="{{ $produk->kategoriProduk->nama_kategori ?? 'Menu' }}"
+                                         data-image="{{ $produk->gambar ? asset('storage/' . $produk->gambar) : '' }}"
+                                         data-options="{{ json_encode($produk->opsis ?? []) }}">
+                                    
+                                    <div>
+                                        @if($produk->gambar)
+                                            <img src="{{ asset('storage/' . $produk->gambar) }}" alt="{{ $produk->nama_produk }}" class="w-full h-32 object-cover border-b border-slate-100">
+                                        @else
+                                            <div class="w-full h-32 bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center border-b border-slate-100">
+                                                <svg class="w-12 h-12 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
                                                 </svg>
-                                            </button>
+                                            </div>
+                                        @endif
+                                        <div class="p-3">
+                                            <div class="flex items-center justify-between mb-1">
+                                                <span class="text-[10px] font-bold text-primary-600 uppercase tracking-wider">{{ $produk->kategoriProduk->nama_kategori ?? 'Menu' }}</span>
+                                                @if($produk->stock < 5)
+                                                    <span class="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">Stok: {{ $produk->stock }}</span>
+                                                @else
+                                                    <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Stok: {{ $produk->stock }}</span>
+                                                @endif
+                                            </div>
+                                            <h2 class="font-bold text-slate-900 text-sm mb-1 line-clamp-2 min-h-[2.5rem]">{{ $produk->nama_produk }}</h2>
                                         </div>
+                                    </div>
+                                    <div class="p-3 pt-0 flex items-center justify-between border-t border-slate-100 mt-2">
+                                        <span class="font-bold text-primary-600 text-sm">Rp {{ number_format($produk->harga_jual, 0, ',', '.') }}</span>
+                                        <span class="text-xs font-semibold text-primary-600 bg-primary-50 px-2.5 py-1 rounded-lg">Pilih & kustomisasi</span>
                                     </div>
                                 </article>
                             @endforeach
@@ -188,7 +245,7 @@
                     @endif
                 </div>
 
-                <!-- 2. VIEW DENAH MEJA (Tanpa pindah halaman) -->
+                <!-- 2. VIEW DENAH MEJA -->
                 <div id="pos-view-denah" class="hidden space-y-4">
                     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
                         <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100">
@@ -279,8 +336,8 @@
 
             </section>
 
-            <!-- PANEL ORDER / KERANJANG (1/3 lebar) -->
-            <aside class="pos-order-panel" id="pos-order" aria-labelledby="pos-order-title">
+            <!-- PANEL ORDER / KERANJANG -->
+            <aside class="pos-order-panel bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col h-fit sticky top-24" id="pos-order" aria-labelledby="pos-order-title">
                 <div class="p-4 border-b border-slate-200 flex items-center justify-between">
                     <div>
                         <h2 id="pos-order-title" class="font-bold text-slate-900">Pesanan Baru</h2>
@@ -292,7 +349,7 @@
                 <p class="pos-cart-empty text-center py-12 text-slate-500 text-sm" data-cart-empty>
                     Keranjang kosong.<br>Tambahkan menu dari katalog.
                 </p>
-                <div class="pos-cart-lines max-h-96 overflow-y-auto p-4" data-cart-lines aria-live="polite"></div>
+                <div class="pos-cart-lines max-h-80 overflow-y-auto p-4 space-y-3" data-cart-lines aria-live="polite"></div>
 
                 <form class="pos-order-form p-4 border-t border-slate-200" id="pos-form" method="post" action="{{ route('transaksis.store') }}">
                     @csrf
@@ -301,13 +358,13 @@
                     <!-- Tipe Pesanan -->
                     <div class="mb-4">
                         <label class="block text-xs font-bold text-slate-700 mb-2">Tipe Pesanan</label>
-                        <div class="pos-type-selector">
-                            <label class="pos-type-option">
-                                <input type="radio" name="tipe_pesanan" value="dine-in" checked>
+                        <div class="pos-type-selector grid grid-cols-2 gap-2">
+                            <label class="flex items-center justify-center p-2.5 rounded-xl border border-slate-200 text-xs font-bold cursor-pointer bg-white hover:bg-slate-50">
+                                <input type="radio" name="tipe_pesanan" value="dine-in" checked class="mr-1.5">
                                 <span>🍽️ Makan di Tempat</span>
                             </label>
-                            <label class="pos-type-option">
-                                <input type="radio" name="tipe_pesanan" value="take-away">
+                            <label class="flex items-center justify-center p-2.5 rounded-xl border border-slate-200 text-xs font-bold cursor-pointer bg-white hover:bg-slate-50">
+                                <input type="radio" name="tipe_pesanan" value="take-away" class="mr-1.5">
                                 <span>🥡 Bawa Pulang</span>
                             </label>
                         </div>
@@ -344,16 +401,22 @@
                             </div>
                             <button type="button" onclick="switchPosView('denah')" class="text-[11px] font-semibold text-primary-600 hover:text-primary-800 underline">Ganti Meja</button>
                         </div>
-                        <p class="pos-field-hint text-xs text-slate-500 mt-1.5" data-takeaway-hint hidden>Pesanan bawa pulang tidak memerlukan meja.</p>
-                        @if ($mejas->isEmpty())
-                            <span class="text-xs text-red-600 mt-1.5 block">Tidak ada meja aktif. Aktifkan meja untuk melanjutkan pesanan.</span>
-                        @endif
+                        <p class="text-xs text-slate-500 mt-1.5" data-takeaway-hint hidden>Pesanan bawa pulang tidak memerlukan meja.</p>
                     </div>
 
-                    <!-- Catatan -->
+                    <!-- Metode Pembayaran -->
                     <div class="mb-4">
-                        <label class="block text-xs font-bold text-slate-700 mb-2">Catatan Pesanan (Opsional)</label>
-                        <textarea name="catatan" rows="2" placeholder="Contoh: Jangan terlalu manis..." class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"></textarea>
+                        <label class="block text-xs font-bold text-slate-700 mb-2">Metode Pembayaran <span class="text-red-500">*</span></label>
+                        <select name="metode_pembayaran" id="metode_pembayaran" required class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <option value="tunai">💵 Tunai (Cash)</option>
+                            <option value="qris">📱 QRIS (Scan Otomatis)</option>
+                        </select>
+                    </div>
+
+                    <!-- Catatan Umum -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-slate-700 mb-2">Catatan Transaksi (Opsional)</label>
+                        <textarea name="catatan" rows="2" placeholder="Catatan untuk seluruh pesanan..." class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"></textarea>
                     </div>
 
                     <!-- Ringkasan Total -->
@@ -372,7 +435,7 @@
                         </div>
                     </div>
 
-                    <button class="pos-checkout w-full mt-4 px-4 py-3 bg-primary-600 text-white rounded-xl font-bold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2" type="submit" data-checkout disabled>
+                    <button class="w-full mt-4 px-4 py-3 bg-primary-600 text-white rounded-xl font-bold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2" type="submit" data-checkout disabled>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
@@ -386,7 +449,7 @@
 
 <script>
     (() => {
-        const products = document.querySelector('[data-pos-products]');
+        const productsContainer = document.querySelector('[data-pos-products]');
         const search = document.querySelector('#pos-search');
         const noResults = document.querySelector('[data-pos-no-results]');
         const cartLines = document.querySelector('[data-cart-lines]');
@@ -405,6 +468,23 @@
         const selectedTableIndicator = document.querySelector('#selected-table-indicator');
         const selectedTableText = document.querySelector('#selected-table-text');
 
+        // Modal Elements
+        const productModal = document.querySelector('#product-modal');
+        const modalCloseBtn = document.querySelector('#modal-close-btn');
+        const modalProductImg = document.querySelector('#modal-product-img');
+        const modalProductPlaceholder = document.querySelector('#modal-product-placeholder');
+        const modalProductCategory = document.querySelector('#modal-product-category');
+        const modalProductName = document.querySelector('#modal-product-name');
+        const modalProductDesc = document.querySelector('#modal-product-desc');
+        const modalProductPrice = document.querySelector('#modal-product-price');
+        const modalProductStock = document.querySelector('#modal-product-stock');
+        const modalOptionsContainer = document.querySelector('#modal-options-container');
+        const modalProductNotes = document.querySelector('#modal-product-notes');
+        const modalQtyVal = document.querySelector('#modal-qty-val');
+        const modalQtyMinus = document.querySelector('#modal-qty-minus');
+        const modalQtyPlus = document.querySelector('#modal-qty-plus');
+        const modalAddBtn = document.querySelector('#modal-add-btn');
+
         // View Tabs Elements
         const viewMenu = document.querySelector('#pos-view-menu');
         const viewDenah = document.querySelector('#pos-view-denah');
@@ -414,15 +494,15 @@
 
         const cart = new Map();
         let activeCategory = 'all';
+        let currentModalProduct = null;
+        let modalQty = 1;
+
         const currency = new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
             maximumFractionDigits: 0,
         });
 
-        // ==========================================
-        // TOAST NOTIFICATION
-        // ==========================================
         function showToast(message) {
             const toast = document.querySelector('#pos-toast');
             const toastMsg = document.querySelector('#pos-toast-msg');
@@ -439,83 +519,44 @@
             }, 2500);
         }
 
-        // ==========================================
-        // SPA VIEW SWITCHER (MENU vs DENAH MEJA)
-        // ==========================================
+        // SPA VIEW SWITCHER
         window.switchPosView = function(viewName) {
-            const sidebarMenu = document.querySelector('#sidebar-nav-menu');
-            const sidebarDenah = document.querySelector('#sidebar-nav-denah');
-
             if (viewName === 'denah') {
                 viewMenu?.classList.add('hidden');
                 viewDenah?.classList.remove('hidden');
                 denahLegendBar?.classList.remove('hidden');
                 denahLegendBar?.classList.add('flex');
 
-                // Update Tab Buttons
                 tabBtnMenu?.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
                 tabBtnMenu?.classList.add('text-slate-600', 'hover:text-slate-900');
-
                 tabBtnDenah?.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
                 tabBtnDenah?.classList.remove('text-slate-600', 'hover:text-slate-900');
 
-                // Update Sidebar
-                sidebarMenu?.classList.remove('active');
-                sidebarMenu?.classList.add('inactive');
-                sidebarDenah?.classList.add('active');
-                sidebarDenah?.classList.remove('inactive');
-
-                if (history.replaceState) {
-                    history.replaceState(null, null, '#denah');
-                }
+                history.replaceState?.(null, null, '#denah');
             } else {
                 viewMenu?.classList.remove('hidden');
                 viewDenah?.classList.add('hidden');
                 denahLegendBar?.classList.add('hidden');
                 denahLegendBar?.classList.remove('flex');
 
-                // Update Tab Buttons
                 tabBtnMenu?.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
                 tabBtnMenu?.classList.remove('text-slate-600', 'hover:text-slate-900');
-
                 tabBtnDenah?.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
                 tabBtnDenah?.classList.add('text-slate-600', 'hover:text-slate-900');
 
-                // Update Sidebar
-                sidebarMenu?.classList.add('active');
-                sidebarMenu?.classList.remove('inactive');
-                sidebarDenah?.classList.remove('active');
-                sidebarDenah?.classList.add('inactive');
-
-                if (history.replaceState) {
-                    history.replaceState(null, null, '#menu');
-                }
+                history.replaceState?.(null, null, '#menu');
             }
         };
 
-        // ==========================================
-        // PILIH MEJA DARI DENAH (TANPA PINDAH HALAMAN)
-        // ==========================================
         window.selectTableFromDenah = function(mejaId, mejaNomor) {
-            // 1. Set dropdown value
-            if (tableSelect) {
-                tableSelect.value = String(mejaId);
-            }
-
-            // 2. Set order type to dine-in
+            if (tableSelect) tableSelect.value = String(mejaId);
             const dineInRadio = document.querySelector('input[name="tipe_pesanan"][value="dine-in"]');
             if (dineInRadio) {
                 dineInRadio.checked = true;
                 syncOrderType();
             }
-
-            // 3. Update Indicator & Highlight Card
             updateTableSelectionUI(mejaId, mejaNomor);
-
-            // 4. Kembali otomatis ke Katalog Menu
             window.switchPosView('menu');
-
-            // 5. Beri feedback Toast
             showToast(`Meja ${mejaNomor} terpilih untuk pesanan ini!`);
         };
 
@@ -525,14 +566,10 @@
                 document.querySelectorAll('.pos-table-card').forEach(card => card.classList.remove('ring-4', 'ring-primary-400'));
                 return;
             }
-
-            // Update badge in cart
             if (selectedTableIndicator && selectedTableText) {
                 selectedTableText.textContent = `Meja ${mejaNomor || mejaId} Terpilih`;
                 selectedTableIndicator.classList.remove('hidden');
             }
-
-            // Highlight in denah
             document.querySelectorAll('.pos-table-card').forEach(card => {
                 if (card.dataset.mejaId === String(mejaId)) {
                     card.classList.add('ring-4', 'ring-primary-400');
@@ -543,23 +580,137 @@
         }
 
         // ==========================================
-        // POS CART LOGIC
+        // MODAL KUSTOMISASI
         // ==========================================
-        function selectedOrderType() {
-            return form.querySelector('input[name="tipe_pesanan"]:checked').value;
+        function openProductModal(card) {
+            currentModalProduct = {
+                id: card.dataset.id,
+                name: card.dataset.name,
+                price: Number(card.dataset.price),
+                stock: Number(card.dataset.stock),
+                desc: card.dataset.desc,
+                category: card.dataset.categoryName,
+                image: card.dataset.image,
+                options: JSON.parse(card.dataset.options || '[]')
+            };
+
+            modalProductName.textContent = currentModalProduct.name;
+            modalProductCategory.textContent = currentModalProduct.category;
+            modalProductDesc.textContent = currentModalProduct.desc;
+            modalProductPrice.textContent = currency.format(currentModalProduct.price);
+            modalProductStock.textContent = `Stok ${currentModalProduct.stock}`;
+            modalProductNotes.value = '';
+            modalQty = 1;
+            modalQtyVal.textContent = modalQty;
+
+            if (currentModalProduct.image) {
+                modalProductImg.src = currentModalProduct.image;
+                modalProductImg.classList.remove('hidden');
+                modalProductPlaceholder.classList.add('hidden');
+            } else {
+                modalProductImg.classList.add('hidden');
+                modalProductPlaceholder.classList.remove('hidden');
+            }
+
+            // Render options from DB
+            modalOptionsContainer.replaceChildren();
+            if (currentModalProduct.options.length > 0) {
+                currentModalProduct.options.forEach(opt => {
+                    const label = document.createElement('label');
+                    label.className = 'text-xs flex items-center justify-between p-2.5 rounded-xl border border-slate-200 cursor-pointer bg-slate-50 hover:bg-slate-100 transition';
+
+                    const leftDiv = document.createElement('div');
+                    leftDiv.className = 'flex items-center gap-2';
+
+                    const input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.value = opt.nama_opsi;
+                    input.dataset.extra = opt.harga_tambahan || 0;
+                    input.className = 'rounded text-primary-600 focus:ring-primary-500';
+
+                    const span = document.createElement('span');
+                    span.className = 'font-semibold text-slate-800';
+                    span.textContent = opt.nama_opsi;
+
+                    leftDiv.append(input, span);
+
+                    const priceSpan = document.createElement('span');
+                    priceSpan.className = 'text-[11px] font-bold text-primary-600';
+                    priceSpan.textContent = Number(opt.harga_tambahan) > 0 ? `+${currency.format(opt.harga_tambahan)}` : 'Gratis';
+
+                    label.append(leftDiv, priceSpan);
+                    modalOptionsContainer.append(label);
+                });
+            } else {
+                modalOptionsContainer.innerHTML = '<span class="text-xs text-slate-400 italic col-span-2">Tidak ada opsi kustomisasi untuk menu ini.</span>';
+            }
+
+            modalAddBtn.disabled = currentModalProduct.stock < 1;
+            productModal.classList.remove('hidden');
         }
 
-        function makeButton(label, action, product, ariaLabel) {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'pos-qty-btn';
-            button.textContent = label;
-            button.dataset.cartAction = action;
-            button.dataset.id = product.id;
-            button.setAttribute('aria-label', ariaLabel);
-            return button;
+        function closeProductModal() {
+            productModal.classList.add('hidden');
+            currentModalProduct = null;
         }
 
+        modalCloseBtn?.addEventListener('click', closeProductModal);
+        productModal?.addEventListener('click', (e) => {
+            if (e.target === productModal) closeProductModal();
+        });
+
+        modalQtyMinus?.addEventListener('click', () => {
+            if (modalQty > 1) {
+                modalQty -= 1;
+                modalQtyVal.textContent = modalQty;
+            }
+        });
+
+        modalQtyPlus?.addEventListener('click', () => {
+            if (currentModalProduct && modalQty < currentModalProduct.stock) {
+                modalQty += 1;
+                modalQtyVal.textContent = modalQty;
+            }
+        });
+
+        modalAddBtn?.addEventListener('click', () => {
+            if (!currentModalProduct) return;
+
+            const selectedOpts = [];
+            let extraPrice = 0;
+            modalOptionsContainer.querySelectorAll('input:checked').forEach(cb => {
+                selectedOpts.push(cb.value);
+                extraPrice += Number(cb.dataset.extra || 0);
+            });
+
+            const note = modalProductNotes.value.trim();
+            const customization = [...selectedOpts, note].filter(Boolean).join(', ');
+            const finalUnitPrice = currentModalProduct.price + extraPrice;
+
+            // Unique cart key based on product id + customization to handle different options of the same item
+            const cartKey = `${currentModalProduct.id}_${customization}`;
+
+            const existingItem = cart.get(cartKey) || {
+                id: currentModalProduct.id,
+                name: currentModalProduct.name,
+                basePrice: currentModalProduct.price,
+                price: finalUnitPrice,
+                stock: currentModalProduct.stock,
+                qty: 0,
+                customization: customization
+            };
+
+            existingItem.qty = Math.min(existingItem.qty + modalQty, existingItem.stock);
+            cart.set(cartKey, existingItem);
+
+            renderCart();
+            showToast(`${currentModalProduct.name} ditambahkan ke keranjang`);
+            closeProductModal();
+        });
+
+        // ==========================================
+        // RENDER CART
+        // ==========================================
         function renderCart() {
             cartLines.replaceChildren();
             cartInputs.replaceChildren();
@@ -567,105 +718,102 @@
             let subtotal = 0;
             let index = 0;
 
-            for (const product of cart.values()) {
-                itemCount += product.qty;
-                subtotal += product.price * product.qty;
+            for (const [key, item] of cart.entries()) {
+                itemCount += item.qty;
+                subtotal += item.price * item.qty;
 
                 const line = document.createElement('div');
-                line.className = 'pos-cart-item';
+                line.className = 'p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col gap-2';
 
-                const detail = document.createElement('div');
-                detail.className = 'flex-1 min-w-0';
+                const topRow = document.createElement('div');
+                topRow.className = 'flex items-start justify-between gap-2';
+
+                const info = document.createElement('div');
+                info.className = 'flex-1 min-w-0';
                 const name = document.createElement('div');
                 name.className = 'font-bold text-slate-900 text-sm truncate';
-                name.textContent = product.name;
+                name.textContent = item.name;
+                
                 const price = document.createElement('div');
-                price.className = 'text-xs text-slate-500 mt-0.5';
-                price.textContent = currency.format(product.price * product.qty);
-                detail.append(name, price);
+                price.className = 'text-xs font-semibold text-primary-600 mt-0.5';
+                price.textContent = currency.format(item.price * item.qty);
+                info.append(name, price);
 
-                const customizationLabel = document.createElement('div');
-                customizationLabel.className = 'mt-2 pt-2 border-t border-slate-200';
-                const customTitle = document.createElement('div');
-                customTitle.className = 'text-[10px] font-bold text-slate-500 uppercase mb-1.5';
-                customTitle.textContent = 'Kustomisasi';
-                customizationLabel.appendChild(customTitle);
+                if (item.customization) {
+                    const badge = document.createElement('div');
+                    badge.className = 'text-[11px] text-slate-600 bg-white px-2 py-1 rounded border border-slate-200 mt-1.5 italic';
+                    badge.textContent = `Opsi/Catatan: ${item.customization}`;
+                    info.appendChild(badge);
+                }
 
-                const presetsContainer = document.createElement('div');
-                presetsContainer.className = 'grid grid-cols-2 gap-1 mb-2';
-                const presets = ['Es sedikit', 'Gula aren dipisah', 'Sirup dipisah', 'Oatmilk (+Rp 8.000)'];
-
-                presets.forEach(preset => {
-                    const label = document.createElement('label');
-                    label.className = 'pos-customization-preset';
-
-                    const input = document.createElement('input');
-                    input.type = 'checkbox';
-                    input.checked = (product.customization || '').includes(preset);
-
-                    const text = document.createTextNode(preset);
-                    label.append(input, text);
-
-                    presetsContainer.append(label);
-                });
-
-                const customization = document.createElement('textarea');
-                customization.className = 'w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs resize-none focus:outline-none focus:ring-1 focus:ring-primary-500';
-                customization.name = `items[${index}][customization]`;
-                customization.maxLength = 250;
-                customization.rows = 2;
-                customization.placeholder = 'Catatan tambahan...';
-
-                const currentCustom = product.customization || '';
-                const noteOnly = currentCustom.split(', ').filter(p => !presets.includes(p)).join(', ');
-                customization.value = noteOnly;
-
-                const updateCustomization = () => {
-                    const checked = [];
-                    presetsContainer.querySelectorAll('input:checked').forEach(cb => {
-                        checked.push(cb.nextSibling.textContent.trim());
-                    });
-                    const note = customization.value.trim();
-                    product.customization = [checked.join(', '), note].filter(Boolean).join(', ');
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'text-slate-400 hover:text-red-600 text-xs font-bold';
+                removeBtn.textContent = '✕';
+                removeBtn.onclick = () => {
+                    cart.delete(key);
+                    renderCart();
                 };
 
-                presetsContainer.querySelectorAll('input').forEach(cb => {
-                    cb.addEventListener('change', updateCustomization);
-                });
-                customization.addEventListener('input', updateCustomization);
+                topRow.append(info, removeBtn);
 
-                customizationLabel.append(presetsContainer, customization);
+                const bottomRow = document.createElement('div');
+                bottomRow.className = 'flex items-center justify-between pt-2 border-t border-slate-200';
 
-                const controls = document.createElement('div');
-                controls.className = 'flex items-center gap-1.5 ml-3';
-                controls.append(makeButton('−', 'decrease', product, `Kurangi ${product.name}`));
-                const quantity = document.createElement('span');
-                quantity.className = 'w-6 text-center font-bold text-sm text-slate-900';
-                quantity.textContent = product.qty;
-                controls.append(quantity);
-                const increase = makeButton('+', 'increase', product, `Tambah ${product.name}`);
-                increase.disabled = product.qty >= product.stock;
-                controls.append(increase);
+                const qtyControls = document.createElement('div');
+                qtyControls.className = 'flex items-center gap-2';
 
-                const remove = document.createElement('button');
-                remove.type = 'button';
-                remove.className = 'text-xs text-red-600 hover:text-red-700 font-semibold ml-2';
-                remove.dataset.cartAction = 'remove';
-                remove.dataset.id = product.id;
-                remove.textContent = 'Hapus';
+                const minusBtn = document.createElement('button');
+                minusBtn.type = 'button';
+                minusBtn.className = 'w-6 h-6 rounded bg-white border border-slate-300 font-bold text-xs flex items-center justify-center hover:bg-slate-100';
+                minusBtn.textContent = '−';
+                minusBtn.onclick = () => {
+                    if (item.qty > 1) {
+                        item.qty -= 1;
+                    } else {
+                        cart.delete(key);
+                    }
+                    renderCart();
+                };
 
-                line.append(detail, controls);
-                cartLines.append(line, customizationLabel, remove);
+                const qtySpan = document.createElement('span');
+                qtySpan.className = 'text-xs font-bold text-slate-800';
+                qtySpan.textContent = `${item.qty}x`;
 
-                const productId = document.createElement('input');
-                productId.type = 'hidden';
-                productId.name = `items[${index}][produk_id]`;
-                productId.value = product.id;
-                const productQty = document.createElement('input');
-                productQty.type = 'hidden';
-                productQty.name = `items[${index}][qty]`;
-                productQty.value = product.qty;
-                cartInputs.append(productId, productQty);
+                const plusBtn = document.createElement('button');
+                plusBtn.type = 'button';
+                plusBtn.className = 'w-6 h-6 rounded bg-white border border-slate-300 font-bold text-xs flex items-center justify-center hover:bg-slate-100';
+                plusBtn.textContent = '+';
+                plusBtn.onclick = () => {
+                    if (item.qty < item.stock) {
+                        item.qty += 1;
+                        renderCart();
+                    }
+                };
+
+                qtyControls.append(minusBtn, qtySpan, plusBtn);
+                bottomRow.appendChild(qtyControls);
+
+                line.append(topRow, bottomRow);
+                cartLines.appendChild(line);
+
+                // Hidden Inputs for Form Submission
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = `items[${index}][produk_id]`;
+                idInput.value = item.id;
+
+                const qtyInput = document.createElement('input');
+                qtyInput.type = 'hidden';
+                qtyInput.name = `items[${index}][qty]`;
+                qtyInput.value = item.qty;
+
+                const customInput = document.createElement('input');
+                customInput.type = 'hidden';
+                customInput.name = `items[${index}][customization]`;
+                customInput.value = item.customization || '';
+
+                cartInputs.append(idInput, qtyInput, customInput);
                 index += 1;
             }
 
@@ -675,44 +823,16 @@
             cartSubtotal.textContent = currency.format(subtotal);
             cartTax.textContent = currency.format(tax);
             cartTotal.textContent = currency.format(subtotal + tax);
-            checkout.disabled = cart.size === 0 || (selectedOrderType() === 'dine-in' && !tableSelect.value);
-
-            document.querySelectorAll('[data-add-product]').forEach((button) => {
-                const product = cart.get(button.dataset.id);
-                button.disabled = Number(button.dataset.stock) < 1 || (product && product.qty >= product.stock);
-            });
+            
+            const dineIn = form.querySelector('input[name="tipe_pesanan"]:checked').value === 'dine-in';
+            checkout.disabled = cart.size === 0 || (dineIn && !tableSelect.value);
         }
 
-        products?.addEventListener('click', (event) => {
-            const button = event.target.closest('[data-add-product]');
-            if (!button || button.disabled) return;
-
-            const id = button.dataset.id;
-            const product = cart.get(id) ?? {
-                id,
-                name: button.dataset.name,
-                price: Number(button.dataset.price),
-                stock: Number(button.dataset.stock),
-                qty: 0,
-                customization: '',
-            };
-            product.qty = Math.min(product.qty + 1, product.stock);
-            cart.set(id, product);
-            renderCart();
-            showToast(`${product.name} ditambahkan`);
-        });
-
-        cartLines.addEventListener('click', (event) => {
-            const button = event.target.closest('[data-cart-action]');
-            if (!button) return;
-
-            const product = cart.get(button.dataset.id);
-            if (!product) return;
-            if (button.dataset.cartAction === 'increase') product.qty = Math.min(product.qty + 1, product.stock);
-            if (button.dataset.cartAction === 'decrease') product.qty -= 1;
-            if (button.dataset.cartAction === 'remove' || product.qty < 1) cart.delete(product.id);
-            else cart.set(product.id, product);
-            renderCart();
+        // Product Card Click Listener to Open Modal
+        productsContainer?.addEventListener('click', (e) => {
+            const card = e.target.closest('[data-pos-product]');
+            if (!card) return;
+            openProductModal(card);
         });
 
         search?.addEventListener('input', () => {
@@ -729,65 +849,52 @@
 
         categoryTabs.forEach(tab => {
             tab.addEventListener('click', () => {
-                categoryTabs.forEach(t => {
-                    t.classList.remove('active');
-                    t.classList.add('inactive');
-                });
-                tab.classList.remove('inactive');
-                tab.classList.add('active');
+                categoryTabs.forEach(t => t.classList.remove('active', 'bg-white', 'text-slate-900', 'shadow-sm') || t.classList.add('inactive', 'text-slate-600'));
+                tab.classList.remove('inactive', 'text-slate-600');
+                tab.classList.add('active', 'bg-white', 'text-slate-900', 'shadow-sm');
                 activeCategory = tab.dataset.category;
                 search?.dispatchEvent(new Event('input'));
             });
         });
 
         function syncOrderType() {
-            const dineIn = selectedOrderType() === 'dine-in';
+            const dineIn = form.querySelector('input[name="tipe_pesanan"]:checked').value === 'dine-in';
             tableSelect.disabled = !dineIn;
             tableSelect.required = dineIn;
             takeawayHint.hidden = dineIn;
             if (!dineIn) {
                 selectedTableIndicator?.classList.add('hidden');
-            } else if (tableSelect.value) {
-                const opt = tableSelect.options[tableSelect.selectedIndex];
-                updateTableSelectionUI(tableSelect.value, opt?.dataset?.nomor || opt?.text?.split('·')[0]);
             }
             renderCart();
         }
 
-        orderTypeInputs.forEach((input) => input.addEventListener('change', syncOrderType));
+        orderTypeInputs.forEach(input => input.addEventListener('change', syncOrderType));
         tableSelect?.addEventListener('change', () => {
             const opt = tableSelect.options[tableSelect.selectedIndex];
             updateTableSelectionUI(tableSelect.value, opt?.dataset?.nomor || opt?.text?.split('·')[0]);
             renderCart();
         });
 
-        form?.addEventListener('submit', (event) => {
-            const dineIn = selectedOrderType() === 'dine-in';
+        form?.addEventListener('submit', (e) => {
+            const dineIn = form.querySelector('input[name="tipe_pesanan"]:checked').value === 'dine-in';
             if (cart.size === 0 || (dineIn && !tableSelect.value)) {
-                event.preventDefault();
+                e.preventDefault();
                 return;
             }
             checkout.disabled = true;
             checkout.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Menyimpan pesanan...`;
         });
 
-        // ==========================================
         // INITIALIZATION
-        // ==========================================
         syncOrderType();
-
-        // Check URL hash on load
         if (window.location.hash === '#denah') {
-            window.switchPosView('denah');
-        } else {
-            window.switchPosView('menu');
+            switchPosView('denah');
         }
-
-        // Initialize table selection if already chosen
         if (tableSelect && tableSelect.value) {
             const opt = tableSelect.options[tableSelect.selectedIndex];
             updateTableSelectionUI(tableSelect.value, opt?.dataset?.nomor || opt?.text?.split('·')[0]);
         }
     })();
 </script>
+
 @endsection

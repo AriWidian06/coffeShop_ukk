@@ -87,7 +87,7 @@
             <p class="text-slate-500">Menu yang ada di Bagi Kopi eatery</p>
         </div>
 
-        <!-- Menu Grid (Responsive: 1 kolom mobile, 2 tablet, 3 laptop, 4 desktop besar) -->
+        <!-- Menu Grid -->
         <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @forelse($produks as $produk)
                 @php
@@ -226,7 +226,6 @@
                 </div>
                     <fieldset id="drink-customization-options" class="product-customization-options" hidden>
                         <legend id="customization-legend">Penyesuaian</legend>
-                        <!-- Options will be injected by JS -->
                     </fieldset>
                 <label class="product-custom-note-label" for="dialog-product-note">Catatan tambahan (opsional)</label>
                 <textarea id="dialog-product-note" maxlength="180" rows="3" placeholder="Tulis permintaan lain untuk kasir"></textarea>
@@ -302,6 +301,15 @@
                 </div>
             </div>
 
+            <!-- PILIHAN METODE PEMBAYARAN -->
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-2">Metode Pembayaran:</label>
+                <select id="payment-method" class="text-sm font-semibold bg-white border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-primary-500 focus:outline-none w-full">
+                    <option value="qris">📱 QRIS (Scan Otomatis)</option>
+                    <option value="tunai">💵 Bayar di Kasir (Cash)</option>
+                </select>
+            </div>
+
             <div>
                 <label class="block text-xs font-bold text-slate-700 mb-2">Catatan Khusus (Opsional):</label>
                 <input type="text" id="order-notes" placeholder="Contoh: Es sedikit, gula aren dipisah..."
@@ -359,6 +367,16 @@
                 </div>
                 <div id="receipt-notes-display" class="text-[11px] text-slate-600 italic pt-1"></div>
             </div>
+
+            <!-- BAGIAN TAMPILAN QRIS DINAMIS DI STRUK -->
+            <div id="receipt-qris-section" class="hidden text-center p-3 bg-amber-50 rounded-2xl border border-amber-200 space-y-2">
+                <p class="text-xs font-bold text-amber-800">Scan QRIS untuk Membayar Tagihan:</p>
+                <div class="p-2 bg-white rounded-xl shadow-inner inline-block border border-amber-100">
+                    <img id="receipt-qris-img" src="" alt="QRIS Code" class="w-40 h-40 mx-auto rounded-lg">
+                </div>
+                <p class="text-[10px] text-amber-900">Nominal otomatis sesuai total belanja.</p>
+            </div>
+
             <button onclick="closeReceipt()" class="w-full py-3.5 rounded-2xl bg-primary-600 text-white text-sm font-bold hover:bg-primary-700 transition-all shadow-lg">
                 Tutup & Pesan Baru
             </button>
@@ -561,7 +579,6 @@
             const addQuantity = Math.min(quantity, available);
             if (addQuantity < 1) return;
 
-            // HITUNG HARGA TAMBAHAN DARI OPSI
             let extraPrice = 0;
             if (product.options && product.options.length > 0) {
                 const selectedOptions = Array.from(document.querySelectorAll('input[name="drink_customization"]:checked'));
@@ -684,6 +701,7 @@
 
             const orderType = document.getElementById('order-type').value;
             const tableSelect = document.getElementById('table-number');
+            const paymentMethod = document.getElementById('payment-method').value;
             const notes = document.getElementById('order-notes').value.trim();
             const checkout = document.getElementById('checkout-btn');
             const error = document.getElementById('checkout-error');
@@ -701,6 +719,7 @@
                     body: JSON.stringify({
                         meja_id: orderType === 'dine-in' ? Number(tableSelect.value) : null,
                         tipe_pesanan: orderType,
+                        metode_pembayaran: paymentMethod,
                         catatan: notes || null,
                         items: cart.map(item => ({
                             produk_id: item.produkId,
@@ -716,7 +735,7 @@
                     throw new Error(validationMessage || result.message || 'Pesanan gagal dikirim. Coba lagi.');
                 }
 
-                const order = result.data;
+                const order = result.data || result.transaksi;
                 document.getElementById('receipt-date').textContent = new Date(order.waktu_transaksi).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
                 document.getElementById('receipt-number').textContent = `#${order.id}`;
                 document.getElementById('receipt-order-type').textContent = orderType === 'dine-in' ? 'Dine-in' : 'Takeaway';
@@ -730,6 +749,15 @@
                 });
                 document.getElementById('receipt-items-list').innerHTML = itemsList;
                 document.getElementById('receipt-grand-total').textContent = formatRupiah(order.total_harga);
+
+                // TAMPILKAN QRIS OTOMATIS DI STRUK JIKA METODE QRIS DIPILIH
+                const qrisSection = document.getElementById('receipt-qris-section');
+                if (paymentMethod === 'qris') {
+                    document.getElementById('receipt-qris-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=QRIS-BAGI-KOPI-TX-${order.id}-AMOUNT-${order.total_harga}`;
+                    qrisSection.classList.remove('hidden');
+                } else {
+                    qrisSection.classList.add('hidden');
+                }
 
                 const notesDisplay = document.getElementById('receipt-notes-display');
                 if (notes) {
@@ -793,12 +821,10 @@
         }
 
         function filterMenu() {
-            // Support both desktop and mobile search inputs
             const queryDesktop = document.getElementById('menu-search')?.value.toLowerCase() || '';
             const queryMobile = document.getElementById('menu-search-mobile')?.value.toLowerCase() || '';
             const query = queryDesktop || queryMobile;
 
-            // Sync inputs
             if(document.getElementById('menu-search')) document.getElementById('menu-search').value = query;
             if(document.getElementById('menu-search-mobile')) document.getElementById('menu-search-mobile').value = query;
 

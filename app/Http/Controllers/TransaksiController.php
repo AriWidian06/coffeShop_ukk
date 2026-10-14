@@ -54,6 +54,8 @@ class TransaksiController extends Controller
     public function create(Request $request)
     {
         $mejas = Meja::where('status_aktif', true)->orderBy('nomor_meja')->get();
+        
+        // Memuat data produk beserta relasi kategori dan opsi dari database secara dinamis
         $produks = Produk::with(['kategoriProduk', 'opsis'])
             ->where('status_aktif', true)
             ->where('tipe', 'jual')
@@ -79,6 +81,7 @@ class TransaksiController extends Controller
         $request->validate([
             'meja_id' => 'nullable|required_if:tipe_pesanan,dine-in|exists:mejas,id',
             'tipe_pesanan' => 'required|in:dine-in,take-away',
+            'metode_pembayaran' => 'required|in:tunai,qris',
             'items' => 'required|array|min:1',
             'items.*.produk_id' => 'required|exists:produks,id',
             'items.*.qty' => 'required|integer|min:1',
@@ -101,13 +104,11 @@ class TransaksiController extends Controller
                     ]);
                 }
 
-                // --- PERBAIKAN HITUNG HARGA KOSTUMISASI ---
+                // Kalkulasi harga tambahan dari opsi kustomisasi produk
                 $extraPrice = 0;
                 if (!empty($item['customization'])) {
-                    // Pisahkan opsi yang dipilih (misal: "nuklir (+5000), rudal (+3000)")
                     $selectedOptions = explode(', ', $item['customization']);
                     foreach ($selectedOptions as $optText) {
-                        // Cari opsi di database yang namanya ada di dalam teks pilihan
                         $opsi = \App\Models\ProdukOpsi::where('produk_id', $produk->id)
                             ->where('nama_opsi', 'like', '%' . $optText . '%')
                             ->first();
@@ -119,7 +120,6 @@ class TransaksiController extends Controller
 
                 $subtotal = ($produk->harga_jual + $extraPrice) * $item['qty'];
                 $subtotalHarga += $subtotal;
-                // ------------------------------------------
 
                 $detailItems[] = [
                     'produk_id' => $produk->id,
@@ -152,8 +152,14 @@ class TransaksiController extends Controller
                 return response()->json([
                     'success' => true,
                     'transaksi' => $transaksi->load(['meja', 'detail_transaksis.produk']),
+                    'redirect_url' => $request->metode_pembayaran === 'qris' ? route('kasir.payment.qris', $transaksi->id) : null,
                     'message' => 'Transaksi berhasil dibuat.',
                 ]);
+            }
+
+            if ($request->metode_pembayaran === 'qris') {
+                return redirect()->route('kasir.payment.qris', $transaksi->id)
+                    ->with('success', 'Pesanan berhasil dibuat. Silakan lakukan pembayaran QRIS.');
             }
 
             if ($request->filled('redirect_to')) {
@@ -215,6 +221,28 @@ class TransaksiController extends Controller
                 'ready' => $activeOrders->where('status_pesanan', 'ready')->count(),
             ],
         ]);
+    }
+
+    public function showQrisPayment($id)
+    {
+        $transaksi = Transaksi::with(['detail_transaksis.produk', 'meja', 'karyawan', 'pembayaran'])->findOrFail($id);
+        
+        return view('transaksis.qris', compact('transaksi'));
+    }
+
+    public function processQrisPayment(Request $request, $id)
+    {
+        $transaksi = Transaksi::findOrFail($id);
+        
+        $transaksi->update([
+            'status_pesanan' => 'completed',
+        ]);
+
+        if ($transaksi->pembayaran) {
+            $transaksi->pembayaran->update(['status' => 'paid']);
+        }
+
+        return redirect()->route('transaksis.index')->with('success', 'Pembayaran QRIS untuk Struk #' . $transaksi->id . ' berhasil dikonfirmasi dan lunas!');
     }
 
     public function destroy(Transaksi $transaksi)
