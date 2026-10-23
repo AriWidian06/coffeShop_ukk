@@ -10,6 +10,14 @@
         ->orderBy('nama_produk')
         ->get();
 
+    $produksData = $produks->map(fn($p) => [
+        'id' => $p->id,
+        'opsis' => $p->opsis->map(fn($o) => [
+            'nama' => $o->nama_opsi,
+            'harga' => (float) $o->harga_tambahan
+        ])
+    ])->keyBy('id');
+
     $statusLabels = [
         'pending' => 'Menunggu',
         'ready' => 'Siap',
@@ -168,6 +176,7 @@
 
                     <form class="pos-order-form p-4 border-t border-slate-200 flex-shrink-0" id="pos-form" method="post" action="{{ route('transaksis.store') }}">
                         @csrf
+                         <input type="hidden" name="metode_pembayaran" value="cash">
                         <div data-cart-inputs></div>
 
                         {{-- Tipe Pesanan --}}
@@ -675,14 +684,14 @@
             <div class="space-y-1.5">
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Metode Pembayaran</label>
                 <div class="grid grid-cols-2 gap-2">
-                    <label class="flex items-center justify-center gap-2 py-2.5 px-4 border border-slate-200 rounded-xl cursor-pointer has-[:checked]:border-primary-600 has-[:checked]:bg-primary-50 has-[:checked]:text-primary-700 font-bold text-xs transition">
-                        <input type="radio" name="metode_pembayaran" value="cash" checked class="hidden" onchange="toggleQpMethod('cash')">
-                        <span>💵 Tunai</span>
-                    </label>
-                    <label class="flex items-center justify-center gap-2 py-2.5 px-4 border border-slate-200 rounded-xl cursor-pointer has-[:checked]:border-primary-600 has-[:checked]:bg-primary-50 has-[:checked]:text-primary-700 font-bold text-xs transition">
-                        <input type="radio" name="metode_pembayaran" value="QRIS" class="hidden" onchange="toggleQpMethod('QRIS')">
-                        <span>📱 QRIS</span>
-                    </label>
+                     <label class="flex items-center justify-center gap-2 py-2.5 px-4 border border-slate-200 rounded-xl cursor-pointer has-[:checked]:border-primary-600 has-[:checked]:bg-primary-50 has-[:checked]:text-primary-700 font-bold text-xs transition">
+                         <input type="radio" name="metode_pembayaran" value="cash" checked class="hidden" onchange="toggleQpMethod('cash')">
+                         <span>💵 Tunai</span>
+                     </label>
+                     <label class="flex items-center justify-center gap-2 py-2.5 px-4 border border-slate-200 rounded-xl cursor-pointer has-[:checked]:border-primary-600 has-[:checked]:bg-primary-50 has-[:checked]:text-primary-700 font-bold text-xs transition">
+                         <input type="radio" name="metode_pembayaran" value="QRIS" class="hidden" onchange="toggleQpMethod('QRIS')">
+                         <span>📱 QRIS</span>
+                     </label>
                 </div>
             </div>
 
@@ -771,6 +780,7 @@
     // DATA SERIALIZATION FOR TABLE INSPECTOR & ACTIVE ORDERS
     // ─────────────────────────────────────────────────────────
     const mejaData = @json($mejas->keyBy('id'));
+    const productsOptionsData = @json($produksData);
     let activeOrdersData = @json($activeOrders);
     let pesananAktifList = @json($pesananAktif);
     const csrfToken = '{{ csrf_token() }}';
@@ -1005,14 +1015,14 @@
                         <input type="hidden" name="redirect_to" value="{{ route('dashboard') }}#meja">
 
                         <div class="grid grid-cols-2 gap-2 text-xs font-bold">
-                            <label class="flex items-center justify-center gap-1.5 py-2 px-3 border border-slate-200 rounded-xl cursor-pointer has-[:checked]:border-primary-600 has-[:checked]:bg-primary-50 has-[:checked]:text-primary-700 transition">
-                                <input type="radio" name="metode_pembayaran" value="cash" checked class="hidden" onchange="togglePaymentInputs(${order.id}, 'cash', ${order.total_harga})">
-                                <span>💵 Tunai</span>
-                            </label>
-                            <label class="flex items-center justify-center gap-1.5 py-2 px-3 border border-slate-200 rounded-xl cursor-pointer has-[:checked]:border-primary-600 has-[:checked]:bg-primary-50 has-[:checked]:text-primary-700 transition">
-                                <input type="radio" name="metode_pembayaran" value="QRIS" class="hidden" onchange="togglePaymentInputs(${order.id}, 'QRIS', ${order.total_harga})">
-                                <span>📱 QRIS</span>
-                            </label>
+                                 <label class="flex items-center justify-center gap-1.5 py-2 px-3 border border-slate-200 rounded-xl cursor-pointer has-[:checked]:border-primary-600 has-[:checked]:bg-primary-50 has-[:checked]:text-primary-700 transition">
+                                     <input type="radio" name="metode_pembayaran" value="cash" checked class="hidden" onchange="togglePaymentInputs(${order.id}, 'cash', ${order.total_harga})">
+                                     <span>💵 Tunai</span>
+                                 </label>
+                                 <label class="flex items-center justify-center gap-1.5 py-2 px-3 border border-slate-200 rounded-xl cursor-pointer has-[:checked]:border-primary-600 has-[:checked]:bg-primary-50 has-[:checked]:text-primary-700 transition">
+                                     <input type="radio" name="metode_pembayaran" value="QRIS" class="hidden" onchange="togglePaymentInputs(${order.id}, 'QRIS', ${order.total_harga})">
+                                     <span>📱 QRIS</span>
+                                 </label>
                         </div>
 
                         <div id="cash-input-group-${order.id}">
@@ -1255,9 +1265,9 @@
         document.getElementById('qp-subtitle').textContent = `${label} • Tagihan: Rp ${formatNumber(totalHarga)}`;
         document.getElementById('qp-total-display').textContent = `Rp ${formatNumber(totalHarga)}`;
 
-        const cashRadio = document.querySelector('input[name="metode_pembayaran"][value="cash"]');
+                                 const cashRadio = document.querySelector('input[name="metode_pembayaran"][value="cash"]');
         if (cashRadio) cashRadio.checked = true;
-        toggleQpMethod('cash');
+                                 toggleQpMethod('tunai');
 
         const cashInput = document.getElementById('qp-cash-input');
         cashInput.value = totalHarga;
@@ -1736,7 +1746,14 @@
 
             for (const product of cart.values()) {
                 itemCount += product.qty;
-                subtotal += product.price * product.qty;
+                
+                const options = productsOptionsData[product.id]?.opsis || [];
+                const extraPrice = options.reduce((sum, opt) => {
+                    return (product.customization || '').includes(opt.nama) ? sum + Number(opt.harga) : sum;
+                }, 0);
+                
+                const lineTotal = (Number(product.price) + extraPrice) * product.qty;
+                subtotal += lineTotal;
 
                 const line = document.createElement('div');
                 line.className = 'pos-cart-item';
@@ -1748,58 +1765,81 @@
                 name.textContent = product.name;
                 const price = document.createElement('div');
                 price.className = 'text-xs text-slate-500 mt-0.5';
-                price.textContent = currency.format(product.price * product.qty);
+                                price.textContent = currency.format(lineTotal);
+
+
                 detail.append(name, price);
 
-                const customizationLabel = document.createElement('div');
-                customizationLabel.className = 'mt-2 pt-2 border-t border-slate-200';
-                const customTitle = document.createElement('div');
-                customTitle.className = 'text-[10px] font-bold text-slate-500 uppercase mb-1.5';
-                customTitle.textContent = 'Kustomisasi';
-                customizationLabel.appendChild(customTitle);
+                 const customizationLabel = document.createElement('div');
+                 customizationLabel.className = 'mt-2 pt-2 border-t border-slate-200';
+                 const customTitle = document.createElement('div');
+                 customTitle.className = 'text-[10px] font-bold text-slate-500 uppercase mb-1.5';
+                 customTitle.textContent = 'Kustomisasi';
+                 customizationLabel.appendChild(customTitle);
 
-                const presetsContainer = document.createElement('div');
-                presetsContainer.className = 'grid grid-cols-2 gap-1 mb-2';
-                const presets = ['Es sedikit', 'Gula aren dipisah', 'Sirup dipisah', 'Oatmilk (+Rp 8.000)'];
+                  const presetsContainer = document.createElement('div');
+                  presetsContainer.className = 'grid grid-cols-2 gap-1 mb-2';
 
-                presets.forEach(preset => {
-                    const label = document.createElement('label');
-                    label.className = 'pos-customization-preset';
 
-                    const input = document.createElement('input');
-                    input.type = 'checkbox';
-                    input.checked = (product.customization || '').includes(preset);
+                 options.forEach(option => {
+                     const label = document.createElement('label');
+                     label.className = 'pos-customization-preset';
+                     const optText = option.harga > 0 ? `${option.nama} (+Rp ${formatNumber(option.harga)})` : option.nama;
 
-                    const text = document.createTextNode(preset);
-                    label.append(input, text);
+                     const input = document.createElement('input');
+                     input.type = 'checkbox';
+                     input.dataset.option = option.nama;
+                     input.checked = (product.customization || '').includes(option.nama);
 
-                    presetsContainer.append(label);
-                });
+                     const text = document.createTextNode(optText);
+                     label.append(input, text);
+
+                     presetsContainer.append(label);
+                 });
+
 
                 const customization = document.createElement('textarea');
                 customization.className = 'w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs resize-none focus:outline-none focus:ring-1 focus:ring-primary-500';
-                customization.name = `items[${index}][customization]`;
                 customization.maxLength = 250;
                 customization.rows = 2;
                 customization.placeholder = 'Catatan tambahan...';
 
-                const currentCustom = product.customization || '';
-                const noteOnly = currentCustom.split(', ').filter(p => !presets.includes(p)).join(', ');
-                customization.value = noteOnly;
+                 const currentCustom = product.customization || '';
+                 const optionNames = options.map(o => o.nama);
+                 const noteOnly = currentCustom.split(', ').filter(p => !optionNames.includes(p)).join(', ');
+                 customization.value = noteOnly;
 
-                const updateCustomization = () => {
-                    const checked = [];
-                    presetsContainer.querySelectorAll('input:checked').forEach(cb => {
-                        checked.push(cb.nextSibling.textContent.trim());
-                    });
-                    const note = customization.value.trim();
-                    product.customization = [checked.join(', '), note].filter(Boolean).join(', ');
-                };
+                 const customizationInput = document.createElement('input');
+                 customizationInput.type = 'hidden';
+                 customizationInput.name = `items[${index}][customization]`;
+                 customizationInput.value = product.customization || '';
+
+                  const updateCustomization = () => {
+                      const checked = [];
+                      presetsContainer.querySelectorAll('input:checked').forEach((cb) => {
+                         if (cb.dataset.option) checked.push(cb.dataset.option);
+                     });
+                     const note = customization.value.trim();
+                     product.customization = [checked.join(', '), note].filter(Boolean).join(', ');
+                     customizationInput.value = product.customization;
+                     renderCart();
+                 };
+
+                 const updateNote = () => {
+                     const checked = [];
+                     presetsContainer.querySelectorAll('input:checked').forEach((cb) => {
+                         if (cb.dataset.option) checked.push(cb.dataset.option);
+                     });
+                     const note = customization.value.trim();
+                     product.customization = [checked.join(', '), note].filter(Boolean).join(', ');
+                     customizationInput.value = product.customization;
+                 };
+
 
                 presetsContainer.querySelectorAll('input').forEach(cb => {
                     cb.addEventListener('change', updateCustomization);
                 });
-                customization.addEventListener('input', updateCustomization);
+                customization.addEventListener('input', updateNote);
 
                 customizationLabel.append(presetsContainer, customization);
 
@@ -1832,7 +1872,7 @@
                 productQty.type = 'hidden';
                 productQty.name = `items[${index}][qty]`;
                 productQty.value = product.qty;
-                cartInputs.append(productId, productQty);
+                cartInputs.append(productId, productQty, customizationInput);
                 index += 1;
             }
 

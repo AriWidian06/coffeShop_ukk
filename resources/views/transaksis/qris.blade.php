@@ -28,9 +28,9 @@
         <!-- QR Code Generator -->
         <div class="flex justify-center mb-6">
             <div class="p-4 bg-white border-2 border-slate-100 rounded-2xl shadow-sm inline-block">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=QRIS-PERKOCI-EATERY-TX-{{ $transaksi->id }}-AMOUNT-{{ $transaksi->total_harga }}" 
-                     alt="QRIS Code" 
-                     class="w-52 h-52 mx-auto rounded-lg">
+                 <img src="{{ asset('images/qris.jpg') }}" 
+                      alt="QRIS Code" 
+                      class="w-52 h-52 mx-auto rounded-lg">
             </div>
         </div>
 

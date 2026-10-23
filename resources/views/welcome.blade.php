@@ -305,7 +305,7 @@
             <div>
                 <label class="block text-xs font-bold text-slate-700 mb-2">Metode Pembayaran:</label>
                 <select id="payment-method" class="text-sm font-semibold bg-white border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-primary-500 focus:outline-none w-full">
-                    <option value="qris">📱 QRIS (Scan Otomatis)</option>
+                     <option value="QRIS">📱 QRIS (Scan Otomatis)</option>
                     <option value="tunai">💵 Bayar di Kasir (Cash)</option>
                 </select>
             </div>
@@ -752,8 +752,8 @@
 
                 // TAMPILKAN QRIS OTOMATIS DI STRUK JIKA METODE QRIS DIPILIH
                 const qrisSection = document.getElementById('receipt-qris-section');
-                if (paymentMethod === 'qris') {
-                    document.getElementById('receipt-qris-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=QRIS-BAGI-KOPI-TX-${order.id}-AMOUNT-${order.total_harga}`;
+                 if (paymentMethod === 'QRIS') {
+                     document.getElementById('receipt-qris-img').src = `{{ asset('images/qris.jpg') }}`;
                     qrisSection.classList.remove('hidden');
                 } else {
                     qrisSection.classList.add('hidden');

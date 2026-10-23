@@ -238,10 +238,10 @@
                         
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-2">Metode Pembayaran</label>
-                            <select name="metode_pembayaran" required class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                                <option value="cash">Tunai</option>
-                                <option value="QRIS">QRIS</option>
-                            </select>
+                             <select name="metode_pembayaran" required class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                 <option value="cash">Tunai</option>
+                                 <option value="QRIS">QRIS</option>
+                             </select>
                         </div>
 
                         <button type="submit" class="w-full px-6 py-2.5 bg-emerald-600 text-white rounded-xl font-semibold text-sm hover:bg-emerald-700 transition-all shadow-md shadow-emerald-600/20">

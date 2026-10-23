@@ -81,7 +81,7 @@ class TransaksiController extends Controller
         $request->validate([
             'meja_id' => 'nullable|required_if:tipe_pesanan,dine-in|exists:mejas,id',
             'tipe_pesanan' => 'required|in:dine-in,take-away',
-            'metode_pembayaran' => 'required|in:tunai,qris',
+            'metode_pembayaran' => 'required|in:cash,QRIS',
             'items' => 'required|array|min:1',
             'items.*.produk_id' => 'required|exists:produks,id',
             'items.*.qty' => 'required|integer|min:1',
@@ -109,8 +109,9 @@ class TransaksiController extends Controller
                 if (!empty($item['customization'])) {
                     $selectedOptions = explode(', ', $item['customization']);
                     foreach ($selectedOptions as $optText) {
+                        $optName = explode(' (+', $optText)[0];
                         $opsi = \App\Models\ProdukOpsi::where('produk_id', $produk->id)
-                            ->where('nama_opsi', 'like', '%' . $optText . '%')
+                            ->where('nama_opsi', 'like', '%' . $optName . '%')
                             ->first();
                         if ($opsi) {
                             $extraPrice += $opsi->harga_tambahan;
@@ -152,12 +153,12 @@ class TransaksiController extends Controller
                 return response()->json([
                     'success' => true,
                     'transaksi' => $transaksi->load(['meja', 'detail_transaksis.produk']),
-                    'redirect_url' => $request->metode_pembayaran === 'qris' ? route('kasir.payment.qris', $transaksi->id) : null,
+                     'redirect_url' => $request->metode_pembayaran === 'QRIS' ? route('kasir.payment.qris', $transaksi->id) : null,
                     'message' => 'Transaksi berhasil dibuat.',
                 ]);
             }
 
-            if ($request->metode_pembayaran === 'qris') {
+             if ($request->metode_pembayaran === 'QRIS') {
                 return redirect()->route('kasir.payment.qris', $transaksi->id)
                     ->with('success', 'Pesanan berhasil dibuat. Silakan lakukan pembayaran QRIS.');
             }
@@ -238,9 +239,16 @@ class TransaksiController extends Controller
             'status_pesanan' => 'completed',
         ]);
 
-        if ($transaksi->pembayaran) {
-            $transaksi->pembayaran->update(['status' => 'paid']);
-        }
+        \App\Models\Pembayaran::updateOrCreate(
+            ['transaksi_id' => $transaksi->id],
+            [
+                'jumlah_bayar' => $transaksi->total_harga,
+                 'metode_pembayaran' => 'QRIS',
+                'status_pembayaran' => 'paid',
+                'kembalian' => 0,
+                'waktu_pembayaran' => now(),
+            ]
+        );
 
         return redirect()->route('transaksis.index')->with('success', 'Pembayaran QRIS untuk Struk #' . $transaksi->id . ' berhasil dikonfirmasi dan lunas!');
     }
