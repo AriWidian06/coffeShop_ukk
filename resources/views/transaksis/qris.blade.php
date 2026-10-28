@@ -17,7 +17,7 @@
             </p>
         </div>
 
-        <!-- TOTAL HARGA OTOMATIS -->
+        <!-- Total Harga -->
         <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 mb-6 shadow-inner">
             <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Total Tagihan Pembayaran</p>
             <div class="text-3xl font-black text-primary-600 mt-1">
@@ -25,27 +25,30 @@
             </div>
         </div>
 
-        <!-- QR Code Generator -->
-        <div class="flex justify-center mb-6">
-            <div class="p-4 bg-white border-2 border-slate-100 rounded-2xl shadow-sm inline-block">
-                 <img src="{{ asset('images/qris.jpg') }}" 
-                      alt="QRIS Code" 
-                      class="w-52 h-52 mx-auto rounded-lg">
-            </div>
+        <!-- Midtrans Payment Button -->
+        <div class="flex justify-center mb-8">
+            <button id="pay-button" 
+                    class="w-full px-6 py-4 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-2xl transition-all text-lg shadow-lg shadow-primary-600/30 flex items-center justify-center gap-2 active:scale-95">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .845-3 2s1.343 2 3 2 3 .845 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Bayar Sekarang
+            </button>
         </div>
 
-        <!-- Panduan Kasir -->
-        <div class="space-y-2 mb-8 text-left text-xs text-slate-600 bg-amber-50 border border-amber-200 p-4 rounded-xl">
-            <p class="font-bold text-amber-800 flex items-center gap-1">
+        <!-- Panduan Pembayaran -->
+        <div class="space-y-2 mb-8 text-left text-xs text-slate-600 bg-blue-50 border border-blue-100 p-4 rounded-xl">
+            <p class="font-bold text-blue-800 flex items-center gap-1">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                Panduan Kasir:
+                Cara Bayar:
             </p>
-            <ul class="list-disc list-inside space-y-1 text-amber-900">
-                <li>Minta pelanggan scan QRIS di atas menggunakan aplikasi e-wallet / mobile banking.</li>
-                <li>Pastikan nominal yang terproses di HP pelanggan sama persis dengan tagihan.</li>
-                <li>Klik tombol <span class="font-bold">Konfirmasi Lunas</span> di bawah setelah pembayaran diterima.</li>
+            <ul class="list-disc list-inside space-y-1 text-blue-900">
+                <li>Klik tombol <span class="font-bold">Bayar Sekarang</span>.</li>
+                <li>Pilih metode pembayaran (QRIS, E-Wallet, Bank Transfer).</li>
+                <li>Lakukan pembayaran sesuai nominal tagihan.</li>
+                <li>Sistem akan otomatis memperbarui status menjadi Lunas.</li>
             </ul>
         </div>
 
@@ -55,16 +58,73 @@
                class="flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition text-sm text-center flex items-center justify-center">
                 Kembali
             </a>
-            
-            <form action="{{ route('kasir.payment.qris.process', $transaksi->id) }}" method="POST" class="flex-1">
-                @csrf
-                <button type="submit" 
-                        class="w-full px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition text-sm shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-1">
-                    Konfirmasi Lunas ✓
-                </button>
-            </form>
+            <button type="button" id="check-button"
+                    class="flex-1 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition text-sm text-center flex items-center justify-center">
+                Cek Status
+            </button>
         </div>
-
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script src="{{ config('services.midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+<script>
+    const orderId = '{{ $orderId }}';
+    const checkUrl = '{{ route('kasir.payment.qris.check', $transaksi->id) }}';
+    const csrfToken = '{{ csrf_token() }}';
+
+    function checkStatus(redirectOnPaid, attempt = 1) {
+        fetch(checkUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({ order_id: orderId }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.paid) {
+                alert('Pembayaran berhasil dan sudah lunas!');
+                window.location.href = "{{ route('transaksis.index') }}";
+                return;
+            }
+
+            if (redirectOnPaid && attempt < 3) {
+                setTimeout(() => checkStatus(redirectOnPaid, attempt + 1), 2000);
+                return;
+            }
+
+            if (redirectOnPaid) {
+                alert('Pembayaran belum terkonfirmasi (status: ' + data.status + '). Silakan cek beberapa saat lagi.');
+            }
+        })
+        .catch(() => {
+            if (redirectOnPaid) {
+                alert('Gagal mengecek status pembayaran.');
+            }
+        });
+    }
+
+    document.getElementById('pay-button').onclick = function() {
+        window.snap.pay('{{ $snapToken }}', {
+            onSuccess: function(result) {
+                checkStatus(true);
+            },
+            onPending: function(result) {
+                alert('Menunggu Pembayaran...');
+                checkStatus(false);
+            },
+            onError: function(result) {
+                alert('Pembayaran Gagal!');
+            }
+        });
+    };
+
+    document.getElementById('check-button').onclick = function() {
+        checkStatus(true);
+    };
+</script>
 @endsection

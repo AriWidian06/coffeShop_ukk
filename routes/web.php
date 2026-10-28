@@ -18,6 +18,8 @@ use App\Models\Produk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+Route::post('/midtrans/notification', [TransaksiController::class, 'midtransNotification'])->name('midtrans.notification');
+
 // ==========================================
 // 1. PUBLIC ROUTES (Tanpa Login)
 // ==========================================
@@ -248,6 +250,6 @@ Route::middleware('auth:karyawan')->group(function () {
     // Rute khusus Kasir untuk pembayaran QRIS
     Route::middleware(['auth:karyawan'])->prefix('kasir')->name('kasir.')->group(function () {
         Route::get('/transaksi/{id}/qris', [TransaksiController::class, 'showQrisPayment'])->name('payment.qris');
-        Route::post('/transaksi/{id}/qris/process', [TransaksiController::class, 'processQrisPayment'])->name('payment.qris.process');
+        Route::post('/transaksi/{id}/qris/check', [TransaksiController::class, 'checkQrisPayment'])->name('payment.qris.check');
     });
 });

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DetailTransaksi;
 use App\Models\Produk;
 use App\Models\Transaksi;
+use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -17,6 +18,7 @@ class TransaksiController extends Controller
         $validated = $request->validate([
             'meja_id' => 'nullable|required_if:tipe_pesanan,dine-in|exists:mejas,id',
             'tipe_pesanan' => 'required|in:dine-in,take-away',
+            'metode_pembayaran' => 'nullable|in:QRIS,tunai',
             'catatan' => 'nullable|string|max:500',
             'items' => 'required|array|min:1',
             'items.*.produk_id' => 'required|integer|exists:produks,id',
@@ -126,16 +128,47 @@ class TransaksiController extends Controller
             ];
         });
 
+        $data = [
+            'id' => $result['transaksi']->id,
+            'waktu_transaksi' => $result['transaksi']->waktu_transaksi->toIso8601String(),
+            'subtotal' => $result['subtotal'],
+            'pajak' => $result['pajak'],
+            'total_harga' => (float) $result['transaksi']->total_harga,
+        ];
+
+        if (($validated['metode_pembayaran'] ?? null) === 'QRIS') {
+            try {
+                $data['qris'] = (new PaymentService())->createQrisCharge($result['transaksi']);
+            } catch (\Exception $e) {
+                $data['qris_error'] = 'QRIS otomatis gagal dibuat. Silakan bayar di kasir.';
+            }
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Pesanan berhasil dikirim ke kasir.',
-            'data' => [
-                'id' => $result['transaksi']->id,
-                'waktu_transaksi' => $result['transaksi']->waktu_transaksi->toIso8601String(),
-                'subtotal' => $result['subtotal'],
-                'pajak' => $result['pajak'],
-                'total_harga' => (float) $result['transaksi']->total_harga,
-            ],
+            'data' => $data,
         ], 201);
+    }
+
+    public function checkStatus(Request $request, $id, PaymentService $paymentService)
+    {
+        $transaksi = Transaksi::findOrFail($id);
+
+        $validated = $request->validate([
+            'order_id' => 'required|string',
+        ]);
+
+        if (!str_starts_with($validated['order_id'], 'TRX-' . $transaksi->id . '-')) {
+            return response()->json(['success' => false, 'message' => 'Order ID tidak valid.'], 422);
+        }
+
+        $status = $paymentService->syncStatus($transaksi, $validated['order_id']);
+
+        return response()->json([
+            'success' => true,
+            'paid' => in_array($status, ['capture', 'settlement'], true),
+            'status' => $status,
+        ]);
     }
 }

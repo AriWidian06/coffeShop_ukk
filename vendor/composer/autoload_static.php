@@ -91,6 +91,7 @@ class ComposerStaticInit53b5d56b3b7e3cbac1713e68c8850f6c
             'Symfony\\Component\\CssSelector\\' => 30,
             'Symfony\\Component\\Console\\' => 26,
             'Symfony\\Component\\Clock\\' => 24,
+            'SnapBi\\' => 7,
         ),
         'R' =>
         array (
@@ -119,6 +120,7 @@ class ComposerStaticInit53b5d56b3b7e3cbac1713e68c8850f6c
         array (
             'Monolog\\' => 8,
             'Mockery\\' => 8,
+            'Midtrans\\' => 9,
         ),
         'L' =>
         array (
@@ -323,6 +325,10 @@ class ComposerStaticInit53b5d56b3b7e3cbac1713e68c8850f6c
         array (
             0 => __DIR__ . '/..' . '/symfony/clock',
         ),
+        'SnapBi\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/midtrans/midtrans-php/SnapBi',
+        ),
         'Ramsey\\Uuid\\' =>
         array (
             0 => __DIR__ . '/..' . '/ramsey/uuid/src',
@@ -388,6 +394,10 @@ class ComposerStaticInit53b5d56b3b7e3cbac1713e68c8850f6c
         'Mockery\\' =>
         array (
             0 => __DIR__ . '/..' . '/mockery/mockery/library/Mockery',
+        ),
+        'Midtrans\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/midtrans/midtrans-php/Midtrans',
         ),
         'League\\Uri\\' =>
         array (
@@ -534,9 +544,11 @@ class ComposerStaticInit53b5d56b3b7e3cbac1713e68c8850f6c
         'App\\Http\\Controllers\\Api\\TransaksiController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/TransaksiController.php',
         'App\\Http\\Controllers\\AuthController' => __DIR__ . '/../..' . '/app/Http/Controllers/AuthController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
+        'App\\Http\\Controllers\\DashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/DashboardController.php',
         'App\\Http\\Controllers\\HealthController' => __DIR__ . '/../..' . '/app/Http/Controllers/HealthController.php',
         'App\\Http\\Controllers\\KaryawanController' => __DIR__ . '/../..' . '/app/Http/Controllers/KaryawanController.php',
         'App\\Http\\Controllers\\KategoriProdukController' => __DIR__ . '/../..' . '/app/Http/Controllers/KategoriProdukController.php',
+        'App\\Http\\Controllers\\LaporanController' => __DIR__ . '/../..' . '/app/Http/Controllers/LaporanController.php',
         'App\\Http\\Controllers\\MejaController' => __DIR__ . '/../..' . '/app/Http/Controllers/MejaController.php',
         'App\\Http\\Controllers\\PembayaranController' => __DIR__ . '/../..' . '/app/Http/Controllers/PembayaranController.php',
         'App\\Http\\Controllers\\ProdukController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProdukController.php',
@@ -548,6 +560,7 @@ class ComposerStaticInit53b5d56b3b7e3cbac1713e68c8850f6c
         'App\\Models\\Meja' => __DIR__ . '/../..' . '/app/Models/Meja.php',
         'App\\Models\\Pembayaran' => __DIR__ . '/../..' . '/app/Models/Pembayaran.php',
         'App\\Models\\Produk' => __DIR__ . '/../..' . '/app/Models/Produk.php',
+        'App\\Models\\ProdukOpsi' => __DIR__ . '/../..' . '/app/Models/ProdukOpsi.php',
         'App\\Models\\Supplier' => __DIR__ . '/../..' . '/app/Models/Supplier.php',
         'App\\Models\\Transaksi' => __DIR__ . '/../..' . '/app/Models/Transaksi.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
@@ -3599,6 +3612,14 @@ class ComposerStaticInit53b5d56b3b7e3cbac1713e68c8850f6c
         'League\\Uri\\UriTemplate\\VariableBag' => __DIR__ . '/..' . '/league/uri/UriTemplate/VariableBag.php',
         'League\\Uri\\Urn' => __DIR__ . '/..' . '/league/uri/Urn.php',
         'League\\Uri\\UrnComparisonMode' => __DIR__ . '/..' . '/league/uri-interfaces/UrnComparisonMode.php',
+        'Midtrans\\ApiRequestor' => __DIR__ . '/..' . '/midtrans/midtrans-php/Midtrans/ApiRequestor.php',
+        'Midtrans\\Config' => __DIR__ . '/..' . '/midtrans/midtrans-php/Midtrans/Config.php',
+        'Midtrans\\CoreApi' => __DIR__ . '/..' . '/midtrans/midtrans-php/Midtrans/CoreApi.php',
+        'Midtrans\\Notification' => __DIR__ . '/..' . '/midtrans/midtrans-php/Midtrans/Notification.php',
+        'Midtrans\\Sanitizer' => __DIR__ . '/..' . '/midtrans/midtrans-php/Midtrans/Sanitizer.php',
+        'Midtrans\\Snap' => __DIR__ . '/..' . '/midtrans/midtrans-php/Midtrans/Snap.php',
+        'Midtrans\\SnapApiRequestor' => __DIR__ . '/..' . '/midtrans/midtrans-php/Midtrans/SnapApiRequestor.php',
+        'Midtrans\\Transaction' => __DIR__ . '/..' . '/midtrans/midtrans-php/Midtrans/Transaction.php',
         'Mockery\\Adapter\\Phpunit\\Extension' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery/Adapter/Phpunit/Extension.php',
         'Mockery\\Adapter\\Phpunit\\Extension\\Subscriber\\TestFinishedSubscriber' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery/Adapter/Phpunit/Extension/Subscriber/TestFinishedSubscriber.php',
         'Mockery\\Adapter\\Phpunit\\Extension\\Subscriber\\TestSuiteStartedSubscriber' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery/Adapter/Phpunit/Extension/Subscriber/TestSuiteStartedSubscriber.php',
@@ -5973,6 +5994,9 @@ class ComposerStaticInit53b5d56b3b7e3cbac1713e68c8850f6c
         'SebastianBergmann\\Type\\UnknownType' => __DIR__ . '/..' . '/sebastian/type/src/type/UnknownType.php',
         'SebastianBergmann\\Type\\VoidType' => __DIR__ . '/..' . '/sebastian/type/src/type/VoidType.php',
         'SebastianBergmann\\Version' => __DIR__ . '/..' . '/sebastian/version/src/Version.php',
+        'SnapBi\\SnapBi' => __DIR__ . '/..' . '/midtrans/midtrans-php/SnapBi/SnapBi.php',
+        'SnapBi\\SnapBiApiRequestor' => __DIR__ . '/..' . '/midtrans/midtrans-php/SnapBi/SnapBiApiRequestor.php',
+        'SnapBi\\SnapBiConfig' => __DIR__ . '/..' . '/midtrans/midtrans-php/SnapBi/SnapBiConfig.php',
         'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
         'Symfony\\Component\\Clock\\Clock' => __DIR__ . '/..' . '/symfony/clock/Clock.php',
         'Symfony\\Component\\Clock\\ClockAwareTrait' => __DIR__ . '/..' . '/symfony/clock/ClockAwareTrait.php',

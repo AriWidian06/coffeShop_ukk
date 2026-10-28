@@ -374,7 +374,7 @@
                 <div class="p-2 bg-white rounded-xl shadow-inner inline-block border border-amber-100">
                     <img id="receipt-qris-img" src="" alt="QRIS Code" class="w-40 h-40 mx-auto rounded-lg">
                 </div>
-                <p class="text-[10px] text-amber-900">Nominal otomatis sesuai total belanja.</p>
+                <p id="receipt-qris-status" class="text-[10px] font-bold text-amber-700">Nominal otomatis sesuai total belanja.</p>
             </div>
 
             <button onclick="closeReceipt()" class="w-full py-3.5 rounded-2xl bg-primary-600 text-white text-sm font-bold hover:bg-primary-700 transition-all shadow-lg">
@@ -750,11 +750,18 @@
                 document.getElementById('receipt-items-list').innerHTML = itemsList;
                 document.getElementById('receipt-grand-total').textContent = formatRupiah(order.total_harga);
 
-                // TAMPILKAN QRIS OTOMATIS DI STRUK JIKA METODE QRIS DIPILIH
+                // TAMPILKAN QRIS DINAMIS DI STRUK JIKA METODE QRIS DIPILIH
                 const qrisSection = document.getElementById('receipt-qris-section');
-                 if (paymentMethod === 'QRIS') {
-                     document.getElementById('receipt-qris-img').src = `{{ asset('images/qris.jpg') }}`;
+                const qrisStatus = document.getElementById('receipt-qris-status');
+                if (paymentMethod === 'QRIS' && order.qris && order.qris.qr_url) {
+                    document.getElementById('receipt-qris-img').src = order.qris.qr_url;
                     qrisSection.classList.remove('hidden');
+                    startQrisPolling(order.id, order.qris.order_id);
+                } else if (paymentMethod === 'QRIS') {
+                    document.getElementById('receipt-qris-img').src = '';
+                    qrisSection.classList.remove('hidden');
+                    qrisStatus.textContent = order.qris_error || 'QRIS otomatis tidak tersedia. Silakan bayar di kasir.';
+                    qrisStatus.className = 'text-[10px] font-bold text-red-700';
                 } else {
                     qrisSection.classList.add('hidden');
                 }
@@ -786,7 +793,48 @@
             }
         }
 
+        let qrisPollTimer = null;
+
+        function stopQrisPolling() {
+            if (qrisPollTimer) {
+                clearInterval(qrisPollTimer);
+                qrisPollTimer = null;
+            }
+        }
+
+        function startQrisPolling(transaksiId, orderId) {
+            stopQrisPolling();
+            const statusEl = document.getElementById('receipt-qris-status');
+            statusEl.textContent = 'Menunggu pembayaran...';
+            statusEl.className = 'text-[10px] font-bold text-amber-700';
+
+            qrisPollTimer = setInterval(async () => {
+                try {
+                    const response = await fetch(`/api/transaksis/${transaksiId}/check-status`, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ order_id: orderId }),
+                    });
+                    const data = await response.json();
+
+                    if (data.paid) {
+                        statusEl.textContent = 'Pembayaran Lunas ✓';
+                        statusEl.className = 'text-[10px] font-bold text-emerald-700';
+                        stopQrisPolling();
+                    } else {
+                        statusEl.textContent = 'Menunggu pembayaran...';
+                    }
+                } catch (pollError) {
+                    // diamkan, coba lagi pada interval berikutnya
+                }
+            }, 3000);
+        }
+
         function closeReceipt() {
+            stopQrisPolling();
             const receiptModal = document.getElementById('receipt-modal');
             receiptModal.classList.add('hidden');
             receiptModal.classList.remove('flex');

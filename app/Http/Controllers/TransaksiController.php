@@ -9,6 +9,7 @@ use App\Models\Meja;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\DB;
+use App\Services\PaymentService;
 use Illuminate\Validation\ValidationException;
 
 class TransaksiController extends Controller
@@ -227,30 +228,50 @@ class TransaksiController extends Controller
     public function showQrisPayment($id)
     {
         $transaksi = Transaksi::with(['detail_transaksis.produk', 'meja', 'karyawan', 'pembayaran'])->findOrFail($id);
-        
-        return view('transaksis.qris', compact('transaksi'));
+
+        try {
+            $paymentService = new PaymentService();
+            $payment = $paymentService->createSnapToken($transaksi);
+
+            return view('transaksis.qris', [
+                'transaksi' => $transaksi,
+                'snapToken' => $payment['token'],
+                'orderId' => $payment['order_id'],
+            ]);
+        } catch (\Exception $e) {
+            return back()->withErrors(['payment' => 'Gagal membuat pembayaran: ' . $e->getMessage()]);
+        }
     }
 
-    public function processQrisPayment(Request $request, $id)
+    public function checkQrisPayment(Request $request, $id, PaymentService $paymentService)
     {
         $transaksi = Transaksi::findOrFail($id);
-        
-        $transaksi->update([
-            'status_pesanan' => 'completed',
+
+        $validated = $request->validate([
+            'order_id' => 'required|string',
         ]);
 
-        \App\Models\Pembayaran::updateOrCreate(
-            ['transaksi_id' => $transaksi->id],
-            [
-                'jumlah_bayar' => $transaksi->total_harga,
-                 'metode_pembayaran' => 'QRIS',
-                'status_pembayaran' => 'paid',
-                'kembalian' => 0,
-                'waktu_pembayaran' => now(),
-            ]
-        );
+        if (!str_starts_with($validated['order_id'], 'TRX-' . $transaksi->id . '-')) {
+            return response()->json(['success' => false, 'message' => 'Order ID tidak valid.'], 422);
+        }
 
-        return redirect()->route('transaksis.index')->with('success', 'Pembayaran QRIS untuk Struk #' . $transaksi->id . ' berhasil dikonfirmasi dan lunas!');
+        $status = $paymentService->syncStatus($transaksi, $validated['order_id']);
+
+        return response()->json([
+            'success' => true,
+            'paid' => in_array($status, ['capture', 'settlement'], true),
+            'status' => $status,
+            'status_pesanan' => $transaksi->fresh()->status_pesanan,
+        ]);
+    }
+
+    public function midtransNotification(Request $request, PaymentService $paymentService)
+    {
+        $notification = $request->all();
+        if ($paymentService->handleNotification($notification)) {
+            return response()->json(['status' => 'OK']);
+        }
+        return response()->json(['status' => 'Error'], 400);
     }
 
     public function destroy(Transaksi $transaksi)
