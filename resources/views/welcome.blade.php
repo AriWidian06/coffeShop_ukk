@@ -88,7 +88,7 @@
         </div>
 
         <!-- Menu Grid -->
-        <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div id="menu-grid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             @forelse($produks as $produk)
                 @php
                     $categorySlug = \Illuminate\Support\Str::slug($produk->kategoriProduk->nama_kategori ?? 'lainnya', '-');
@@ -112,26 +112,27 @@
                         <div class="relative aspect-4/3 bg-slate-100 overflow-hidden group pointer-events-none">
                             <img src="{{ $imageUrl }}" alt="{{ $produk->nama_produk }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 pointer-events-none">
                         </div>
-                        <div class="p-5">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-primary-600 bg-primary-50 px-2 py-1 rounded-md mb-2 inline-block">
-                                {{ $produk->kategoriProduk->nama_kategori ?? 'Umum' }}
-                            </span>
-                            <h3 class="font-bold text-slate-900 text-lg leading-tight mb-2">{{ $produk->nama_produk }}</h3>
-                            <p class="text-sm text-slate-500 line-clamp-2">
-                                {{ $produk->deskripsi ?? 'Produk berkualitas dari Perkoci Eatery.' }}
-                            </p>
-                        </div>
+                         <div class="p-3 sm:p-5">
+                             <span class="text-[10px] font-bold uppercase tracking-wider text-primary-600 bg-primary-50 px-2 py-1 rounded-md mb-2 inline-block">
+                                 {{ $produk->kategoriProduk->nama_kategori ?? 'Umum' }}
+                             </span>
+                             <h3 class="font-bold text-slate-900 text-base sm:text-lg leading-tight mb-2">{{ $produk->nama_produk }}</h3>
+                             <p class="text-sm text-slate-500 line-clamp-2">
+                                 {{ $produk->deskripsi ?? 'Produk berkualitas dari Perkoci Eatery.' }}
+                             </p>
+                         </div>
                     </button>
 
-                    <div class="px-5 pb-5 flex flex-col flex-1">
-                        <div class="pt-4 border-t border-slate-100 flex items-center justify-between gap-3 mt-auto">
-                            <span class="font-extrabold text-primary-700 text-lg">Rp {{ $hargaFormatted }}</span>
-                            <button type="button" data-product-open @disabled($produk->stock < 1)
-                                class="product-customize-button min-h-11 rounded-xl bg-primary-600 px-4 py-2 text-white text-sm font-bold hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed">
-                                Pilih & kustomisasi
-                            </button>
-                        </div>
-                    </div>
+                     <div class="px-3 pb-3 sm:px-5 sm:pb-5 flex flex-col flex-1">
+                         <div class="pt-4 border-t border-slate-100 flex items-center justify-between gap-2 sm:gap-3 mt-auto">
+                             <span class="font-extrabold text-primary-700 text-sm sm:text-lg">Rp {{ $hargaFormatted }}</span>
+                             <button type="button" data-product-open @disabled($produk->stock < 1)
+                                 class="product-customize-button min-h-11 rounded-xl bg-primary-600 px-2 py-2 sm:px-4 text-white text-xs sm:text-sm font-bold hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                                 <span class="sm:hidden">Pilih</span>
+                                 <span class="hidden sm:inline">Pilih & kustomisasi</span>
+                             </button>
+                         </div>
+                     </div>
                 </article>
             @empty
                 <div class="col-span-full text-center py-20">
@@ -162,7 +163,7 @@
         .product-detail-trigger { display: block; width: 100%; padding: 0; border: 0; background: #fff; color: inherit; font: inherit; cursor: pointer; }
         .product-detail-trigger:focus-visible, .product-customize-button:focus-visible, .product-dialog button:focus-visible, .product-dialog textarea:focus-visible { outline: 3px solid #2563eb; outline-offset: 3px; }
         .product-customize-button { flex: 0 0 auto; cursor: pointer; }
-        .product-dialog { position: fixed; inset: 0; width: min(760px, calc(100vw - 32px)); height: fit-content; max-width: none; max-height: min(90dvh, 820px); margin: auto; padding: 0; overflow-x: hidden; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; color: #0f172a; box-shadow: 0 20px 60px rgba(15, 23, 42, .28); }
+        .product-dialog { position: fixed; inset: 0; width: min(760px, calc(100vw - 32px)); height: fit-content; max-width: none; max-height: min(90dvh, 820px); margin: auto; padding: 0; overflow-x: hidden; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 1.5rem; background: #fff; color: #0f172a; box-shadow: 0 20px 60px rgba(15, 23, 42, .28); }
         .product-dialog::backdrop { background: rgba(25, 18, 14, .62); backdrop-filter: blur(2px); }
         .product-dialog-shell { position: relative; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); min-height: 450px; }
         .product-dialog-image-wrap { min-height: 100%; background: #f1f5f9; pointer-events: none; }
@@ -199,7 +200,7 @@
             .product-dialog-image-wrap, .product-dialog-image { height: 190px; min-height: 190px; max-height: 190px; }
             .product-dialog-content { padding: 1rem 1.1rem 1.2rem; }
             .product-dialog-description { min-height: 0; }
-            .product-dialog-footer { position: sticky; bottom: -1.2rem; margin: 1rem -1.1rem -1.2rem; padding: .8rem 1.1rem calc(.8rem + env(safe-area-inset-bottom)); border-top: 1px solid #cbd5e1; background: #fff; }
+            .product-dialog-footer { position: sticky; bottom: 0; margin: 1rem -1.1rem -1.2rem; padding: 1rem 1.1rem calc(1rem + env(safe-area-inset-bottom)); border-top: 1px solid #cbd5e1; background: #fff; }
         }
         @media (max-width: 370px) {
             .product-dialog-footer { align-items: stretch; flex-direction: column; }
@@ -244,7 +245,7 @@
 
     <!-- Cart Drawer (Slide Over) -->
     <div id="cart-drawer-backdrop" onclick="toggleCart()" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden transition-opacity duration-300"></div>
-    <aside id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl flex flex-col translate-x-full transition-transform duration-300 ease-in-out">
+    <aside id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl flex flex-col translate-x-full transition-transform duration-300 ease-in-out rounded-l-3xl">
         <!-- Header Cart -->
         <div class="p-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
             <div class="flex items-center gap-3">
