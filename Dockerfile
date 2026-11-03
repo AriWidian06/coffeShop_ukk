@@ -1,6 +1,15 @@
+# --- STAGE 1: Build Frontend Assets (Vite) ---
+FROM node:20-alpine AS frontend-builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# --- STAGE 2: Production PHP Apache Server ---
 FROM php:8.2-apache
 
-# Install dependencies yang dibutuhkan Laravel, Node.js, dan npm sekaligus
+# Install dependencies sistem yang dibutuhkan Laravel
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -8,35 +17,33 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip \
-    nodejs \
-    npm
+    unzip
 
-# Clear cache
+# Clear apt cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions
+# Install ekstensi PHP untuk MySQL & Laravel
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Get latest Composer
+# Install Composer terbaru
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy semua file project ke dalam container
+# Copy seluruh file project dari local/git
 COPY . /var/www/html
 
+# SALIN hasil build Vite dari Stage 1 ke folder public/build Laravel
+COPY --from=frontend-builder /app/public/build /var/www/html/public/build
+
 # Install dependencies PHP menggunakan Composer
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autolauder
 
-# Install dependencies Node.js dan build aset Vite (CSS/JS)
-RUN npm run build
-
-# Atur permission untuk storage dan bootstrap/cache terlebih dahulu
+# Atur permission storage dan cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Buat symbolic link storage Laravel agar gambar produk bisa diakses
+# Buat symbolic link storage dan bersihkan cache config/view
 RUN php artisan storage:link
 RUN php artisan view:clear && php artisan config:clear
 
