@@ -209,12 +209,12 @@
                                          data-stock="{{ $produk->stock }}"
                                          data-desc="{{ $produk->deskripsi ?? 'Tidak ada deskripsi.' }}"
                                          data-category-name="{{ $produk->kategoriProduk->nama_kategori ?? 'Menu' }}"
-                                         data-image="{{ $produk->gambar ? asset('storage/' . $produk->gambar) : '' }}"
+                                         data-image="{{ $produk->gambar ? asset('images/' . $produk->gambar) : '' }}"
                                          data-options="{{ json_encode($produk->opsis ?? []) }}">
                                     
                                     <div>
                                         @if($produk->gambar)
-                                            <img src="{{ asset('storage/' . $produk->gambar) }}" alt="{{ $produk->nama_produk }}" class="w-full h-32 object-cover border-b border-slate-100">
+                                            <img src="{{ asset('images/' . $produk->gambar) }}" alt="{{ $produk->nama_produk }}" class="w-full h-32 object-cover border-b border-slate-100">
                                         @else
                                             <div class="w-full h-32 bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center border-b border-slate-100">
                                                 <svg class="w-12 h-12 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

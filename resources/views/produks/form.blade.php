@@ -25,7 +25,7 @@
         <div class="flex items-start gap-4">
             @if(isset($produk) && $produk->gambar)
                 <div class="relative group">
-                    <img src="{{ asset('storage/' . $produk->gambar) }}" alt="Preview" class="w-24 h-24 object-cover rounded-xl border border-slate-200 shadow-sm">
+                    <img src="{{ asset('images/' . $produk->gambar) }}" alt="Preview" class="w-24 h-24 object-cover rounded-xl border border-slate-200 shadow-sm">
                     <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
                         <span class="text-white text-[10px] font-bold">Current</span>
                     </div>

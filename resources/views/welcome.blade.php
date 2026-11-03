@@ -94,7 +94,7 @@
                     $categorySlug = \Illuminate\Support\Str::slug($produk->kategoriProduk->nama_kategori ?? 'lainnya', '-');
                     $dataName = strtolower($produk->nama_produk);
                     $hargaFormatted = number_format($produk->harga_jual, 0, ',', '.');
-                    $imageUrl = $produk->gambar ? asset('storage/' . $produk->gambar) : 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=600&q=80';
+                    $imageUrl = $produk->gambar ? asset('images/' . $produk->gambar) : 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=600&q=80';
                 @endphp
 
                 <article class="menu-card product-card bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-primary-200 overflow-hidden flex flex-col"
