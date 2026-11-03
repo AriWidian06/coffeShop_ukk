@@ -42,6 +42,12 @@ EXPOSE 80
 # Jalankan Apache di foreground
 CMD ["apache2-foreground"]
 
-#run npm 
-RUN composer install --no-dev --optimize-autoloader
+# Contoh penambahan instalasi Node.js di dalam Dockerfile sebelum npm run build
+RUN apt-get update && apt-get install -y nodejs npm
+
+# Atau jika menggunakan versi Node yang lebih baru (misal Node 20):
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
+
+# Setelah itu baru jalankan perintah build aset:
 RUN npm install && npm run build
