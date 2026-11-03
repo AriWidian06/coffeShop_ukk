@@ -38,7 +38,7 @@ COPY . /var/www/html
 COPY --from=frontend-builder /app/public/build /var/www/html/public/build
 
 # Install dependencies PHP menggunakan Composer
-RUN composer install --no-dev --optimize-autolauder
+RUN composer install --no-dev --no-interaction --optimize-autoloader
 
 # Atur permission storage dan cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
