@@ -31,10 +31,11 @@ COPY . /var/www/html
 RUN composer install --no-dev --optimize-autoloader
 
 # Install dependencies Node.js dan build aset Vite (CSS/JS)
-RUN npm install && npm run build
+RUN npm run build
 
 # Buat symbolic link storage Laravel agar gambar produk bisa diakses
 RUN php artisan storage:link
+RUN php artisan view:clear && php artisan config:clear
 
 # Atur permission untuk storage dan bootstrap/cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
