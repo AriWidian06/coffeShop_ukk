@@ -31,7 +31,7 @@ COPY . /var/www/html
 RUN composer install --no-dev --optimize-autoloader
 
 # Install dependencies Node.js dan build aset Vite (CSS/JS)
-RUN npm install && npm run build
+RUN npm ci && npm run build
 
 # Atur permission untuk storage dan bootstrap/cache terlebih dahulu
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache

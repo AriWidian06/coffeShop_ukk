@@ -24,3 +24,5 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 /storage/logs/*.log
+/public/build
+/node_modules
