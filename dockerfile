@@ -41,3 +41,7 @@ EXPOSE 80
 
 # Jalankan Apache di foreground
 CMD ["apache2-foreground"]
+
+#run npm 
+RUN composer install --no-dev --optimize-autoloader
+RUN npm install && npm run build
