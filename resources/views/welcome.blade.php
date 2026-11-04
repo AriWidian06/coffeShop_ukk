@@ -9,178 +9,265 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="antialiased text-slate-800 bg-slate-50">
+<body class="antialiased text-slate-800 bg-slate-50 pb-24">
 
     <!-- Mobile Header -->
-    <header class="sticky top-0 z-40 bg-white border-b border-slate-200">
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
         <div class="px-4 py-3">
             <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-2">
-                    <div class="w-9 h-9 rounded-xl bg-primary-600 text-white flex items-center justify-center">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 1v3M10 1v3M14 1v3" />
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-2xl bg-primary-600 text-white flex items-center justify-center shadow-md shadow-primary-600/20 overflow-hidden shrink-0">
+                        <img 
+                            src="{{ asset('images/logo.jpeg') }}" 
+                            alt="Logo Bagi Kopi" 
+                            class="w-full h-full object-cover"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                        >
+                        <svg class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10h-1.26A8 8 0 109 20h9a2 2 0 002-2v-6a2 2 0 00-2-2z" />
                         </svg>
                     </div>
                     <div>
-                        <h1 class="font-bold text-base text-slate-900 leading-tight">Bagi Kopi</h1>
-                        <p class="text-[10px] text-slate-500 font-medium">ARTISANAL BREW • CATALOG</p>
+                        <h1 id="header-title" class="font-extrabold text-base text-slate-900 leading-tight">Bagi Kopi</h1>
+                        <p id="header-subtitle" class="text-[10px] text-slate-500 font-bold tracking-wider">ARTISANAL BREW • CATALOG</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
                     @if(isset($mejaAktif))
-                        <div class="flex items-center gap-1.5 px-2.5 py-1.5 bg-primary-50 rounded-lg border border-primary-200">
+                        <div class="flex items-center gap-1.5 px-3 py-1.5 bg-primary-50 rounded-xl border border-primary-200">
                             <svg class="w-3.5 h-3.5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                             <span class="text-xs font-bold text-primary-700">Meja #{{ $mejaAktif->nomor_meja }}</span>
                         </div>
                     @endif
+                    <button class="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </button>
                 </div>
             </div>
 
-            <!-- Search -->
-            <div class="relative">
+            <!-- Search (Hanya tampil di tab Pesan) -->
+            <div id="search-container" class="relative">
                 <input type="text" id="menu-search-mobile" onkeyup="filterMenu()" 
                     placeholder="Cari kopi, pastry, atau manual brew..."
-                    class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white">
-                <svg class="w-5 h-5 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="w-full pl-10 pr-10 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all">
+                <svg class="w-5 h-5 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
+                <button class="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-md mx-auto px-4 py-6">
-        <!-- Category Pills -->
-        <div class="mb-6">
-            <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-2">
-                <button onclick="setCategory('semua', this)" class="category-btn active px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all bg-primary-600 text-white shadow-md shadow-primary-600/20">
-                    Semua
-                </button>
-                @foreach($kategoriProduks as $kategori)
-                    @php $categorySlug = \Illuminate\Support\Str::slug($kategori->nama_kategori, '-'); @endphp
-                    <button onclick="setCategory('{{ $categorySlug }}', this)" class="category-btn px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
-                        {{ $kategori->nama_kategori }}
-                    </button>
-                @endforeach
-            </div>
-        </div>
-
-        <!-- Section Header -->
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <h2 class="text-lg font-bold text-slate-900">Katalog Pilihan</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Disangrai teliti di roastery harian Bagi Kopi</p>
-            </div>
-            <span class="px-2.5 py-1 bg-primary-50 text-primary-700 text-xs font-bold rounded-lg">{{ $produks->count() }} SAJIAN</span>
-        </div>
-
-        <!-- Menu List -->
-        <div id="menu-grid" class="space-y-3">
-            @forelse($produks as $produk)
-                @php
-                    $categorySlug = \Illuminate\Support\Str::slug($produk->kategoriProduk->nama_kategori ?? 'lainnya', '-');
-                    $dataName = strtolower($produk->nama_produk);
-                    $hargaFormatted = number_format($produk->harga_jual, 0, ',', '.');
-                    $imageUrl = $produk->gambar ? asset('images/' . $produk->gambar) : 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=600&q=80';
-                    
-                    $badge = null;
-                    $badgeColor = 'bg-blue-500';
-                    if (str_contains(strtolower($produk->nama_produk), 'aren latte')) {
-                        $badge = 'BEST SELLER';
-                        $badgeColor = 'bg-blue-500';
-                    } elseif (str_contains(strtolower($produk->kategoriProduk->nama_kategori ?? ''), 'manual')) {
-                        $badge = 'MANUAL BREW';
-                        $badgeColor = 'bg-amber-500';
-                    } elseif ($produk->stock < 5 && $produk->stock > 0) {
-                        $badge = 'SISA ' . $produk->stock . ' BOTOL';
-                        $badgeColor = 'bg-orange-500';
-                    } elseif ($produk->stock < 1) {
-                        $badge = 'HABIS';
-                        $badgeColor = 'bg-red-500';
-                    }
-                @endphp
-
-                <article class="menu-card product-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
-                    data-category="{{ $categorySlug }}" data-name="{{ $dataName }}"
-                    data-product-id="{{ $produk->id }}" data-product-name="{{ $produk->nama_produk }}"
-                    data-product-description="{{ $produk->deskripsi ?? '' }}"
-                    data-product-category="{{ $produk->kategoriProduk->nama_kategori ?? 'Umum' }}"
-                    data-product-price="{{ $produk->harga_jual }}" data-product-stock="{{ $produk->stock }}"
-                    data-product-customizable="{{ $produk->is_customizable ? 'true' : 'false' }}"
-                    data-product-options="{{ json_encode($produk->opsis) }}"
-                    data-product-image="{{ $imageUrl }}">
-                    
-                    <div class="flex p-3 gap-3">
-                        <div class="w-24 h-24 rounded-xl bg-slate-100 overflow-hidden shrink-0 relative">
-                            <img src="{{ $imageUrl }}" alt="{{ $produk->nama_produk }}" class="w-full h-full object-cover">
-                            @if($badge)
-                                <span class="absolute top-1 left-1 px-1.5 py-0.5 {{ $badgeColor }} text-white text-[9px] font-bold rounded-md">{{ $badge }}</span>
-                            @endif
-                        </div>
-                        
-                        <div class="flex-1 min-w-0 flex flex-col justify-between">
-                            <div>
-                                <h3 class="font-bold text-slate-900 text-sm leading-tight mb-1">{{ $produk->nama_produk }}</h3>
-                                <p class="text-[11px] text-slate-500 line-clamp-2">{{ $produk->deskripsi ?? 'Produk berkualitas dari Bagi Kopi.' }}</p>
-                            </div>
-                            <div class="flex items-center justify-between mt-2">
-                                <span class="font-bold text-primary-700 text-sm">Rp {{ $hargaFormatted }}</span>
-                                @if($produk->stock > 0)
-                                    <button type="button" onclick="quickAddToCart({{ $produk->id }}, '{{ addslashes($produk->nama_produk) }}', {{ $produk->harga_jual }}, {{ $produk->stock }})" 
-                                        class="w-7 h-7 rounded-full bg-primary-600 text-white flex items-center justify-center hover:bg-primary-700 active:scale-95 transition">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                        </svg>
-                                    </button>
-                                @else
-                                    <span class="text-[10px] font-bold text-red-600">Habis</span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </article>
-            @empty
-                <div class="text-center py-12">
-                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+    <!-- Main Content Area -->
+    <main class="max-w-md mx-auto px-4 py-5 space-y-5">
+        
+        <!-- ================= TAB PESAN (KATALOG MENU) ================= -->
+        <div id="tab-pesan" class="space-y-5">
+            @if(isset($mejaAktif))
+            <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                     </div>
-                    <p class="font-bold text-slate-900 mb-0.5">Belum ada menu tersedia</p>
-                    <p class="text-slate-500 text-sm">Silakan tambahkan produk melalui dashboard admin.</p>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-slate-900">Meja #{{ $mejaAktif->nomor_meja }}</h3>
+                            <span class="px-2 py-0.5 bg-primary-600 text-white text-[10px] font-extrabold rounded-md">DINE-IN</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">Bagi Kopi Main Hall • Lantai 1</p>
+                        <p class="text-[11px] text-primary-600 font-semibold mt-1 flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.14 0M1.394 9.393c5.857-5.858 15.355-5.858 21.213 0"/></svg>
+                            WiFi: <span class="font-bold">BagiKopi_Guest</span> (Sandi: <span class="font-mono bg-slate-100 px-1 rounded">bagikopi2026</span>)
+                        </p>
+                    </div>
                 </div>
-            @endforelse
+                <a href="{{ route('meja.index') ?? '#' }}" class="px-3.5 py-1.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 transition flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                    Ubah
+                </a>
+            </div>
+            @endif
+
+            <!-- Category Pills -->
+            <div>
+                <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-1">
+                    <button onclick="setCategory('semua', this)" class="category-btn active px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all bg-primary-600 text-white shadow-md shadow-primary-600/20">
+                        Semua
+                    </button>
+                    @foreach($kategoriProduks as $kategori)
+                        @php $categorySlug = \Illuminate\Support\Str::slug($kategori->nama_kategori, '-'); @endphp
+                        <button onclick="setCategory('{{ $categorySlug }}', this)" class="category-btn px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
+                            {{ $kategori->nama_kategori }}
+                        </button>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Section Header -->
+            <div class="flex items-center justify-between pt-1">
+                <div>
+                    <h2 class="text-base font-bold text-slate-900">Katalog Pilihan</h2>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Disangrai teliti di roastery harian Bagi Kopi</p>
+                </div>
+                <span class="px-2.5 py-1 bg-slate-200/70 text-slate-700 text-xs font-extrabold rounded-lg">{{ $produks->count() }} SAJIAN</span>
+            </div>
+
+            <!-- Menu List -->
+            <div id="menu-grid" class="space-y-3">
+                @forelse($produks as $produk)
+                    @php
+                        $categorySlug = \Illuminate\Support\Str::slug($produk->kategoriProduk->nama_kategori ?? 'lainnya', '-');
+                        $dataName = strtolower($produk->nama_produk);
+                        $hargaFormatted = number_format($produk->harga_jual, 0, ',', '.');
+                        $imageUrl = $produk->gambar ? asset('images/' . $produk->gambar) : 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=600&q=80';
+                        
+                        $badge = null;
+                        $badgeColor = 'bg-blue-600';
+                        if (str_contains(strtolower($produk->nama_produk), 'aren latte')) {
+                            $badge = 'BEST SELLER';
+                            $badgeColor = 'bg-blue-600';
+                        } elseif (str_contains(strtolower($produk->kategoriProduk->nama_kategori ?? ''), 'manual')) {
+                            $badge = 'MANUAL BREW';
+                            $badgeColor = 'bg-amber-600';
+                        } elseif ($produk->stock < 5 && $produk->stock > 0) {
+                            $badge = 'SISA ' . $produk->stock . ' BOTOL';
+                            $badgeColor = 'bg-orange-600';
+                        } elseif ($produk->stock < 1) {
+                            $badge = 'HABIS';
+                            $badgeColor = 'bg-red-500';
+                        }
+                    @endphp
+
+                    <article class="menu-card product-card bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-3"
+                        data-category="{{ $categorySlug }}" data-name="{{ $dataName }}"
+                        data-product-id="{{ $produk->id }}" data-product-name="{{ $produk->nama_produk }}"
+                        data-product-description="{{ $produk->deskripsi ?? '' }}"
+                        data-product-category="{{ $produk->kategoriProduk->nama_kategori ?? 'Umum' }}"
+                        data-product-price="{{ $produk->harga_jual }}" data-product-stock="{{ $produk->stock }}"
+                        data-product-customizable="{{ $produk->is_customizable ? 'true' : 'false' }}"
+                        data-product-options="{{ json_encode($produk->opsis) }}"
+                        data-product-image="{{ $imageUrl }}">
+                        
+                        <div class="flex gap-3">
+                            <div class="w-24 h-24 rounded-xl bg-slate-100 overflow-hidden shrink-0 relative shadow-inner">
+                                <img src="{{ $imageUrl }}" alt="{{ $produk->nama_produk }}" class="w-full h-full object-cover">
+                                @if($badge)
+                                    <span class="absolute top-1 left-1 px-1.5 py-0.5 {{ $badgeColor }} text-white text-[9px] font-extrabold rounded-md shadow-sm">{{ $badge }}</span>
+                                @endif
+                            </div>
+                            
+                            <div class="flex-1 min-w-0 flex flex-col justify-between">
+                                <div>
+                                    <h3 class="font-bold text-slate-900 text-sm leading-tight mb-1">{{ $produk->nama_produk }}</h3>
+                                    <p class="text-[11px] text-slate-500 italic line-clamp-2 leading-relaxed">{{ $produk->deskripsi ?? 'Produk berkualitas dari Bagi Kopi.' }}</p>
+                                </div>
+                                <div class="flex items-center justify-between mt-2">
+                                    <span class="font-extrabold text-primary-600 text-sm">Rp {{ $hargaFormatted }}</span>
+                                    @if($produk->stock > 0)
+                                        <button type="button" onclick="quickAddToCart({{ $produk->id }}, '{{ addslashes($produk->nama_produk) }}', {{ $produk->harga_jual }}, {{ $produk->stock }})" 
+                                            class="w-8 h-8 rounded-xl bg-primary-600 text-white flex items-center justify-center hover:bg-primary-700 active:scale-95 shadow-md shadow-primary-600/20 transition">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                            </svg>
+                                        </button>
+                                    @else
+                                        <span class="text-[10px] font-bold px-2 py-1 bg-red-50 text-red-600 rounded-lg">Habis</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                @empty
+                    <div class="text-center py-12">
+                        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                        </div>
+                        <p class="font-bold text-slate-900 mb-0.5">Belum ada menu tersedia</p>
+                        <p class="text-slate-500 text-sm">Silakan tambahkan produk melalui dashboard admin.</p>
+                    </div>
+                @endforelse
+            </div>
+
+            <div id="no-menu" class="hidden text-center py-12">
+                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <p class="font-bold text-slate-900 mb-0.5">Menu tidak ditemukan</p>
+                <p class="text-slate-500 text-sm">Coba gunakan kata kunci lain</p>
+            </div>
+
+            <!-- Banner Customization Info Card -->
+            <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-900 text-xs">Pilihan Susu Nabati & Level Es</h4>
+                    <p class="text-[11px] text-slate-500 leading-snug">Kustomisasi oatside, almond milk, dan gula aren tersedia di keranjang.</p>
+                </div>
+            </div>
         </div>
 
-        <div id="no-menu" class="hidden text-center py-12">
-            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        <!-- ================= TAB STATUS PESANAN ================= -->
+        @include('user.status')
+
+    </main>
+
+    <!-- FLOATING CART BOTTOM BAR -->
+    <div id="floating-cart-bar" class="fixed bottom-16 left-4 right-4 max-w-md mx-auto z-40 hidden transition-all duration-300 transform translate-y-2 opacity-0">
+        <div onclick="toggleCart()" class="bg-primary-600 hover:bg-primary-700 text-white rounded-2xl p-3.5 shadow-xl shadow-primary-600/30 flex items-center justify-between cursor-pointer transition-all active:scale-95">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center relative">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    <span id="floating-cart-badge" class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-amber-500 text-white text-[10px] font-extrabold rounded-full flex items-center justify-center border-2 border-primary-600">0</span>
+                </div>
+                <div>
+                    <div id="floating-cart-title" class="text-[11px] font-bold text-primary-100 tracking-wide">0 MENU DIPILIH</div>
+                    <div id="floating-cart-total" class="text-base font-extrabold">Rp 0</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-1.5 bg-white/15 px-3.5 py-2 rounded-xl text-xs font-bold hover:bg-white/25 transition">
+                <span>Lihat Keranjang</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
             </div>
-            <p class="font-bold text-slate-900 mb-0.5">Menu tidak ditemukan</p>
-            <p class="text-slate-500 text-sm">Coba gunakan kata kunci lain</p>
-        </div>     
-    </main>
+        </div>
+    </div>
 
     <!-- Mobile Bottom Navigation -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-2 z-40 safe-area-pb max-w-md mx-auto">
         <div class="flex items-center justify-around">
-            <a href="{{ route('welcome') }}" class="flex flex-col items-center gap-1 py-1 px-3 text-primary-600">
+            <button onclick="switchTab('pesan')" id="nav-pesan" class="flex flex-col items-center gap-1 py-1 px-3 text-primary-600 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 <span class="text-[10px] font-bold">Pesan</span>
-            </a>
-            <button onclick="toggleCart()" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-400 relative">
+            </button>
+            <button onclick="toggleCart()" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-400 relative transition hover:text-slate-600">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
                 <span class="text-[10px] font-bold">Keranjang</span>
                 <span id="bottom-nav-badge" class="absolute -top-1 right-2 w-4 h-4 bg-amber-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center hidden">0</span>
             </button>
-            <button class="flex flex-col items-center gap-1 py-1 px-3 text-slate-400">
+            <button onclick="switchTab('status')" id="nav-status" class="flex flex-col items-center gap-1 py-1 px-3 text-slate-400 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -189,351 +276,14 @@
         </div>
     </nav>
 
-    <!-- ========================================== -->
-    <!-- CART PAGE (FULL PAGE CHECKOUT - SCROLLABLE) -->
-    <!-- ========================================== -->
-    <div id="cart-page" class="fixed inset-0 z-50 bg-slate-50 hidden flex flex-col">
-        <!-- Cart Header (Sticky) -->
-        <div class="bg-white border-b border-slate-200 shrink-0">
-            <div class="max-w-3xl mx-auto px-4 py-4">
-                <div class="flex items-center justify-between mb-1">
-                    <div class="flex items-center gap-2">
-                        <div class="w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h2 class="text-xl font-bold text-slate-900">Keranjang Pesanan</h2>
-                            <p class="text-xs text-slate-500">Konfirmasi sajian racikan barista sebelum proses seduh.</p>
-                        </div>
-                    </div>
-                    <button onclick="toggleCart()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Scrollable Content Area -->
-        <div class="flex-1 overflow-y-auto pb-4">
-            <div class="max-w-3xl mx-auto px-4 py-6 space-y-4">
-                
-                <!-- Cart Items -->
-                <div id="cart-items">
-                    <!-- Items akan di-render oleh JavaScript -->
-                </div>
-
-                <!-- Opsi Layanan & Meja Section (DATABASE CONNECTED - SYNTAX FIXED) -->
-                <div class="bg-white rounded-2xl border border-slate-200 p-4">
-                    <h3 class="text-sm font-bold text-slate-900 mb-3">Opsi Layanan & Meja</h3>
-                    <div class="space-y-3">
-                        <!-- Order Type Selection -->
-                        <div class="grid grid-cols-2 gap-2">
-                            <button type="button" onclick="setOrderType('dine-in')" id="btn-dine-in" class="order-type-btn active py-3 px-4 rounded-xl border-2 border-primary-600 bg-primary-50 text-primary-700 font-bold text-sm shadow-sm transition-all">
-                                Dine-in
-                            </button>
-                            <button type="button" onclick="setOrderType('take-away')" id="btn-take-away" class="order-type-btn py-3 px-4 rounded-xl border-2 border-slate-200 text-slate-600 font-bold text-sm bg-white hover:border-primary-300 transition-all">
-                                Takeaway
-                            </button>
-                        </div>
-
-                        <!-- Table Selection (Only for Dine-in) -->
-                        <div id="table-selection-container">
-                            <label class="block text-xs font-bold text-slate-700 mb-2">Pilih Meja:</label>
-                            <select id="table-number" class="w-full text-sm font-semibold bg-white border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-primary-500 focus:outline-none">
-                                @if(isset($mejas) && $mejas->isEmpty())
-                                    <option value="">Tidak ada meja tersedia</option>
-                                @elseif(isset($mejas))
-                                    @php
-                                        $mejaTerisi = $mejaTerisi ?? collect();
-                                        $semuaTerisi = $mejaAktif === null && $mejas->count() > 0 && $mejas->every(fn ($m) => $mejaTerisi->contains($m->id));
-                                    @endphp
-                                    @if($semuaTerisi)
-                                        <option value="">Semua meja sudah terisi</option>
-                                    @endif
-                                    @foreach($mejas as $meja)
-                                        @php
-                                            $dipakai = $mejaTerisi->contains($meja->id);
-                                            $dipilihSendiri = isset($mejaAktif) && $mejaAktif->id === $meja->id;
-                                            $terisi = $dipakai && !$dipilihSendiri;
-                                        @endphp
-                                        <option value="{{ $meja->id }}" {{ $dipilihSendiri ? 'selected' : '' }} {{ $terisi ? 'disabled' : '' }}>
-                                            Meja {{ $meja->nomor_meja }} (Kapasitas: {{ $meja->kapasitas }}){{ $terisi ? ' - Terisi' : '' }}
-                                        </option>
-                                    @endforeach
-                                @else
-                                    <option value="">Pilih meja...</option>
-                                @endif
-                            </select>
-                            @if(isset($mejaAktif))
-                                <p class="text-xs text-slate-500 mt-2">Anda sedang menggunakan Meja #{{ $mejaAktif->nomor_meja }}</p>
-                            @endif
-                        </div>
-
-                        <div>
-                            <label for="order-notes" class="block text-xs font-bold text-slate-700 mb-2">Catatan Pesanan (Opsional)</label>
-                            <textarea id="order-notes" rows="2" placeholder="Contoh: Es sedikit, gula aren dipisah..." class="w-full text-sm bg-white border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-primary-500 focus:outline-none resize-none"></textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Payment Method -->
-                <div class="bg-white rounded-2xl border border-slate-200 p-4">
-                    <h3 class="text-sm font-bold text-slate-900 mb-3">METODE PEMBAYARAN</h3>
-                    <div class="space-y-2">
-                        <label class="flex items-center gap-3 p-3 rounded-xl border-2 border-primary-600 bg-primary-50 cursor-pointer">
-                            <input type="radio" name="payment_method" value="QRIS" checked class="w-5 h-5 text-primary-600">
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2">
-                                    <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                                    </svg>
-                                    <span class="font-bold text-slate-900 text-sm">QRIS Instan</span>
-                                    <span class="text-[10px] font-bold text-white bg-primary-600 px-1.5 py-0.5 rounded">Cepat</span>
-                                </div>
-                                <p class="text-xs text-slate-500 mt-0.5">BCA, GoPay, OVO, Dana, ShopeePay</p>
-                            </div>
-                            <div class="w-5 h-5 rounded-full bg-primary-600 flex items-center justify-center">
-                                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                        </label>
-
-                        <label class="flex items-center gap-3 p-3 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-slate-300">
-                            <input type="radio" name="payment_method" value="tunai" class="w-5 h-5 text-primary-600">
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2">
-                                    <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 3.666V14m-6.118 4.014c.696 1.285 2.056 2.154 3.618 2.154s2.922-.869 3.618-2.154M19 10.25c0 .455-.066.893-.188 1.308M7.5 14c0 .69.105 1.354.3 1.972m9.4-1.972c.195-.618.3-1.282.3-1.972M12 2a8 8 0 100 16 8 8 0 000-16z" />
-                                    </svg>
-                                    <span class="font-bold text-slate-900 text-sm">Bayar di Kasir / Tunai</span>
-                                </div>
-                                <p class="text-xs text-slate-500 mt-0.5">Tunjukkan nomor meja saat ke bar</p>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Payment Details -->
-                <div class="bg-white rounded-2xl border border-slate-200 p-4">
-                    <h3 class="text-sm font-bold text-slate-900 mb-3">RINCIAN PEMBAYARAN</h3>
-                    <div class="space-y-2 text-sm">
-                        <div class="flex justify-between text-slate-600">
-                            <span>Subtotal Pesanan (<span id="subtotal-count">0</span> Item)</span>
-                            <span id="summary-subtotal" class="font-semibold">Rp 0</span>
-                        </div>
-                        <div class="flex justify-between text-slate-600">
-                            <span>PB1 Resto (10%)</span>
-                            <span id="pb1-amount">Rp 0</span>
-                        </div>
-                        <div class="border-t border-slate-200 pt-2 mt-2">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <span class="font-bold text-slate-900">Total Tagihan</span>
-                                    <p class="text-xs text-slate-500 mt-0.5">Termasuk PPN & Pelayanan</p>
-                                </div>
-                                <span id="summary-total" class="text-2xl font-bold text-primary-600">Rp 0</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Estimated Time -->
-                <div class="flex items-start gap-2 text-xs text-slate-600 pb-4">
-                    <svg class="w-4 h-4 mt-0.5 text-primary-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <p>Estimasi waktu peracikan: <span class="font-bold text-primary-600">10-14 menit</span>. Pesanan langsung diantar ke meja Anda.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Fixed Bottom Payment Button -->
-        <div class="shrink-0 bg-white border-t border-slate-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-            <div class="max-w-3xl mx-auto">
-                <button onclick="processOrder()" id="checkout-btn" disabled class="w-full bg-primary-600 text-white rounded-xl py-4 px-6 flex items-center justify-between font-bold shadow-lg shadow-primary-600/25 active:scale-95 transition disabled:bg-slate-300 disabled:cursor-not-allowed">
-                    <div>
-                        <div class="text-sm">BAYAR SEKARANG</div>
-                        <div class="text-xs opacity-90">QRIS Instan</div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span id="bottom-total" class="text-lg">Rp 0</span>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </div>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- RECEIPT MODAL -->
-    <div id="receipt-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="bg-white max-w-sm w-full rounded-3xl border border-slate-200 p-6 shadow-2xl space-y-4">
-            <div class="text-center space-y-1">
-                <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center text-3xl font-bold mb-3">✓</div>
-                <h3 class="font-bold text-xl text-slate-900">Pesanan Diterima!</h3>
-                <p class="text-sm text-slate-500">Tunjukkan struk digital ini ke kasir atau tunggu di meja Anda.</p>
-            </div>
-            <div class="bg-slate-50 p-4 rounded-2xl border border-dashed border-slate-300 text-xs space-y-2 font-mono">
-                <div class="flex justify-between border-b border-slate-200 pb-2">
-                    <span class="font-bold">BAGI KOPI</span>
-                    <span id="receipt-date"></span>
-                </div>
-                <div class="flex justify-between text-slate-700 font-bold">
-                    <span>NO. PESANAN</span>
-                    <span id="receipt-number"></span>
-                </div>
-                <div class="flex justify-between text-slate-700 font-bold">
-                    <span id="receipt-order-type"></span>
-                    <span id="receipt-target" class="text-primary-600"></span>
-                </div>
-                <div id="receipt-items-list" class="space-y-1.5 py-2 border-b border-slate-200"></div>
-                <div class="flex justify-between font-bold pt-1 text-sm text-slate-900">
-                    <span>TOTAL:</span>
-                    <span id="receipt-grand-total"></span>
-                </div>
-                <div id="receipt-notes-display" class="text-[11px] text-slate-600 italic pt-1"></div>
-            </div>
-
-            <div id="receipt-qris-section" class="hidden text-center p-3 bg-amber-50 rounded-2xl border border-amber-200 space-y-2">
-                <p class="text-xs font-bold text-amber-800">Scan QRIS untuk Membayar Tagihan:</p>
-                <div class="p-2 bg-white rounded-xl shadow-inner inline-block border border-amber-100">
-                    <img id="receipt-qris-img" src="" alt="QRIS Code" class="w-40 h-40 mx-auto rounded-lg">
-                </div>
-                <p id="receipt-qris-status" class="text-[10px] font-bold text-amber-700">Nominal otomatis sesuai total belanja.</p>
-            </div>
-
-            <button onclick="closeReceipt()" class="w-full py-3.5 rounded-2xl bg-primary-600 text-white text-sm font-bold hover:bg-primary-700 transition-all shadow-lg">
-                Tutup & Pesan Baru
-            </button>
-        </div>
-    </div>
-
+    <!-- ================= KERANJANG & CHECKOUT PAGE ================= -->
+    @include('user.keranjang')
+    <!-- ================= QRIS PAYMENT PAGE ================= -->
+    @include('user.qr')
+    <!-- ================= Mobile Customization Modal ================= -->
+    @include('user.costume')
     <!-- Mobile Customization Modal -->
-    <div id="mobile-customization-modal" class="fixed inset-0 z-50 hidden">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeMobileCustomization()"></div>
-        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[90vh] overflow-y-auto animate-slide-up">
-            <div class="sticky top-0 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
-                <button onclick="closeMobileCustomization()" class="p-2 -ml-2 text-slate-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
-                </button>
-                <h3 class="font-bold text-slate-900">Kustomisasi Pesanan</h3>
-                <div class="w-10"></div>
-            </div>
-
-            <div class="px-4 py-4">
-                <div class="rounded-2xl overflow-hidden mb-4">
-                    <img id="mobile-custom-image" src="" alt="" class="w-full h-48 object-cover">
-                </div>
-                <div class="flex items-center gap-2 mb-2" id="mobile-custom-tags"></div>
-                <h2 id="mobile-custom-name" class="text-xl font-bold text-slate-900 mb-1"></h2>
-                <p id="mobile-custom-description" class="text-sm text-slate-500 mb-3"></p>
-                <div class="flex items-center gap-2 mb-4">
-                    <span id="mobile-custom-price" class="text-2xl font-bold text-primary-600"></span>
-                </div>
-
-                <!-- Dynamic Options from Database -->
-                <div id="dynamic-options-container" class="mb-5 hidden">
-                    <div class="flex items-center justify-between mb-3">
-                        <label class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                            <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                            </svg>
-                            Pilihan Tambahan
-                        </label>
-                    </div>
-                    <div class="space-y-2" id="dynamic-options-list">
-                        <!-- Opsi dari database akan di-render di sini oleh JavaScript -->
-                    </div>
-                </div>
-
-                <!-- Temperature -->
-                <div class="mb-5">
-                    <div class="flex items-center justify-between mb-3">
-                        <label class="text-sm font-bold text-slate-900 flex items-center gap-2">Penyajian Suhu</label>
-                        <span class="text-[10px] font-bold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full">Wajib</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button type="button" onclick="selectTemperature('iced')" id="temp-iced" class="temp-btn active py-3 px-4 rounded-xl border-2 border-primary-600 bg-primary-50 text-primary-700 font-bold text-sm">Dingin / Iced</button>
-                        <button type="button" onclick="selectTemperature('hot')" id="temp-hot" class="temp-btn py-3 px-4 rounded-xl border-2 border-slate-200 text-slate-600 font-bold text-sm">Hangat / Hot</button>
-                    </div>
-                </div>
-
-                <!-- Milk -->
-                <div class="mb-5">
-                    <div class="flex items-center justify-between mb-3">
-                        <label class="text-sm font-bold text-slate-900 flex items-center gap-2">Pilihan Susu</label>
-                        <span class="text-[10px] font-bold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full">Pilih 1</span>
-                    </div>
-                    <div class="space-y-2">
-                        <button type="button" onclick="selectMilk('fresh', 0)" id="milk-fresh" class="milk-btn active w-full py-3 px-4 rounded-xl border-2 border-primary-600 bg-primary-50 text-left flex items-center justify-between">
-                            <span class="font-bold text-slate-900 text-sm">Fresh Milk (Standar)</span>
-                            <div class="milk-check flex items-center gap-2"><span class="text-xs font-bold text-slate-600">+Rp 0</span><svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg></div>
-                        </button>
-                        <button type="button" onclick="selectMilk('oat', 8000)" id="milk-oat" class="milk-btn w-full py-3 px-4 rounded-xl border-2 border-slate-200 text-left flex items-center justify-between">
-                            <span class="font-bold text-slate-900 text-sm">Oat Milk</span>
-                            <div class="milk-check"><span class="text-xs font-bold text-slate-600">+Rp 8.000</span></div>
-                        </button>
-                        <button type="button" onclick="selectMilk('almond', 8000)" id="milk-almond" class="milk-btn w-full py-3 px-4 rounded-xl border-2 border-slate-200 text-left flex items-center justify-between">
-                            <span class="font-bold text-slate-900 text-sm">Almond Milk</span>
-                            <div class="milk-check"><span class="text-xs font-bold text-slate-600">+Rp 8.000</span></div>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Sugar -->
-                <div class="mb-5">
-                    <div class="flex items-center justify-between mb-3">
-                        <label class="text-sm font-bold text-slate-900 flex items-center gap-2">Tingkat Manis Aren</label>
-                        <span class="text-[10px] font-bold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full">Pilih 1</span>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <button type="button" onclick="selectSugar('normal')" id="sugar-normal" class="sugar-btn active py-3 px-2 rounded-xl border-2 border-primary-600 bg-primary-50 text-primary-700 font-bold text-xs text-center">Normal</button>
-                        <button type="button" onclick="selectSugar('less')" id="sugar-less" class="sugar-btn py-3 px-2 rounded-xl border-2 border-slate-200 text-slate-600 font-bold text-xs text-center">Less Sweet</button>
-                        <button type="button" onclick="selectSugar('no')" id="sugar-no" class="sugar-btn py-3 px-2 rounded-xl border-2 border-slate-200 text-slate-600 font-bold text-xs text-center">No Sugar</button>
-                    </div>
-                </div>
-
-                <!-- Extra Shot -->
-                <div class="mb-5">
-                    <label class="flex items-center justify-between p-4 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-primary-300 transition">
-                        <div class="flex items-center gap-3">
-                            <input type="checkbox" id="extra-shot" onchange="toggleExtraShot()" class="w-5 h-5 rounded border-slate-300 text-primary-600 focus:ring-primary-500">
-                            <div>
-                                <div class="font-bold text-slate-900 text-sm">Ekstra Espresso Shot</div>
-                                <div class="text-xs text-slate-500">Ekstra intensitas & body kopi</div>
-                            </div>
-                        </div>
-                        <span class="text-sm font-bold text-primary-600">+Rp 6.000</span>
-                    </label>
-                </div>
-
-                <!-- Notes -->
-                <div class="mb-6">
-                    <label class="text-sm font-bold text-slate-900 flex items-center gap-2 mb-2">Catatan untuk Barista</label>
-                    <textarea id="mobile-custom-notes" rows="3" placeholder="Cth: Less ice batu..." class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"></textarea>
-                </div>
-            </div>
-
-            <!-- Fixed Bottom Bar -->
-            <div class="sticky bottom-0 bg-white border-t border-slate-200 px-4 py-3 flex items-center gap-3">
-                <div class="flex items-center gap-3 bg-slate-100 rounded-xl px-3 py-2">
-                    <button type="button" onclick="decrementQuantity()" class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-slate-700 font-bold shadow-sm">-</button>
-                    <span id="mobile-custom-qty" class="font-bold text-slate-900 w-6 text-center">1</span>
-                    <button type="button" onclick="incrementQuantity()" class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-slate-700 font-bold shadow-sm">+</button>
-                </div>
-                <button type="button" onclick="addToCartFromMobile()" class="flex-1 bg-primary-600 text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-between shadow-lg shadow-primary-600/25 active:scale-95 transition">
-                    <span>Pesan</span>
-                    <span id="mobile-custom-total">Rp 0</span>
-                </button>
-            </div>
-        </div>
-    </div>
+    
 
     <style>
         .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -556,6 +306,46 @@
         let mobileCustomOptions = { temperature: 'iced', milk: 'fresh', milkPrice: 0, sugar: 'normal', extraShot: false, dynamicOptions: {} };
         let currentOrderType = 'dine-in';
         let currentCategory = 'semua';
+        let activeTab = 'pesan';
+
+        // --- TAB SWITCHING FUNCTIONS ---
+        function switchTab(tabName) {
+            activeTab = tabName;
+            const tabPesan = document.getElementById('tab-pesan');
+            const tabStatus = document.getElementById('tab-status');
+            const searchContainer = document.getElementById('search-container');
+            const headerTitle = document.getElementById('header-title');
+            const headerSubtitle = document.getElementById('header-subtitle');
+            
+            const navPesan = document.getElementById('nav-pesan');
+            const navStatus = document.getElementById('nav-status');
+
+            if (tabName === 'status') {
+                tabPesan.classList.add('hidden');
+                tabStatus.classList.remove('hidden');
+                searchContainer.classList.add('hidden');
+                headerTitle.textContent = 'Bagi Kopi';
+                headerSubtitle.textContent = 'ARTISANAL BREW • ORDER STATUS';
+
+                navStatus.classList.remove('text-slate-400');
+                navStatus.classList.add('text-primary-600');
+                navPesan.classList.remove('text-primary-600');
+                navPesan.classList.add('text-slate-400');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                tabStatus.classList.add('hidden');
+                tabPesan.classList.remove('hidden');
+                searchContainer.classList.remove('hidden');
+                headerTitle.textContent = 'Bagi Kopi';
+                headerSubtitle.textContent = 'ARTISANAL BREW • CATALOG';
+
+                navPesan.classList.remove('text-slate-400');
+                navPesan.classList.add('text-primary-600');
+                navStatus.classList.remove('text-primary-600');
+                navStatus.classList.add('text-slate-400');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
 
         // --- MOBILE CUSTOMIZATION FUNCTIONS ---
         function openMobileCustomization(produkId, name, price, stock, image, description, tags = [], options = []) {
@@ -570,7 +360,6 @@
             document.getElementById('mobile-custom-notes').value = '';
             document.getElementById('extra-shot').checked = false;
             
-            // Render opsi dinamis dari database
             const dynamicContainer = document.getElementById('dynamic-options-container');
             const dynamicList = document.getElementById('dynamic-options-list');
             dynamicList.innerHTML = '';
@@ -817,20 +606,43 @@
 
         function syncCheckoutState() {
             const tableId = document.getElementById('table-number').value;
-            document.getElementById('checkout-btn').disabled = cart.length === 0 || (currentOrderType === 'dine-in' && !tableId);
+            const checkoutBtn = document.getElementById('checkout-btn');
+            if (checkoutBtn) {
+                checkoutBtn.disabled = cart.length === 0 || (currentOrderType === 'dine-in' && !tableId);
+            }
         }
 
         function updateHeaderCart() {
             const bottomBadge = document.getElementById('bottom-nav-badge');
+            const floatingBar = document.getElementById('floating-cart-bar');
+            const floatingBadge = document.getElementById('floating-cart-badge');
+            const floatingTitle = document.getElementById('floating-cart-title');
+            const floatingTotal = document.getElementById('floating-cart-total');
+
             const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             
             if (totalQty > 0) {
                 bottomBadge.textContent = totalQty;
                 bottomBadge.classList.remove('hidden');
                 bottomBadge.classList.add('flex');
+
+                floatingBadge.textContent = totalQty;
+                floatingTitle.textContent = `${totalQty} MENU DIPILIH`;
+                floatingTotal.textContent = formatRupiah(subtotal);
+                
+                floatingBar.classList.remove('hidden');
+                setTimeout(() => {
+                    floatingBar.classList.remove('translate-y-2', 'opacity-0');
+                }, 10);
             } else {
                 bottomBadge.classList.add('hidden');
                 bottomBadge.classList.remove('flex');
+
+                floatingBar.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => {
+                    floatingBar.classList.add('hidden');
+                }, 300);
             }
         }
 
@@ -1027,9 +839,7 @@
                     } else {
                         statusEl.textContent = 'Menunggu pembayaran...';
                     }
-                } catch (pollError) {
-                    // diamkan, coba lagi pada interval berikutnya
-                }
+                } catch (pollError) {}
             }, 3000);
         }
 
