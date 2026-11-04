@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Models\Transaksi;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,11 +21,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Paksa HTTPS di environment production (seperti Render) agar asset Vite termuat dengan benar
-        if (config('app.env') === 'production') {
-            URL::forceScheme('https');
-        }
-
         Gate::define('access-admin-panel', function ($user = null) {
             $user = auth('karyawan')->user();
             return $user && strtolower($user->role) === 'admin';
@@ -62,7 +56,7 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::define('access-pos', function ($user = null) {
             $user = auth('karyawan')->user();
-            return $user && in_array(strtolower($user->role), ['kasir', 'admin', 'manager'], false);
+            return $user && in_array(strtolower($user->role), ['kasir', 'admin'], false);
         });
     }
 }

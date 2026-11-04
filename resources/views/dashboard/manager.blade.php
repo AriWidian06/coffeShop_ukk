@@ -10,9 +10,9 @@
                 <div>
                     <div class="flex items-center gap-2 mb-1">
                         <span class="text-xs text-slate-500 font-semibold">Cabang Senopati Flagship</span>
-                        <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full">Live POS Sync</span>
+                        <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full">Live Sync</span>
                     </div>
-                    <h1 class="text-2xl font-bold text-slate-900">Ringkasan Penjualan</h1>
+                    <h1 class="text-2xl font-bold text-slate-900">Laporan Penjualan</h1>
                     <p class="text-sm text-slate-500 mt-1">Shift Pagi Aktif (07:00 - 15:30 WIB) • Lead Barista: Dimas & 4 Kru</p>
                 </div>
                 <div class="flex items-center gap-3">
@@ -91,7 +91,7 @@
                     <div>
                         <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Jumlah Transaksi</p>
                         <h3 class="text-3xl font-bold text-slate-900">{{ $totalTransaksiBulanIni ?? 0 }}</h3>
-                        <p class="text-xs text-slate-500 mt-1">Total tiket POS yang terselesaikan</p>
+                        <p class="text-xs text-slate-500 mt-1">Total tiket yang terselesaikan</p>
                     </div>
                     <div class="px-2 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-bold">
                         +8.2% YoY
@@ -190,7 +190,7 @@
                     <h3 class="font-bold text-slate-900">Metode Pembayaran</h3>
                     <button class="text-xs text-primary-600 font-semibold hover:text-primary-700">Lihat Detail</button>
                 </div>
-                <p class="text-xs text-slate-500 mb-6">Distribusi penyelesaian tagihan di kasir POS</p>
+                <p class="text-xs text-slate-500 mb-6">Distribusi penyelesaian tagihan</p>
                 
                 <!-- Payment Methods -->
                 <div class="space-y-4">

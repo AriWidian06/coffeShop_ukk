@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="min-h-screen bg-slate-50">
-    
     <!-- TOP HEADER -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-20">
         <div class="px-6 py-4">
@@ -21,7 +20,6 @@
                     Tambah Supplier
                 </a>
             </div>
-
             <!-- Stat Card -->
             <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center justify-between max-w-xs">
                 <div>
@@ -38,27 +36,27 @@
     </header>
 
     <!-- MAIN CONTENT -->
-    <main class="p-6 max-w-6xl mx-auto">
+    <main class="p-6 max-w-7xl mx-auto">
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="supplier-table">
+                <table class="supplier-table w-full">
                     <thead>
                         <tr>
-                            <th class="w-16 text-center">No</th>
-                            <th>Nama Supplier</th>
-                            <th>Nomor Telepon</th>
-                            <th>Alamat</th>
-                            <th class="text-right">Aksi</th>
+                            <th class="w-16 text-center px-6 py-4">No</th>
+                            <th class="px-6 py-4 text-left">Nama Supplier</th>
+                            <th class="px-6 py-4 text-left">Nomor Telepon</th>
+                            <th class="px-6 py-4 text-left">Alamat</th>
+                            <th class="text-right px-6 py-4">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-slate-200">
                         @forelse ($suppliers as $index => $supplier)
-                            <tr>
-                                <td class="text-center text-slate-500 font-medium">{{ $suppliers->firstItem() + $index }}</td>
-                                <td>
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="text-center text-slate-500 font-medium px-6 py-4">{{ $suppliers->firstItem() + $index }}</td>
+                                <td class="px-6 py-4">
                                     <div class="font-bold text-slate-900">{{ $supplier->nama_supplier }}</div>
                                 </td>
-                                <td>
+                                <td class="px-6 py-4">
                                     <div class="flex items-center gap-2 text-slate-600">
                                         <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -66,12 +64,12 @@
                                         {{ $supplier->no_telp }}
                                     </div>
                                 </td>
-                                <td>
-                                    <div class="max-w-xs truncate text-slate-600" title="{{ $supplier->alamat }}">
+                                <td class="px-6 py-4">
+                                    <div class="max-w-md truncate text-slate-600" title="{{ $supplier->alamat }}">
                                         {{ $supplier->alamat }}
                                     </div>
                                 </td>
-                                <td class="text-right">
+                                <td class="text-right px-6 py-4">
                                     <div class="flex items-center justify-end gap-2">
                                         <a href="{{ route('suppliers.edit', $supplier) }}" class="p-2 text-slate-600 hover:bg-primary-50 hover:text-primary-600 rounded-lg transition" title="Edit">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,10 +104,10 @@
                     </tbody>
                 </table>
             </div>
-
+            
             <!-- Pagination -->
             @if ($suppliers->hasPages())
-                <div class="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
+                <div class="px-6 py-4 border-t border-slate-200 flex items-center justify-between bg-slate-50">
                     <p class="text-sm text-slate-600">
                         Menampilkan <span class="font-bold">{{ $suppliers->firstItem() }}</span> - <span class="font-bold">{{ $suppliers->lastItem() }}</span> dari <span class="font-bold">{{ $suppliers->total() }}</span> data
                     </p>

@@ -91,7 +91,7 @@ class ProdukController extends Controller
         $validated['is_customizable'] = $request->has('is_customizable');
 
         if ($request->hasFile('gambar')) {
-            $path = $request->file('gambar')->store('produks', 'images');
+            $path = $request->file('gambar')->store('produks', 'public');
             $validated['gambar'] = $path;
         }
 
@@ -141,9 +141,9 @@ class ProdukController extends Controller
 
         if ($request->hasFile('gambar')) {
             if ($produk->gambar) {
-                Storage::disk('images')->delete($produk->gambar);
+                Storage::disk('public')->delete($produk->gambar);
             }
-            $path = $request->file('gambar')->store('produks', 'images');
+            $path = $request->file('gambar')->store('produks', 'public');
             $validated['gambar'] = $path;
         }
 
