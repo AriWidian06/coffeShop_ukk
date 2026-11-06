@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\DetailTransaksi;
 use App\Models\Produk;
+use App\Models\PromoKode;
+use App\Models\PromoUsage;
 use App\Models\Transaksi;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
@@ -20,6 +22,8 @@ class TransaksiController extends Controller
             'tipe_pesanan' => 'required|in:dine-in,take-away',
             'metode_pembayaran' => 'nullable|in:QRIS,tunai',
             'catatan' => 'nullable|string|max:500',
+            'session_id' => 'nullable|string|max:128',
+            'kode_promo' => 'nullable|string|max:50',
             'items' => 'required|array|min:1',
             'items.*.produk_id' => 'required|integer|exists:produks,id',
             'items.*.qty' => 'required|integer|min:1',
@@ -46,6 +50,20 @@ class TransaksiController extends Controller
             $items = [];
             $productsById = [];
             $quantitiesByProduct = [];
+
+            $promo = null;
+            if (!empty($validated['kode_promo'])) {
+                $promo = PromoKode::query()
+                    ->where('kode', PromoKode::normalized($validated['kode_promo']))
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$promo) {
+                    throw ValidationException::withMessages([
+                        'kode_promo' => 'Kode promo tidak ditemukan.',
+                    ]);
+                }
+            }
 
             foreach ($validated['items'] as $item) {
                 $produkId = $item['produk_id'];
@@ -95,17 +113,52 @@ class TransaksiController extends Controller
                 }
             }
 
+            $mejaId = !empty($validated['meja_id']) ? (int) $validated['meja_id'] : null;
+            $sessionId = trim((string) ($validated['session_id'] ?? ''));
+            if ($sessionId === '') {
+                $sessionId = null;
+            }
+
+            $diskon = 0;
+            if ($promo) {
+                $eligibility = $promo->eligibleFor($subtotal, $mejaId, $sessionId);
+                if (!$eligibility['ok']) {
+                    throw ValidationException::withMessages([
+                        'kode_promo' => $eligibility['message'],
+                    ]);
+                }
+                $diskon = $eligibility['diskon'];
+            }
+
             $pajak = round($subtotal * 0.1, 2);
+            $totalHarga = max(0, round($subtotal + $pajak - $diskon, 2));
+
             $transaksi = Transaksi::create([
-                'meja_id' => $validated['meja_id'] ?? null,
+                'meja_id' => $mejaId,
                 'karyawan_id' => null,
                 'sumber_pesanan' => 'web',
                 'catatan' => $validated['catatan'] ?? null,
                 'tipe_pesanan' => $validated['tipe_pesanan'],
-                'total_harga' => $subtotal + $pajak,
+                'total_harga' => $totalHarga,
                 'status_pesanan' => 'pending',
                 'waktu_transaksi' => now(),
+                'promo_kode_id' => $promo?->id,
+                'diskon' => $diskon,
+                'session_id' => $sessionId,
             ]);
+
+            if ($promo) {
+                $promo->increment('kuota_terpakai');
+                PromoUsage::create([
+                    'promo_kode_id' => $promo->id,
+                    'meja_id' => $mejaId,
+                    'transaksi_id' => $transaksi->id,
+                    'session_id' => $sessionId,
+                    'discount_amount' => $diskon,
+                    'status' => 'active',
+                    'used_at' => now(),
+                ]);
+            }
 
             foreach ($quantitiesByProduct as $produkId => $quantity) {
                 $productsById[$produkId]->decrement('stock', $quantity);
@@ -125,6 +178,7 @@ class TransaksiController extends Controller
                 'transaksi' => $transaksi,
                 'subtotal' => $subtotal,
                 'pajak' => $pajak,
+                'diskon' => $diskon,
             ];
         });
 
@@ -133,6 +187,7 @@ class TransaksiController extends Controller
             'waktu_transaksi' => $result['transaksi']->waktu_transaksi->toIso8601String(),
             'subtotal' => $result['subtotal'],
             'pajak' => $result['pajak'],
+            'diskon' => $result['diskon'],
             'total_harga' => (float) $result['transaksi']->total_harga,
         ];
 

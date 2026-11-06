@@ -14,7 +14,7 @@ class ProdukController extends Controller
     public function index(Request $request)
     {
         // Mulai query dengan relasi
-        $query = Produk::with(['supplier', 'kategoriProduk']);
+        $query = Produk::with(['supplier', 'kategoriProduk', 'opsis']);
 
         // 1. Filter Pencarian
         if ($request->has('search') && $request->search != '') {
@@ -83,6 +83,9 @@ class ProdukController extends Controller
             'status_aktif' => 'nullable|boolean',
             'is_customizable' => 'nullable|boolean',
             'opsis' => 'nullable|array',
+            'opsis.*.kategori' => 'nullable|string|max:255',
+            'opsis.*.tipe' => 'required_with:opsis|in:single,multiple',
+            'opsis.*.is_required' => 'nullable|boolean',
             'opsis.*.nama_opsi' => 'required_with:opsis|string|max:255',
             'opsis.*.harga_tambahan' => 'required_with:opsis|numeric|min:0',
         ]);
@@ -100,6 +103,9 @@ class ProdukController extends Controller
         if ($validated['is_customizable'] && $request->has('opsis')) {
             foreach ($request->opsis as $opsi) {
                 $produk->opsis()->create([
+                    'kategori' => $opsi['kategori'] ?? null,
+                    'tipe' => $opsi['tipe'],
+                    'is_required' => $opsi['is_required'] ?? false,
                     'nama_opsi' => $opsi['nama_opsi'],
                     'harga_tambahan' => $opsi['harga_tambahan'],
                 ]);
@@ -132,6 +138,9 @@ class ProdukController extends Controller
             'status_aktif' => 'nullable|boolean',
             'is_customizable' => 'nullable|boolean',
             'opsis' => 'nullable|array',
+            'opsis.*.kategori' => 'nullable|string|max:255',
+            'opsis.*.tipe' => 'required_with:opsis|in:single,multiple',
+            'opsis.*.is_required' => 'nullable|boolean',
             'opsis.*.nama_opsi' => 'required_with:opsis|string|max:255',
             'opsis.*.harga_tambahan' => 'required_with:opsis|numeric|min:0',
         ]);
@@ -154,6 +163,9 @@ class ProdukController extends Controller
             if ($request->has('opsis')) {
                 foreach ($request->opsis as $opsi) {
                     $produk->opsis()->create([
+                        'kategori' => $opsi['kategori'] ?? null,
+                        'tipe' => $opsi['tipe'],
+                        'is_required' => $opsi['is_required'] ?? false,
                         'nama_opsi' => $opsi['nama_opsi'],
                         'harga_tambahan' => $opsi['harga_tambahan'],
                     ]);

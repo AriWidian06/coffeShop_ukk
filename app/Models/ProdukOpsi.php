@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProdukOpsi extends Model
 {
-    protected $fillable = ['produk_id', 'nama_opsi', 'harga_tambahan'];
+    protected $fillable = ['produk_id', 'kategori', 'tipe', 'is_required', 'nama_opsi', 'harga_tambahan'];
 
     public function produk(): BelongsTo
     {

@@ -17,9 +17,9 @@
             <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-2.5">
                     <div class="w-10 h-10 rounded-2xl bg-primary-600 text-white flex items-center justify-center shadow-md shadow-primary-600/20 overflow-hidden shrink-0">
-                        <img 
-                            src="{{ asset('images/logo.jpeg') }}" 
-                            alt="Logo Bagi Kopi" 
+                        <img
+                            src="{{ asset('images/logo.jpeg') }}"
+                            alt="Logo Bagi Kopi"
                             class="w-full h-full object-cover"
                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                         >
@@ -49,7 +49,7 @@
 
             <!-- Search (Hanya tampil di tab Pesan) -->
             <div id="search-container" class="relative">
-                <input type="text" id="menu-search-mobile" onkeyup="filterMenu()" 
+                <input type="text" id="menu-search-mobile" onkeyup="filterMenu()"
                     placeholder="Cari kopi, pastry, atau manual brew..."
                     class="w-full pl-10 pr-10 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all">
                 <svg class="w-5 h-5 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,7 +66,7 @@
 
     <!-- Main Content Area -->
     <main class="max-w-md mx-auto px-4 py-5 space-y-5">
-        
+
         <!-- ================= TAB PESAN (KATALOG MENU) ================= -->
         <div id="tab-pesan" class="space-y-5">
             @if(isset($mejaAktif))
@@ -83,16 +83,12 @@
                             <span class="px-2 py-0.5 bg-primary-600 text-white text-[10px] font-extrabold rounded-md">DINE-IN</span>
                         </div>
                         <p class="text-xs text-slate-500 mt-0.5">Bagi Kopi Main Hall • Lantai 1</p>
-                        <p class="text-[11px] text-primary-600 font-semibold mt-1 flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.14 0M1.394 9.393c5.857-5.858 15.355-5.858 21.213 0"/></svg>
-                            WiFi: <span class="font-bold">BagiKopi_Guest</span> (Sandi: <span class="font-mono bg-slate-100 px-1 rounded">bagikopi2026</span>)
+                        <p class="text-xs text-slate-500 font-semibold mt-1">
+                            Tempat: {{ $mejaAktif->nomor_meja <= 10 ? 'Lt. 1' : 'Lt. 2 Slow Bar' }} &nbsp;•&nbsp; Kapasitas: {{ $mejaAktif->kapasitas }} orang
                         </p>
                     </div>
                 </div>
-                <a href="{{ route('meja.index') ?? '#' }}" class="px-3.5 py-1.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 transition flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                    Ubah
-                </a>
+
             </div>
             @endif
 
@@ -128,7 +124,7 @@
                         $dataName = strtolower($produk->nama_produk);
                         $hargaFormatted = number_format($produk->harga_jual, 0, ',', '.');
                         $imageUrl = $produk->gambar ? asset('images/' . $produk->gambar) : 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=600&q=80';
-                        
+
                         $badge = null;
                         $badgeColor = 'bg-blue-600';
                         if (str_contains(strtolower($produk->nama_produk), 'aren latte')) {
@@ -155,7 +151,7 @@
                         data-product-customizable="{{ $produk->is_customizable ? 'true' : 'false' }}"
                         data-product-options="{{ json_encode($produk->opsis) }}"
                         data-product-image="{{ $imageUrl }}">
-                        
+
                         <div class="flex gap-3">
                             <div class="w-24 h-24 rounded-xl bg-slate-100 overflow-hidden shrink-0 relative shadow-inner">
                                 <img src="{{ $imageUrl }}" alt="{{ $produk->nama_produk }}" class="w-full h-full object-cover">
@@ -163,7 +159,7 @@
                                     <span class="absolute top-1 left-1 px-1.5 py-0.5 {{ $badgeColor }} text-white text-[9px] font-extrabold rounded-md shadow-sm">{{ $badge }}</span>
                                 @endif
                             </div>
-                            
+
                             <div class="flex-1 min-w-0 flex flex-col justify-between">
                                 <div>
                                     <h3 class="font-bold text-slate-900 text-sm leading-tight mb-1">{{ $produk->nama_produk }}</h3>
@@ -172,7 +168,7 @@
                                 <div class="flex items-center justify-between mt-2">
                                     <span class="font-extrabold text-primary-600 text-sm">Rp {{ $hargaFormatted }}</span>
                                     @if($produk->stock > 0)
-                                        <button type="button" onclick="quickAddToCart({{ $produk->id }}, '{{ addslashes($produk->nama_produk) }}', {{ $produk->harga_jual }}, {{ $produk->stock }})" 
+                                        <button type="button" onclick="quickAddToCart({{ $produk->id }}, '{{ addslashes($produk->nama_produk) }}', {{ $produk->harga_jual }}, {{ $produk->stock }})"
                                             class="w-8 h-8 rounded-xl bg-primary-600 text-white flex items-center justify-center hover:bg-primary-700 active:scale-95 shadow-md shadow-primary-600/20 transition">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -252,7 +248,7 @@
     </div>
 
     <!-- Mobile Bottom Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-2 z-40 safe-area-pb max-w-md mx-auto">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-2 z-50 safe-area-pb max-w-md mx-auto">
         <div class="flex items-center justify-around">
             <button onclick="switchTab('pesan')" id="nav-pesan" class="flex flex-col items-center gap-1 py-1 px-3 text-primary-600 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -283,7 +279,7 @@
     <!-- ================= Mobile Customization Modal ================= -->
     @include('user.costume')
     <!-- Mobile Customization Modal -->
-    
+
 
     <style>
         .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -303,10 +299,17 @@
         let nextCartLineId = 1;
         let mobileCustomProduct = null;
         let mobileCustomQty = 1;
-        let mobileCustomOptions = { temperature: 'iced', milk: 'fresh', milkPrice: 0, sugar: 'normal', extraShot: false, dynamicOptions: {} };
+        let mobileCustomOptions = { dynamicOptions: {} };
         let currentOrderType = 'dine-in';
         let currentCategory = 'semua';
         let activeTab = 'pesan';
+        let appliedPromo = null;
+        let promoSessionId = localStorage.getItem('bk_guest_session');
+        if (!promoSessionId) {
+            promoSessionId = 'BK-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+            localStorage.setItem('bk_guest_session', promoSessionId);
+        }
+        const qrLockedMejaId = {{ $mejaAktif ? $mejaAktif->id : 'null' }};
 
         // --- TAB SWITCHING FUNCTIONS ---
         function switchTab(tabName) {
@@ -316,7 +319,7 @@
             const searchContainer = document.getElementById('search-container');
             const headerTitle = document.getElementById('header-title');
             const headerSubtitle = document.getElementById('header-subtitle');
-            
+
             const navPesan = document.getElementById('nav-pesan');
             const navStatus = document.getElementById('nav-status');
 
@@ -351,57 +354,104 @@
         function openMobileCustomization(produkId, name, price, stock, image, description, tags = [], options = []) {
             mobileCustomProduct = { produkId, name, basePrice: price, stock, image, description, options: options };
             mobileCustomQty = 1;
-            mobileCustomOptions = { temperature: 'iced', milk: 'fresh', milkPrice: 0, sugar: 'normal', extraShot: false, dynamicOptions: {} };
-            
+            mobileCustomOptions = { selectedOptions: {} };
+
             document.getElementById('mobile-custom-image').src = image;
             document.getElementById('mobile-custom-name').textContent = name;
             document.getElementById('mobile-custom-description').textContent = description || 'Produk berkualitas dari Bagi Kopi.';
             document.getElementById('mobile-custom-price').textContent = formatRupiah(price);
             document.getElementById('mobile-custom-notes').value = '';
-            document.getElementById('extra-shot').checked = false;
-            
-            const dynamicContainer = document.getElementById('dynamic-options-container');
-            const dynamicList = document.getElementById('dynamic-options-list');
-            dynamicList.innerHTML = '';
-            
-            if (options && options.length > 0) {
-                dynamicContainer.classList.remove('hidden');
-                options.forEach(opt => {
-                    const optId = `opt-${opt.id}`;
-                    const priceText = opt.harga_tambahan > 0 ? `+${formatRupiah(opt.harga_tambahan)}` : 'Gratis';
-                    
-                    const label = document.createElement('label');
-                    label.className = 'flex items-center justify-between p-3 rounded-xl border border-slate-200 cursor-pointer hover:border-primary-300 transition bg-white';
-                    label.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <input type="checkbox" id="${optId}" data-option-id="${opt.id}" data-option-price="${opt.harga_tambahan}" onchange="toggleDynamicOption(this)" class="w-5 h-5 rounded border-slate-300 text-primary-600 focus:ring-primary-500">
-                            <div>
-                                <div class="font-bold text-slate-900 text-sm">${opt.nama_opsi}</div>
-                            </div>
-                        </div>
-                        <span class="text-sm font-bold text-primary-600">${priceText}</span>
-                    `;
-                    dynamicList.appendChild(label);
-                });
-            } else {
-                dynamicContainer.classList.add('hidden');
-            }
-            
-            updateCustomizationUI();
+
+            renderCustomizationGroups();
             updateMobileTotal();
             document.getElementById('mobile-customization-modal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         }
 
-        function toggleDynamicOption(checkbox) {
-            const optId = checkbox.dataset.optionId;
-            const optPrice = parseFloat(checkbox.dataset.optionPrice) || 0;
-            
-            if (checkbox.checked) {
-                mobileCustomOptions.dynamicOptions[optId] = optPrice;
+        function renderCustomizationGroups() {
+            const container = document.getElementById('customization-groups-container');
+            container.innerHTML = '';
+
+            const options = mobileCustomProduct.options || [];
+            const groups = {};
+
+            options.forEach(opt => {
+                const cat = opt.kategori || 'Pilihan Tambahan';
+                if (!groups[cat]) groups[cat] = { tipe: opt.tipe || 'multiple', is_required: opt.is_required || false, items: [] };
+                groups[cat].items.push(opt);
+            });
+
+            Object.keys(groups).forEach(catName => {
+                const group = groups[catName];
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'space-y-3';
+
+                const header = document.createElement('div');
+                header.className = 'flex items-center justify-between mb-1';
+                header.innerHTML = `
+                    <label class="text-sm font-bold text-slate-900">${catName}</label>
+                    <span class="text-[10px] font-bold ${group.is_required ? 'text-primary-600 bg-primary-50' : 'text-slate-500 bg-slate-100'} px-2 py-0.5 rounded-full border ${group.is_required ? 'border-primary-100' : 'border-slate-200'}">
+                        ${group.is_required ? 'Wajib' : group.tipe === 'single' ? 'Pilih 1' : 'Bisa Lebih dari 1'}
+                    </span>
+                `;
+                groupDiv.appendChild(header);
+
+                const itemsDiv = document.createElement('div');
+                if (group.tipe === 'single' && group.items.length === 2) {
+                    itemsDiv.className = 'grid grid-cols-2 gap-2';
+                } else {
+                    itemsDiv.className = 'space-y-2';
+                }
+
+                group.items.forEach(opt => {
+                    const isSelected = mobileCustomOptions.selectedOptions[catName] === opt.id || (group.tipe === 'multiple' && mobileCustomOptions.selectedOptions[`opt-${opt.id}`]);
+                    const priceText = opt.harga_tambahan > 0 ? `+${formatRupiah(opt.harga_tambahan)}` : '';
+
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+
+                    if (group.tipe === 'single' && group.items.length === 2) {
+                        btn.className = `py-3 px-4 rounded-xl border-2 font-bold text-sm transition-all ${isSelected ? 'border-primary-600 bg-primary-50 text-primary-700' : 'border-slate-200 bg-white text-slate-600'}`;
+                        btn.innerHTML = `<span class="block text-center w-full">${opt.nama_opsi}</span>`;
+                    } else {
+                        btn.className = `w-full py-3 px-4 rounded-xl border-2 text-left flex items-center justify-between transition-all ${isSelected ? 'border-primary-600 bg-primary-50 text-primary-700' : 'border-slate-200 bg-white text-slate-600'}`;
+                        btn.innerHTML = `
+                            <span class="font-bold text-sm">${opt.nama_opsi}</span>
+                            <div class="flex items-center gap-2">
+                                ${priceText ? `<span class="text-xs font-bold">${priceText}</span>` : ''}
+                                ${isSelected ? '<svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>' : ''}
+                            </div>
+                        `;
+                    }
+
+                    btn.onclick = () => toggleOption(catName, opt);
+                    itemsDiv.appendChild(btn);
+                });
+
+                groupDiv.appendChild(itemsDiv);
+                container.appendChild(groupDiv);
+            });
+        }
+
+        function toggleOption(catName, opt) {
+            const groupTipe = mobileCustomProduct.options.find(o => o.kategori === catName)?.tipe || 'multiple';
+
+            if (groupTipe === 'single') {
+                if (mobileCustomOptions.selectedOptions[catName] === opt.id) {
+                    delete mobileCustomOptions.selectedOptions[catName];
+                } else {
+                    mobileCustomOptions.selectedOptions[catName] = opt.id;
+                }
             } else {
-                delete mobileCustomOptions.dynamicOptions[optId];
+                const optId = `opt-${opt.id}`;
+                if (mobileCustomOptions.selectedOptions[optId]) {
+                    delete mobileCustomOptions.selectedOptions[optId];
+                } else {
+                    mobileCustomOptions.selectedOptions[optId] = opt.id;
+                }
             }
+
+            renderCustomizationGroups();
             updateMobileTotal();
         }
 
@@ -410,42 +460,8 @@
             document.body.style.overflow = '';
         }
 
-        function selectTemperature(temp) {
-            mobileCustomOptions.temperature = temp;
-            document.getElementById('temp-iced').classList.toggle('active', temp === 'iced');
-            document.getElementById('temp-hot').classList.toggle('active', temp === 'hot');
-        }
-
-        function selectMilk(type, price) {
-            mobileCustomOptions.milk = type;
-            mobileCustomOptions.milkPrice = price;
-            ['fresh', 'oat', 'almond'].forEach(m => {
-                const btn = document.getElementById(`milk-${m}`);
-                const priceText = m === 'fresh' ? '+Rp 0' : '+Rp 8.000';
-                if (m === type) {
-                    btn.classList.add('active');
-                    btn.querySelector('.milk-check').innerHTML = `<span class="text-xs font-bold text-slate-600">${priceText}</span><svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>`;
-                } else {
-                    btn.classList.remove('active');
-                    btn.querySelector('.milk-check').innerHTML = `<span class="text-xs font-bold text-slate-600">${priceText}</span>`;
-                }
-            });
-            updateMobileTotal();
-        }
-
-        function selectSugar(level) {
-            mobileCustomOptions.sugar = level;
-            ['normal', 'less', 'no'].forEach(s => {
-                document.getElementById(`sugar-${s}`).classList.toggle('active', s === level);
-            });
-        }
-
-        function toggleExtraShot() {
-            mobileCustomOptions.extraShot = document.getElementById('extra-shot').checked;
-            updateMobileTotal();
-        }
-
         function cartQtyForProduct(produkId) {
+
             return cart
                 .filter(item => item.produkId === produkId)
                 .reduce((sum, item) => sum + item.qty, 0);
@@ -469,39 +485,54 @@
         }
 
         function updateMobileTotal() {
-            let dynamicOptionsTotal = 0;
-            for (const key in mobileCustomOptions.dynamicOptions) {
-                dynamicOptionsTotal += mobileCustomOptions.dynamicOptions[key];
-            }
-            
-            const total = (mobileCustomProduct.basePrice + mobileCustomOptions.milkPrice + (mobileCustomOptions.extraShot ? 6000 : 0) + dynamicOptionsTotal) * mobileCustomQty;
-            document.getElementById('mobile-custom-total').textContent = formatRupiah(total);
-        }
+            let optionsTotal = 0;
+            const options = mobileCustomProduct.options || [];
 
-        function updateCustomizationUI() {
-            selectTemperature('iced');
-            selectMilk('fresh', 0);
-            selectSugar('normal');
+            Object.keys(mobileCustomOptions.selectedOptions).forEach(key => {
+                const optId = mobileCustomOptions.selectedOptions[key];
+                const opt = options.find(o => o.id == optId);
+                if (opt) optionsTotal += parseFloat(opt.harga_tambahan || 0);
+            });
+
+            const total = (mobileCustomProduct.basePrice + optionsTotal) * mobileCustomQty;
+            document.getElementById('mobile-custom-total').textContent = formatRupiah(total);
         }
 
         function addToCartFromMobile() {
             if (!mobileCustomProduct) return;
 
-            const notes = document.getElementById('mobile-custom-notes').value.trim();
-            const parts = [
-                mobileCustomOptions.temperature === 'hot' ? 'Hot' : 'Iced',
-                { fresh: 'Fresh Milk', oat: 'Oat Milk', almond: 'Almond Milk' }[mobileCustomOptions.milk] || 'Fresh Milk',
-                { normal: 'Normal Sugar', less: 'Less Sugar', no: 'No Sugar' }[mobileCustomOptions.sugar] || 'Normal Sugar',
-            ];
-
-            if (mobileCustomOptions.extraShot) parts.push('Extra Shot');
-
-            const selectedDynamicOptions = [];
-            document.querySelectorAll('#dynamic-options-list input[type="checkbox"]:checked').forEach(cb => {
-                const name = cb.parentElement.querySelector('.font-bold').textContent.trim();
-                if (name) selectedDynamicOptions.push(name);
+            // 1. Validate Mandatory Customizations
+            const options = mobileCustomProduct.options || [];
+            const groups = {};
+            options.forEach(opt => {
+                const cat = opt.kategori || 'Pilihan Tambahan';
+                if (!groups[cat]) groups[cat] = { is_required: false, items: [] };
+                if (opt.is_required) groups[cat].is_required = true;
+                groups[cat].items.push(opt);
             });
-            parts.push(...selectedDynamicOptions);
+
+            for (const catName in groups) {
+                if (groups[catName].is_required) {
+                    const hasSelection = Object.keys(mobileCustomOptions.selectedOptions).some(key => {
+                        const optId = mobileCustomOptions.selectedOptions[key];
+                        return options.find(o => o.id == optId)?.kategori === catName || key === catName;
+                    });
+
+                    if (!hasSelection) {
+                        alert(`Mohon pilih opsi untuk ${catName} terlebih dahulu.`);
+                        return;
+                    }
+                }
+            }
+
+            const notes = document.getElementById('mobile-custom-notes').value.trim();
+            const parts = [];
+
+            Object.keys(mobileCustomOptions.selectedOptions).forEach(key => {
+                const optId = mobileCustomOptions.selectedOptions[key];
+                const opt = options.find(o => o.id == optId);
+                if (opt) parts.push(opt.nama_opsi);
+            });
 
             if (notes) parts.push(notes);
 
@@ -515,11 +546,13 @@
             }
 
             const addQty = Math.min(mobileCustomQty, available);
-            let dynamicOptionsTotal = 0;
-            for (const key in mobileCustomOptions.dynamicOptions) {
-                dynamicOptionsTotal += mobileCustomOptions.dynamicOptions[key];
-            }
-            const finalPrice = mobileCustomProduct.basePrice + mobileCustomOptions.milkPrice + (mobileCustomOptions.extraShot ? 6000 : 0) + dynamicOptionsTotal;
+            let optionsTotal = 0;
+            Object.keys(mobileCustomOptions.selectedOptions).forEach(key => {
+                const optId = mobileCustomOptions.selectedOptions[key];
+                const opt = options.find(o => o.id == optId);
+                if (opt) optionsTotal += parseFloat(opt.harga_tambahan || 0);
+            });
+            const finalPrice = mobileCustomProduct.basePrice + optionsTotal;
 
             const item = cart.find(item => item.produkId === mobileCustomProduct.produkId && item.customization === customization);
             if (item) {
@@ -531,6 +564,8 @@
             renderCart();
             updateHeaderCart();
         }
+
+
 
         function addSimpleToCart(produkId, name, price, stock, image) {
             const available = stock - cartQtyForProduct(produkId);
@@ -580,12 +615,16 @@
             const btnTakeAway = document.getElementById('btn-take-away');
             const tableContainer = document.getElementById('table-selection-container');
             const tableSelect = document.getElementById('table-number');
-            
+
             if (type === 'dine-in') {
                 btnDineIn.classList.add('active');
                 btnTakeAway.classList.remove('active');
                 tableContainer.classList.remove('hidden');
                 tableSelect.disabled = false;
+                if (qrLockedMejaId) {
+                    tableSelect.value = qrLockedMejaId;
+                    tableSelect.disabled = true;
+                }
             } else {
                 btnTakeAway.classList.add('active');
                 btnDineIn.classList.remove('active');
@@ -621,7 +660,7 @@
 
             const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
             const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            
+
             if (totalQty > 0) {
                 bottomBadge.textContent = totalQty;
                 bottomBadge.classList.remove('hidden');
@@ -630,7 +669,7 @@
                 floatingBadge.textContent = totalQty;
                 floatingTitle.textContent = `${totalQty} MENU DIPILIH`;
                 floatingTotal.textContent = formatRupiah(subtotal);
-                
+
                 floatingBar.classList.remove('hidden');
                 setTimeout(() => {
                     floatingBar.classList.remove('translate-y-2', 'opacity-0');
@@ -691,7 +730,8 @@
             });
 
             container.innerHTML = html;
-            updateTotals(subtotal, totalItems);
+            const promoDiscount = appliedPromo && appliedPromo.diskon ? Number(appliedPromo.diskon) : 0;
+            updateTotals(subtotal, totalItems, promoDiscount);
         }
 
         function updateQuantity(index, change) {
@@ -712,17 +752,86 @@
             }
         }
 
-        function updateTotals(subtotal = 0, totalItems = 0) {
+        function updateTotals(subtotal = 0, totalItems = 0, promoDiscount = 0) {
             const pb1 = Math.round(subtotal * 0.10);
-            const total = subtotal + pb1;
+            const total = Math.max(0, subtotal + pb1 - promoDiscount);
 
             document.getElementById('subtotal-count').textContent = totalItems;
             document.getElementById('summary-subtotal').textContent = formatRupiah(subtotal);
             document.getElementById('pb1-amount').textContent = formatRupiah(pb1);
             document.getElementById('summary-total').textContent = formatRupiah(total);
             document.getElementById('bottom-total').textContent = formatRupiah(total);
-            
+
             syncCheckoutState();
+        }
+
+        function removePromo() {
+            appliedPromo = null;
+            const codeInput = document.getElementById('promo-code');
+            if (codeInput) codeInput.value = '';
+            const statusEl = document.getElementById('promo-status');
+            if (statusEl) statusEl.textContent = '';
+            const summaryEl = document.getElementById('promo-summary');
+            if (summaryEl) summaryEl.classList.add('hidden');
+            const removeBtn = document.getElementById('remove-promo-btn');
+            if (removeBtn) removeBtn.classList.add('hidden');
+            renderCart();
+        }
+
+        async function applyPromo() {
+            const codeInput = document.getElementById('promo-code');
+            const statusEl = document.getElementById('promo-status');
+            const summaryEl = document.getElementById('promo-summary');
+            const btn = document.querySelector('button[onclick="applyPromo()"]');
+            const code = (codeInput?.value || '').trim();
+            if (!code) {
+                statusEl.textContent = 'Masukkan kode promo terlebih dahulu.';
+                statusEl.className = 'text-xs text-red-600 mt-2';
+                return;
+            }
+
+            let subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const tableId = currentOrderType === 'dine-in' ? Number(document.getElementById('table-number').value) : null;
+
+            btn.disabled = true;
+            try {
+                const response = await fetch('/api/promo/validate', {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        kode: code,
+                        subtotal,
+                        meja_id: tableId,
+                        session_id: promoSessionId,
+                    }),
+                });
+                const result = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Kode promo tidak valid.');
+                }
+
+                appliedPromo = {
+                    kode: code.toUpperCase(),
+                    diskon: Number(result.data.diskon || 0),
+                    nama: result.data.nama_promo || code,
+                };
+
+                if (codeInput) codeInput.disabled = true;
+                btn.classList.add('hidden');
+                document.getElementById('remove-promo-btn')?.classList.remove('hidden');
+                summaryEl.textContent = `Promo ${appliedPromo.kode} diterapkan: diskon ${formatRupiah(appliedPromo.diskon)}`;
+                summaryEl.classList.remove('hidden');
+                statusEl.textContent = 'Kode promo aktif.';
+                statusEl.className = 'text-xs text-emerald-600 mt-2';
+                renderCart();
+            } catch (error) {
+                removePromo();
+                statusEl.textContent = error.message;
+                statusEl.className = 'text-xs text-red-600 mt-2';
+            } finally {
+                btn.disabled = false;
+            }
         }
 
         async function processOrder() {
@@ -732,7 +841,8 @@
             const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
             const notes = document.getElementById('order-notes')?.value.trim() || '';
             const checkout = document.getElementById('checkout-btn');
-            
+            const orderMejaId = currentOrderType === 'dine-in' ? Number(tableSelect.value) : null;
+
             checkout.disabled = true;
             checkout.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...`;
 
@@ -741,10 +851,12 @@
                     method: 'POST',
                     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        meja_id: currentOrderType === 'dine-in' ? Number(tableSelect.value) : null,
+                        meja_id: orderMejaId,
                         tipe_pesanan: currentOrderType,
                         metode_pembayaran: paymentMethod,
                         catatan: notes || null,
+                        session_id: promoSessionId,
+                        kode_promo: appliedPromo ? appliedPromo.kode : null,
                         items: cart.map(item => ({ produk_id: item.produkId, qty: item.qty, customization: item.customization || null })),
                     }),
                 });
@@ -758,7 +870,7 @@
                 document.getElementById('receipt-date').textContent = new Date(order.waktu_transaksi).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
                 document.getElementById('receipt-number').textContent = `#${order.id}`;
                 document.getElementById('receipt-order-type').textContent = currentOrderType === 'dine-in' ? 'Dine-in' : 'Takeaway';
-                
+
                 let targetText = 'BAWA PULANG';
                 if (currentOrderType === 'dine-in' && tableSelect.value) {
                     const selectedOption = tableSelect.options[tableSelect.selectedIndex];
@@ -896,6 +1008,23 @@
         renderCart();
         updateHeaderCart();
         setOrderType('dine-in');
+
+        // Lock table selection if coming from QR scan
+        @if(isset($mejaAktif))
+            const qrTableSelect = document.getElementById('table-number');
+            const tableContainer = document.getElementById('table-selection-container');
+            if (qrTableSelect) {
+                qrTableSelect.value = {{ $mejaAktif->id }};
+                qrTableSelect.disabled = true;
+                qrTableSelect.classList.add('opacity-50', 'cursor-not-allowed');
+                // Hide the selection label if table is locked from QR
+                const tableLabel = tableContainer?.querySelector('label');
+                if (tableLabel) tableLabel.style.display = 'none';
+                // Show locked info
+                const infoP = tableContainer?.querySelector('p');
+                if (infoP) infoP.innerHTML = '<strong>Meja Anda (dari QR):</strong> Meja #' + {{ $mejaAktif->nomor_meja }} + ' (Terkunci dari scan QR)';
+            }
+        @endif
     </script>
 </body>
 </html>

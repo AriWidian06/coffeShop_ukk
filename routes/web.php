@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\KategoriProdukController;
+use App\Http\Controllers\PromoKodeController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\MejaController;
@@ -223,6 +224,7 @@ Route::middleware('auth:karyawan')->group(function () {
         Route::resource('mejas', MejaController::class)->except(['index', 'show']);
         Route::resource('produks', ProdukController::class)->except('show');
         Route::resource('suppliers', SupplierController::class)->except('show');
+        Route::resource('promo-kodes', PromoKodeController::class)->except('show');
     });
 
     // Transaksi & POS (Kasir & Admin)

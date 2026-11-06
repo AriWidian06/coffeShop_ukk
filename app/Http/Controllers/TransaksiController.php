@@ -195,6 +195,15 @@ class TransaksiController extends Controller
 
         $transaksi->update(['status_pesanan' => $request->status_pesanan]);
 
+        if ($request->status_pesanan === 'completed') {
+            \App\Models\PromoUsage::where('transaksi_id', $transaksi->id)
+                ->where('status', 'active')
+                ->update([
+                    'status' => 'released',
+                    'released_at' => now(),
+                ]);
+        }
+
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,

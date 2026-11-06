@@ -153,10 +153,25 @@
             @if(isset($produk) && $produk->opsis->count() > 0)
                 @foreach($produk->opsis as $index => $opsi)
                     <div class="option-row flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-200 shadow-sm">
-                        <div class="flex-1">
-                            <input type="text" name="opsis[{{ $index }}][nama_opsi]" value="{{ $opsi->nama_opsi }}" required
-                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
-                                placeholder="Contoh: Less Sugar">
+                        <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <div class="flex items-center gap-2">
+                                <input type="text" name="opsis[{{ $index }}][kategori]" value="{{ $opsi->kategori }}"
+                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                                    placeholder="Kategori (cth: Suhu)">
+                                <select name="opsis[{{ $index }}][tipe]" class="px-2 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                    <option value="multiple" {{ $opsi->tipe == 'multiple' ? 'selected' : '' }}>Banyak</option>
+                                    <option value="single" {{ $opsi->tipe == 'single' ? 'selected' : '' }}>Satu</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="text" name="opsis[{{ $index }}][nama_opsi]" value="{{ $opsi->nama_opsi }}" required
+                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                                    placeholder="Contoh: Less Sugar">
+                                <div class="flex items-center gap-1">
+                                    <input type="checkbox" name="opsis[{{ $index }}][is_required]" value="1" id="req-{{ $index }}" {{ $opsi->is_required ? 'checked' : '' }} class="w-4 h-4 text-primary-600 rounded border-slate-300">
+                                    <label for="req-{{ $index }}" class="text-[10px] font-bold text-slate-500 whitespace-nowrap">Wajib</label>
+                                </div>
+                            </div>
                         </div>
                         <div class="w-32">
                             <div class="relative">
@@ -197,18 +212,34 @@
 
         // Add new option row
         addOptionBtn.addEventListener('click', function() {
+            const uniqueId = Date.now();
             const row = document.createElement('div');
             row.className = 'option-row flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-200 shadow-sm';
             row.innerHTML = `
-                <div class="flex-1">
-                    <input type="text" name="opsis[${Date.now()}][nama_opsi]" required
-                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
-                        placeholder="Contoh: Less Sugar">
+                <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <div class="flex items-center gap-2">
+                        <input type="text" name="opsis[${uniqueId}][kategori]"
+                            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                            placeholder="Kategori (cth: Suhu)">
+                        <select name="opsis[${uniqueId}][tipe]" class="px-2 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary-500">
+                            <option value="multiple">Banyak</option>
+                            <option value="single">Satu</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="text" name="opsis[${uniqueId}][nama_opsi]" required
+                            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                            placeholder="Nama Opsi (cth: Less Sugar)">
+                        <div class="flex items-center gap-1">
+                            <input type="checkbox" name="opsis[${uniqueId}][is_required]" id="req-${uniqueId}" class="w-4 h-4 text-primary-600 rounded border-slate-300">
+                            <label for="req-${uniqueId}" class="text-[10px] font-bold text-slate-500 whitespace-nowrap">Wajib</label>
+                        </div>
+                    </div>
                 </div>
                 <div class="w-32">
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">Rp</span>
-                        <input type="number" name="opsis[${Date.now()}][harga_tambahan]" required min="0"
+                        <input type="number" name="opsis[${uniqueId}][harga_tambahan]" required min="0"
                         class="w-full pl-7 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
                         placeholder="0">
                     </div>
@@ -220,9 +251,6 @@
                     </svg>
                 </button>
             `;
-            // Fix: Use a consistent unique ID for the row
-            const uniqueId = Date.now();
-            row.innerHTML = row.innerHTML.replace(/\${Date.now()}/g, uniqueId);
             optionsList.appendChild(row);
         });
 

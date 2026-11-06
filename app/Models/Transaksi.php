@@ -17,12 +17,21 @@ class Transaksi extends Model
         'total_harga',
         'status_pesanan',
         'waktu_transaksi',
+        'promo_kode_id',
+        'diskon',
+        'session_id',
     ];
 
     protected $casts = [
         'total_harga' => 'decimal:2',
+        'diskon' => 'decimal:2',
         'waktu_transaksi' => 'datetime',
     ];
+
+    public function promo()
+    {
+        return $this->belongsTo(PromoKode::class, 'promo_kode_id');
+    }
 
     public function meja()
     {

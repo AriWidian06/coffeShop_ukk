@@ -19,7 +19,7 @@ class RoleDashboardAccessTest extends TestCase
             ->get('/dashboard')
             ->assertOk()
             ->assertSee('Laporan Penjualan')
-            ->assertDontSee('POS');
+            ->assertDontSee('Terminal POS');
     }
 
     public function test_manager_can_view_sales_but_cannot_create_transaction(): void
@@ -50,7 +50,7 @@ class RoleDashboardAccessTest extends TestCase
         $this->actingAs($kasir, 'karyawan')
             ->get('/dashboard')
             ->assertOk()
-            ->assertSee('POS')
+            ->assertSee('Terminal POS')
             ->assertDontSee('Laporan Penjualan');
     }
 
