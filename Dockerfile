@@ -58,5 +58,5 @@ RUN a2enmod rewrite
 # Expose port 80 untuk web server
 EXPOSE 80
 
-# Jalankan Apache di foreground
-CMD ["apache2-foreground"]
+# Jalankan migrate + seeder lalu Apache di foreground
+CMD php artisan migrate --seed --force && apache2-foreground
