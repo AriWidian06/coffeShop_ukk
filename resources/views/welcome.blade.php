@@ -808,7 +808,8 @@
                 const result = await response.json().catch(() => ({}));
 
                 if (!response.ok) {
-                    throw new Error(result.message || 'Kode promo tidak valid.');
+                    const apiMessage = result.errors?.kode?.[0] || result.message || 'Kode promo tidak valid.';
+                    throw new Error(apiMessage);
                 }
 
                 appliedPromo = {

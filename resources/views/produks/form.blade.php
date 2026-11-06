@@ -1,4 +1,9 @@
 <!-- Form Fields -->
+@if ($errors->any())
+    <div class="md:col-span-2 rounded-xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm font-medium">
+        {{ $errors->first() }}
+    </div>
+@endif
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
     <!-- Nama Produk -->
@@ -150,8 +155,13 @@
         </div>
 
         <div id="options-list" class="space-y-3">
-            @if(isset($produk) && $produk->opsis->count() > 0)
-                @foreach($produk->opsis as $index => $opsi)
+            @php
+                $opsiRows = old('opsis', isset($produk) && $produk->opsis->count() > 0 ? $produk->opsis->toArray() : []);
+            @endphp
+            @foreach($opsiRows as $index => $opsi)
+                @php
+                    $opsi = is_array($opsi) ? (object) $opsi : $opsi;
+                @endphp
                     <div class="option-row flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
                             <div class="flex items-center gap-2">
@@ -189,7 +199,6 @@
                         </button>
                     </div>
                 @endforeach
-            @endif
         </div>
     </div>
 </div>
@@ -212,6 +221,10 @@
 
         // Add new option row
         addOptionBtn.addEventListener('click', function() {
+            if (!customizableCheckbox.checked) {
+                customizableCheckbox.checked = true;
+                customizationSection.classList.remove('hidden');
+            }
             const uniqueId = Date.now();
             const row = document.createElement('div');
             row.className = 'option-row flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-200 shadow-sm';
