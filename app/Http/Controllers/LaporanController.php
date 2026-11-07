@@ -115,6 +115,16 @@ class LaporanController extends Controller
             ->take(5)
             ->values();
 
+        $hourlySales = array_fill(0, 24, 0.0);
+        foreach ($transaksis as $transaksi) {
+            if ($transaksi->waktu_transaksi) {
+                $hour = (int) $transaksi->waktu_transaksi->copy()->timezone('Asia/Jakarta')->format('G');
+                $hourlySales[$hour] += (float) $transaksi->total_harga;
+            }
+        }
+        $maxHourlySales = max(1.0, ...$hourlySales);
+        $totalPembayaran = (float) $paymentStats->sum('total');
+
         $logoPath = public_path('images/logo.jpeg');
         $logoData = is_file($logoPath) ? base64_encode(file_get_contents($logoPath)) : null;
 
@@ -133,6 +143,9 @@ class LaporanController extends Controller
             'totalItem' => $totalItem,
             'averageTransactionValue' => $averageTransactionValue,
             'paymentStats' => $paymentStats,
+            'hourlySales' => $hourlySales,
+            'maxHourlySales' => $maxHourlySales,
+            'totalPembayaran' => $totalPembayaran,
             'topProducts' => $topProducts,
             'periodeLabel' => $periodeLabel,
             'start' => $start,
@@ -153,6 +166,10 @@ class LaporanController extends Controller
         $dompdf->loadHtml($html, 'UTF-8');
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
+
+        $canvas = $dompdf->getCanvas();
+        $pageFont = $dompdf->getFontMetrics()->getFont('DejaVu Sans', 'normal');
+        $canvas->page_text(730, 575, 'Halaman {PAGE_NUM} dari {PAGE_COUNT}', $pageFont, 7, [0.45, 0.45, 0.45]);
 
         $filename = 'Laporan_BagiKopi_' . $fileTag . '.pdf';
 

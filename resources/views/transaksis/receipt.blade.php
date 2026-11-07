@@ -65,8 +65,8 @@
     <div class="receipt-container">
         <div class="header">
             <h1>BAGI KOPI</h1>
-            <p>Espresso & Space</p>
-            <p>Senopati, Jakarta</p>
+            <p>coffee & eatary</p>
+            <p>Soreang,Bandung</p>
         </div>
 
         <div class="divider"></div>
