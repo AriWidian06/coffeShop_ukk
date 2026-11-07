@@ -59,4 +59,4 @@ RUN a2enmod rewrite
 EXPOSE 80
 
 # Jalankan migrate + seeder lalu Apache di foreground
-CMD php artisan migrate --seed --force && apache2-foreground
+CMD php artisan migrate --seed --force && php artisan storage:link || true && apache2-foreground

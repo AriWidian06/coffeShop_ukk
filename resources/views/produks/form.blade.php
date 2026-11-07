@@ -244,7 +244,7 @@
                             class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
                             placeholder="Nama Opsi (cth: Less Sugar)">
                         <div class="flex items-center gap-1">
-                            <input type="checkbox" name="opsis[${uniqueId}][is_required]" id="req-${uniqueId}" class="w-4 h-4 text-primary-600 rounded border-slate-300">
+                            <input type="checkbox" name="opsis[${uniqueId}][is_required]" value="1" id="req-${uniqueId}" class="w-4 h-4 text-primary-600 rounded border-slate-300">
                             <label for="req-${uniqueId}" class="text-[10px] font-bold text-slate-500 whitespace-nowrap">Wajib</label>
                         </div>
                     </div>

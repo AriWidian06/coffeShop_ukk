@@ -21,5 +21,20 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
             'password' => 'admin12345',
         ]);
+
+        // Data dasar agar admin bisa langsung menambah produk setelah deploy.
+        \App\Models\Supplier::firstOrCreate(
+            ['nama_supplier' => 'Supplier Utama'],
+            [
+                'alamat' => 'Perkoci Eatery',
+                'no_telp' => '-',
+            ]
+        );
+
+        foreach (['Kopi Susu', 'Pastry', 'Topping'] as $namaKategori) {
+            \App\Models\KategoriProduk::firstOrCreate([
+                'nama_kategori' => $namaKategori,
+            ]);
+        }
     }
 }

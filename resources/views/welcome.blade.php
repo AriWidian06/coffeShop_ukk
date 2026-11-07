@@ -812,29 +812,72 @@
         }
 
         function setOrderType(type) {
-            currentOrderType = type;
+            currentOrderType = type === 'take-away' ? 'take-away' : 'dine-in';
             const btnDineIn = document.getElementById('btn-dine-in');
             const btnTakeAway = document.getElementById('btn-take-away');
             const tableContainer = document.getElementById('table-selection-container');
             const tableSelect = document.getElementById('table-number');
 
-            if (type === 'dine-in') {
-                btnDineIn.classList.add('active');
-                btnTakeAway.classList.remove('active');
-                tableContainer.classList.remove('hidden');
-                tableSelect.disabled = false;
-                if (qrLockedMejaId) {
-                    tableSelect.value = qrLockedMejaId;
-                    tableSelect.disabled = true;
+            const activeClasses = 'py-3 px-4 rounded-xl border-2 border-primary-600 bg-primary-600 text-white font-bold text-sm shadow-md shadow-primary-600/25 transition-all flex items-center justify-center gap-2';
+            const inactiveClasses = 'py-3 px-4 rounded-xl border-2 border-slate-200 bg-white text-slate-600 font-bold text-sm hover:border-primary-300 transition-all flex items-center justify-center gap-2';
+
+            if (currentOrderType === 'dine-in') {
+                if (btnDineIn) btnDineIn.className = activeClasses;
+                if (btnTakeAway) btnTakeAway.className = inactiveClasses;
+                if (btnDineIn) btnDineIn.innerHTML = '<span>Dine-in</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>';
+                if (btnTakeAway) btnTakeAway.innerHTML = '<span>Takeaway</span>';
+                if (tableContainer) tableContainer.classList.remove('hidden');
+                if (tableSelect) {
+                    tableSelect.disabled = false;
+                    if (qrLockedMejaId) {
+                        tableSelect.value = qrLockedMejaId;
+                        tableSelect.disabled = true;
+                    }
                 }
             } else {
-                btnTakeAway.classList.add('active');
-                btnDineIn.classList.remove('active');
-                tableContainer.classList.add('hidden');
-                tableSelect.disabled = true;
-                tableSelect.value = '';
+                if (btnTakeAway) btnTakeAway.className = activeClasses;
+                if (btnDineIn) btnDineIn.className = inactiveClasses;
+                if (btnTakeAway) btnTakeAway.innerHTML = '<span>Takeaway</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>';
+                if (btnDineIn) btnDineIn.innerHTML = '<span>Dine-in</span>';
+                if (tableContainer) tableContainer.classList.add('hidden');
+                if (tableSelect) {
+                    tableSelect.value = '';
+                    tableSelect.disabled = true;
+                }
             }
+
+            const typeLabel = document.getElementById('active-order-type-label');
+            if (typeLabel) typeLabel.textContent = currentOrderType === 'dine-in' ? 'Dine-in' : 'Takeaway';
+            typeLabel?.parentElement?.classList.toggle('hidden', false);
+
+            updatePaymentMethodUI();
             syncCheckoutState();
+        }
+
+        function updatePaymentMethodUI() {
+            const radioQris = document.querySelector('input[name="payment_method"][value="QRIS"]');
+            const radioCash = document.querySelector('input[name="payment_method"][value="tunai"]');
+            const qrisCard = radioQris?.closest('label');
+            const cashCard = radioCash?.closest('label');
+            const checkoutBtn = document.getElementById('checkout-btn');
+
+            const qrisSelected = radioQris?.checked;
+            if (qrisCard) {
+                qrisCard.className = qrisSelected
+                    ? 'flex items-center gap-3 p-3 rounded-xl border-2 border-primary-600 bg-primary-50 cursor-pointer'
+                    : 'flex items-center gap-3 p-3 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-slate-300';
+            }
+            if (cashCard) {
+                cashCard.className = qrisSelected
+                    ? 'flex items-center gap-3 p-3 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-slate-300'
+                    : 'flex items-center gap-3 p-3 rounded-xl border-2 border-primary-600 bg-primary-50 cursor-pointer';
+            }
+
+            if (checkoutBtn) {
+                const orderText = qrisSelected ? 'Bayar Sekarang - QRIS Instan' : 'Bayar Sekarang - Tunai di Kasir';
+                const titleEl = checkoutBtn.querySelector('.text-sm');
+                if (titleEl) titleEl.textContent = orderText;
+            }
         }
 
         function formatRupiah(num) {
@@ -1212,6 +1255,7 @@
         renderCart();
         updateHeaderCart();
         setOrderType('dine-in');
+        updatePaymentMethodUI();
 
         document.addEventListener('visibilitychange', function () {
             if (!document.hidden && activeTab === 'status') {

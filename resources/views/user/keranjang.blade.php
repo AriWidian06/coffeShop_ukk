@@ -26,7 +26,7 @@
 
                     <div id="table-selection-container">
                         <label class="block text-xs font-bold text-slate-700 mb-2">Pilih Meja:</label>
-                        <select id="table-number" class="w-full text-sm font-semibold bg-white border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                        <select id="table-number" onchange="syncCheckoutState()" class="w-full text-sm font-semibold bg-white border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-primary-500 focus:outline-none">
                             @if(isset($mejas) && $mejas->isEmpty())
                                 <option value="">Tidak ada meja tersedia</option>
                             @elseif(isset($mejas))
@@ -79,7 +79,7 @@
                 <h3 class="text-sm font-bold text-slate-900 mb-3">METODE PEMBAYARAN</h3>
                 <div class="space-y-2">
                     <label class="flex items-center gap-3 p-3 rounded-xl border-2 border-primary-600 bg-primary-50 cursor-pointer">
-                        <input type="radio" name="payment_method" value="QRIS" checked class="w-5 h-5 text-primary-600">
+                        <input type="radio" name="payment_method" value="QRIS" checked class="w-5 h-5 text-primary-600" onchange="updatePaymentMethodUI()">
                         <div class="flex-1">
                             <div class="flex items-center gap-2">
                                 <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,7 +93,7 @@
                     </label>
 
                     <label class="flex items-center gap-3 p-3 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-slate-300">
-                        <input type="radio" name="payment_method" value="tunai" class="w-5 h-5 text-primary-600">
+                        <input type="radio" name="payment_method" value="tunai" class="w-5 h-5 text-primary-600" onchange="updatePaymentMethodUI()">
                         <div class="flex-1">
                             <div class="flex items-center gap-2">
                                 <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
