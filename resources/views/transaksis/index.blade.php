@@ -100,7 +100,7 @@
                                 <tr class="hover:bg-slate-50 transition">
                                     <td class="py-4 px-4 align-top">
                                         <div class="font-bold text-slate-900 text-sm">#{{ $transaksi->id }}</div>
-                                        <div class="text-xs text-slate-500 mt-1">{{ optional($transaksi->waktu_transaksi)->format('d/m/Y H:i') }}</div>
+                                        <div class="text-xs text-slate-500 mt-1">{{ optional($transaksi->waktu_transaksi)->copy()->timezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB</div>
                                     </td>
                                     <td class="py-4 px-4 align-top">
                                         <div class="text-sm font-semibold text-slate-900">

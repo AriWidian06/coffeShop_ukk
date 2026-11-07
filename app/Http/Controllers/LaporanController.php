@@ -3,78 +3,163 @@
 namespace App\Http\Controllers;
 
 use App\Models\Transaksi;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Response;
 use Carbon\Carbon;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Illuminate\Http\Request;
 
 class LaporanController extends Controller
 {
     public function export(Request $request)
     {
-        // 1. Tentukan rentang tanggal (Default: Bulan Ini)
-        $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
-        $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->format('Y-m-d'));
+        $tz = 'Asia/Jakarta';
+        Carbon::setLocale('id');
 
-        // 2. Ambil data transaksi beserta relasinya
-        $transaksis = Transaksi::with(['karyawan', 'meja', 'detail_transaksis.produk', 'pembayaran'])
-            ->whereBetween('waktu_transaksi', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+        $user = auth('karyawan')->user();
+        $isManager = strtolower((string) ($user->role ?? '')) === 'manager';
+        $nowWib = Carbon::now($tz);
+
+        if ($isManager) {
+            $periode = $request->query('periode', 'bulanan');
+            if (! in_array($periode, ['harian', 'mingguan', 'bulanan'], true)) {
+                $periode = 'bulanan';
+            }
+
+            $selectedDate = $nowWib->copy();
+            $tanggal = $request->query('tanggal');
+            if (is_string($tanggal) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal)) {
+                try {
+                    $selectedDate = Carbon::parse($tanggal, $tz);
+                } catch (\Throwable $e) {
+                    $selectedDate = $nowWib->copy();
+                }
+            }
+
+            if ($periode === 'harian') {
+                $start = $selectedDate->copy()->startOfDay();
+                $end = $selectedDate->copy()->endOfDay();
+                $periodeLabel = $start->translatedFormat('d F Y');
+            } elseif ($periode === 'mingguan') {
+                $start = $selectedDate->copy()->startOfWeek(Carbon::MONDAY)->startOfDay();
+                $end = $selectedDate->copy()->endOfWeek(Carbon::SUNDAY)->endOfDay();
+                $periodeLabel = $start->translatedFormat('d M') . ' - ' . $end->translatedFormat('d M Y');
+            } else {
+                $start = $selectedDate->copy()->startOfMonth()->startOfDay();
+                $end = $selectedDate->copy()->endOfMonth()->endOfDay();
+                $periodeLabel = $start->translatedFormat('F Y');
+            }
+
+            $fileTag = ucfirst($periode) . '_' . $selectedDate->toDateString();
+        } else {
+            // Admin: default bulan berjalan (WIB), tetap mendukung rentang kustom.
+            if ($request->filled('start_date') || $request->filled('end_date')) {
+                $startInput = $request->input('start_date', $nowWib->copy()->startOfMonth()->toDateString());
+                $endInput = $request->input('end_date', $nowWib->copy()->endOfMonth()->toDateString());
+
+                try {
+                    $start = Carbon::parse($startInput, $tz)->startOfDay();
+                    $end = Carbon::parse($endInput, $tz)->endOfDay();
+                } catch (\Throwable $e) {
+                    $start = $nowWib->copy()->startOfMonth()->startOfDay();
+                    $end = $nowWib->copy()->endOfMonth()->endOfDay();
+                }
+
+                if ($end->lt($start)) {
+                    [$start, $end] = [$end->copy()->startOfDay(), $start->copy()->endOfDay()];
+                }
+
+                $periodeLabel = $start->translatedFormat('d M Y') . ' - ' . $end->translatedFormat('d M Y');
+            } else {
+                $start = $nowWib->copy()->startOfMonth()->startOfDay();
+                $end = $nowWib->copy()->endOfMonth()->endOfDay();
+                $periodeLabel = $start->translatedFormat('F Y');
+            }
+
+            $fileTag = $start->format('Y-m-d') . '_sd_' . $end->format('Y-m-d');
+        }
+
+        $startUtc = $start->copy()->utc();
+        $endUtc = $end->copy()->utc();
+
+        $transaksis = Transaksi::with(['karyawan', 'meja', 'detail_transaksis.produk.kategoriProduk', 'pembayaran'])
+            ->whereBetween('waktu_transaksi', [$startUtc, $endUtc])
             ->orderBy('waktu_transaksi', 'desc')
             ->get();
 
-        // 3. Nama file dinamis
-        $filename = 'Laporan_Transaksi_' . $startDate . '_sd_' . $endDate . '.csv';
+        $totalPendapatan = (float) $transaksis->sum('total_harga');
+        $totalTransaksi = $transaksis->count();
+        $totalDiskon = (float) $transaksis->sum('diskon');
+        $totalItem = (int) $transaksis->flatMap->detail_transaksis->sum('QTY');
+        $averageTransactionValue = $totalTransaksi > 0 ? round($totalPendapatan / $totalTransaksi) : 0;
 
-        // 4. Header untuk memaksa browser mendownload file CSV
-        $headers = [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        $paymentStats = $transaksis
+            ->groupBy(fn ($transaksi) => $transaksi->pembayaran?->metode_pembayaran ?: 'Belum Lunas')
+            ->map(fn ($group, $metode) => (object) [
+                'metode' => $metode,
+                'jumlah' => $group->count(),
+                'total' => (float) $group->sum('total_harga'),
+            ])
+            ->sortByDesc('total')
+            ->values();
+
+        $topProducts = $transaksis
+            ->flatMap->detail_transaksis
+            ->groupBy('produk_id')
+            ->map(fn ($details) => (object) [
+                'nama_produk' => $details->first()->produk?->nama_produk ?? 'Produk dihapus',
+                'kategori' => $details->first()->produk?->kategoriProduk?->nama_kategori ?? 'N/A',
+                'total_qty' => (int) $details->sum('QTY'),
+                'total_revenue' => (float) $details->sum('subtotal'),
+            ])
+            ->sortByDesc('total_qty')
+            ->take(5)
+            ->values();
+
+        $logoPath = public_path('images/logo.jpeg');
+        $logoData = is_file($logoPath) ? base64_encode(file_get_contents($logoPath)) : null;
+
+        $statusLabels = [
+            'pending' => 'Menunggu',
+            'prosesed' => 'Diproses',
+            'ready' => 'Siap',
+            'completed' => 'Selesai',
         ];
 
-        // 5. Proses streaming data ke CSV
-        $callback = function() use ($transaksis) {
-            $file = fopen('php://output', 'w');
-            
-            // Tambahkan BOM agar Excel membaca karakter UTF-8 (seperti 'Rp') dengan benar
-            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+        $html = view('laporan.pdf', [
+            'transaksis' => $transaksis,
+            'totalPendapatan' => $totalPendapatan,
+            'totalTransaksi' => $totalTransaksi,
+            'totalDiskon' => $totalDiskon,
+            'totalItem' => $totalItem,
+            'averageTransactionValue' => $averageTransactionValue,
+            'paymentStats' => $paymentStats,
+            'topProducts' => $topProducts,
+            'periodeLabel' => $periodeLabel,
+            'start' => $start,
+            'end' => $end,
+            'nowWib' => $nowWib,
+            'logoData' => $logoData,
+            'statusLabels' => $statusLabels,
+            'dicetakOleh' => $user?->nama_karyawan ?? 'Sistem',
+            'isManager' => $isManager,
+        ])->render();
 
-            // Header Kolom CSV
-            fputcsv($file, [
-                'ID Transaksi',
-                'Tanggal & Waktu',
-                'Tipe Pesanan',
-                'Meja',
-                'Kasir / Sumber',
-                'Total Item',
-                'Total Harga',
-                'Status Pesanan',
-                'Status Pembayaran'
-            ]);
+        $options = new Options();
+        $options->set('defaultFont', 'DejaVu Sans');
+        $options->set('isRemoteEnabled', false);
+        $options->set('isHtml5ParserEnabled', true);
 
-            // Isi Data Baris per Baris
-            foreach ($transaksis as $transaksi) {
-                // PERBAIKAN: Karena relasinya hasMany, QTY diakses langsung, BUKAN lewat ->pivot
-                $totalItem = 0;
-                foreach ($transaksi->detail_transaksis as $detail) {
-                    // Gunakan ?? untuk fallback jika nama kolom di DB adalah 'qty' (huruf kecil) atau 'QTY' (huruf besar)
-                    $totalItem += ($detail->QTY ?? $detail->qty ?? 0);
-                }
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html, 'UTF-8');
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
 
-                fputcsv($file, [
-                    $transaksi->id,
-                    $transaksi->waktu_transaksi ? $transaksi->waktu_transaksi->format('d/m/Y H:i') : '-',
-                    $transaksi->tipe_pesanan === 'take-away' ? 'Bawa Pulang' : 'Makan di Tempat',
-                    $transaksi->meja ? 'Meja ' . $transaksi->meja->nomor_meja : 'Tanpa Meja',
-                    $transaksi->karyawan ? $transaksi->karyawan->nama_karyawan : ($transaksi->sumber_pesanan ?? 'Web Order'),
-                    $totalItem,
-                    'Rp ' . number_format($transaksi->total_harga, 0, ',', '.'),
-                    ucfirst($transaksi->status_pesanan),
-                    $transaksi->pembayaran ? 'Lunas' : 'Belum Lunas'
-                ]);
-            }
+        $filename = 'Laporan_BagiKopi_' . $fileTag . '.pdf';
 
-            fclose($file);
-        };
-
-        return Response::stream($callback, 200, $headers);
+        return response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Cache-Control' => 'private, max-age=0, must-revalidate',
+        ]);
     }
 }

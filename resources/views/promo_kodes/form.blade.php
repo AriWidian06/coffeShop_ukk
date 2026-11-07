@@ -59,12 +59,12 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="text-sm font-bold text-slate-800">Tanggal Mulai</label>
-                    <input type="datetime-local" name="tanggal_mulai" value="{{ old('tanggal_mulai', isset($promoKode) && $promoKode->tanggal_mulai ? $promoKode->tanggal_mulai->format('Y-m-d\TH:i') : '') }}" class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary-500">
+                    <label class="text-sm font-bold text-slate-800">Tanggal Mulai <span class="text-xs font-normal text-slate-500">(WIB)</span></label>
+                    <input type="datetime-local" name="tanggal_mulai" value="{{ old('tanggal_mulai', isset($promoKode) && $promoKode->tanggal_mulai ? $promoKode->tanggal_mulai->copy()->timezone('Asia/Jakarta')->format('Y-m-d\TH:i') : '') }}" class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary-500">
                 </div>
                 <div>
-                    <label class="text-sm font-bold text-slate-800">Tanggal Berakhir</label>
-                    <input type="datetime-local" name="tanggal_berakhir" value="{{ old('tanggal_berakhir', isset($promoKode) && $promoKode->tanggal_berakhir ? $promoKode->tanggal_berakhir->format('Y-m-d\TH:i') : '') }}" class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary-500">
+                    <label class="text-sm font-bold text-slate-800">Tanggal Berakhir <span class="text-xs font-normal text-slate-500">(WIB)</span></label>
+                    <input type="datetime-local" name="tanggal_berakhir" value="{{ old('tanggal_berakhir', isset($promoKode) && $promoKode->tanggal_berakhir ? $promoKode->tanggal_berakhir->copy()->timezone('Asia/Jakarta')->format('Y-m-d\TH:i') : '') }}" class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary-500">
                 </div>
             </div>
 

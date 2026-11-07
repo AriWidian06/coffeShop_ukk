@@ -77,7 +77,7 @@
         </div>
         <div class="info-row">
             <span>Tanggal:</span>
-            <span>{{ $transaksi->waktu_transaksi?->format('d/m/Y H:i') }}</span>
+            <span>{{ $transaksi->waktu_transaksi?->copy()->timezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB</span>
         </div>
         <div class="info-row">
             <span>Kasir:</span>

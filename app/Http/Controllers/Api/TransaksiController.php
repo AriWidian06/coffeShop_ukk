@@ -206,6 +206,79 @@ class TransaksiController extends Controller
         ], 201);
     }
 
+    public function myOrder(Request $request)
+    {
+        $validated = $request->validate([
+            'session_id' => 'nullable|string|max:128',
+            'meja_id' => 'nullable|integer',
+        ]);
+
+        $sessionId = trim((string) ($validated['session_id'] ?? ''));
+        $mejaId = !empty($validated['meja_id']) ? (int) $validated['meja_id'] : null;
+
+        $query = Transaksi::with(['meja', 'detail_transaksis.produk', 'pembayaran', 'promo'])
+            ->latest('waktu_transaksi');
+
+        $transaksi = null;
+
+        if ($sessionId !== '') {
+            $transaksi = (clone $query)->where('session_id', $sessionId)->first();
+        }
+
+        if (! $transaksi && $mejaId) {
+            $transaksi = (clone $query)
+                ->where('meja_id', $mejaId)
+                ->whereIn('status_pesanan', ['pending', 'prosesed', 'ready'])
+                ->first();
+        }
+
+        if (! $transaksi) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Belum ada pesanan aktif.',
+            ], 404);
+        }
+
+        $statusMeta = [
+            'pending' => ['label' => 'Menunggu Konfirmasi', 'step' => 1],
+            'prosesed' => ['label' => 'Sedang Dibuat', 'step' => 2],
+            'ready' => ['label' => 'Siap Diantar', 'step' => 3],
+            'completed' => ['label' => 'Selesai', 'step' => 4],
+        ];
+        $meta = $statusMeta[$transaksi->status_pesanan] ?? ['label' => 'Menunggu Konfirmasi', 'step' => 1];
+        $waktuWib = $transaksi->waktu_transaksi?->copy()->timezone('Asia/Jakarta');
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $transaksi->id,
+                'status_pesanan' => $transaksi->status_pesanan,
+                'status_label' => $meta['label'],
+                'status_step' => $meta['step'],
+                'tipe_pesanan' => $transaksi->tipe_pesanan,
+                'nomor_meja' => $transaksi->meja?->nomor_meja,
+                'waktu_transaksi' => $waktuWib?->toIso8601String(),
+                'waktu_transaksi_label' => $waktuWib?->translatedFormat('d M Y, H:i') . ' WIB',
+                'total_harga' => (float) $transaksi->total_harga,
+                'diskon' => (float) $transaksi->diskon,
+                'kode_promo' => $transaksi->promo?->kode,
+                'catatan' => $transaksi->catatan,
+                'items' => $transaksi->detail_transaksis->map(fn ($detail) => [
+                    'nama_produk' => $detail->produk?->nama_produk ?? 'Menu',
+                    'qty' => $detail->QTY,
+                    'customization' => $detail->customization,
+                    'subtotal' => (float) $detail->subtotal,
+                    'gambar' => $detail->produk?->gambar ? asset('storage/' . $detail->produk->gambar) : null,
+                ])->values(),
+                'pembayaran' => $transaksi->pembayaran ? [
+                    'metode_pembayaran' => $transaksi->pembayaran->metode_pembayaran,
+                    'status_pembayaran' => $transaksi->pembayaran->status_pembayaran,
+                    'jumlah_bayar' => (float) $transaksi->pembayaran->jumlah_bayar,
+                ] : null,
+            ],
+        ]);
+    }
+
     public function checkStatus(Request $request, $id, PaymentService $paymentService)
     {
         $transaksi = Transaksi::findOrFail($id);

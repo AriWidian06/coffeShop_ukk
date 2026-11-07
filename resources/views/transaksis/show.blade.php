@@ -95,7 +95,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-slate-500 font-semibold mb-1">Waktu Transaksi</p>
-                    <p class="text-sm font-bold text-slate-900">{{ $transaksi->waktu_transaksi?->format('d/m/Y H:i') ?? '-' }}</p>
+                    <p class="text-sm font-bold text-slate-900">{{ $transaksi->waktu_transaksi?->copy()->timezone('Asia/Jakarta')->format('d/m/Y H:i') ?? '-' }} WIB</p>
                 </div>
             </div>
 
@@ -219,7 +219,7 @@
                             </div>
                             <div>
                                 <p class="text-xs text-slate-500">Waktu Bayar</p>
-                                <p class="text-sm font-bold text-slate-900">{{ $transaksi->pembayaran->waktu_pembayaran?->format('d/m/Y H:i') ?? '-' }}</p>
+                                <p class="text-sm font-bold text-slate-900">{{ $transaksi->pembayaran->waktu_pembayaran?->copy()->timezone('Asia/Jakarta')->format('d/m/Y H:i') ?? '-' }} WIB</p>
                             </div>
                         </div>
                     </div>

@@ -25,7 +25,7 @@
         'completed' => 'Selesai',
     ];
 
-    $hour = now()->hour;
+    $hour = now('Asia/Jakarta')->hour;
     $shift = match(true) {
         $hour >= 6 && $hour < 14 => 'Pagi (06:00 - 14:00)',
         $hour >= 14 && $hour < 22 => 'Siang/Sore (14:00 - 22:00)',
@@ -58,7 +58,7 @@
                 </div>
                 <div class="kasir-badge" id="live-clock">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <span id="clock-text">{{ now()->format('H:i:s') }}</span> WIB
+                    <span id="clock-text">{{ now('Asia/Jakarta')->format('H:i:s') }}</span> WIB
                 </div>
             </div>
         </div>
@@ -508,7 +508,7 @@
                                     </div>
 
                                     <div class="text-[11px] text-slate-500 font-medium">
-                                        {{ $order->waktu_transaksi?->format('H:i') }} ({{ $order->waktu_transaksi?->diffForHumans(null, true, true) }})
+                                        {{ $order->waktu_transaksi?->copy()->timezone('Asia/Jakarta')->format('H:i') }} ({{ $order->waktu_transaksi?->diffForHumans(null, true, true) }})
                                     </div>
                                 </div>
                             </div>
@@ -1117,7 +1117,7 @@
         const el = document.getElementById('clock-text');
         if (el) {
             const now = new Date();
-            el.textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            el.textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' });
         }
         setTimeout(updateClock, 1000);
     })();
@@ -1614,7 +1614,7 @@
                    </button>`
                 : '';
 
-            const timeStr = order.waktu_transaksi ? new Date(order.waktu_transaksi).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-';
+            const timeStr = order.waktu_transaksi ? new Date(order.waktu_transaksi).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }) : '-';
             const searchKeywords = `#${order.id} ${tableLabel.toLowerCase()} ${(order.sumber_pesanan || '')} ${searchItems} ${(order.catatan || '')}`.toLowerCase();
 
             return `

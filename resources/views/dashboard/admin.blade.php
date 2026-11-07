@@ -19,7 +19,9 @@
                         <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <span class="text-sm font-semibold text-slate-700">{{ now()->format('d M Y') }}</span>
+                        <span class="text-sm font-semibold text-slate-700">{{ $nowWib->translatedFormat('d M Y') }}</span>
+                        <span class="text-slate-300">•</span>
+                        <span class="text-sm font-bold text-primary-600 tabular-nums" id="admin-live-clock">{{ $nowWib->format('H:i:s') }} WIB</span>
                     </div>
                     <a href="{{ route('laporan.export') }}" class="px-4 py-2 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -209,7 +211,7 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-4 border-t border-slate-200">
                     <div>
                         <p class="text-xs text-slate-500">Puncak Transaksi</p>
-                        <p class="text-sm font-bold text-slate-900">{{ $peakHour !== null ? $peakHour . ':00 WIB' : 'N/A' }}</p>
+                        <p class="text-sm font-bold text-slate-900">{{ $peakHourLabel }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-slate-500">Avg Ticket Size</p>
@@ -221,7 +223,7 @@
                     </div>
                     <div>
                         <p class="text-xs text-slate-500">Metode Terbanyak</p>
-                        <p class="text-sm font-bold text-slate-900">Real-time Data</p>
+                        <p class="text-sm font-bold text-slate-900">{{ $metodeTerbanyak }}</p>
                     </div>
                 </div>
             </div>
@@ -308,7 +310,7 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="text-sm font-bold text-slate-900">#{{ $transaksi->id }}</div>
-                                    <div class="text-xs text-slate-500">{{ $transaksi->waktu_transaksi?->format('H:i') }} WIB • {{ $transaksi->sumber_pesanan }}</div>
+                                    <div class="text-xs text-slate-500">{{ $transaksi->waktu_transaksi?->copy()->timezone('Asia/Jakarta')->format('H:i') }} WIB • {{ $transaksi->sumber_pesanan }}</div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="text-sm font-semibold text-slate-900">
@@ -393,4 +395,25 @@
         </div>
     </main>
 </div>
+
+<script>
+    (function () {
+        const clock = document.getElementById('admin-live-clock');
+        if (!clock) return;
+
+        const renderClock = () => {
+            const time = new Date().toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+                timeZone: 'Asia/Jakarta',
+            });
+            clock.textContent = time + ' WIB';
+        };
+
+        renderClock();
+        setInterval(renderClock, 1000);
+    })();
+</script>
 @endsection

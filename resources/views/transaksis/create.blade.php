@@ -38,7 +38,7 @@
                     </div>
                     <div class="px-3 py-2 bg-slate-50 rounded-lg border border-slate-200">
                         <p class="text-[10px] text-slate-500 font-semibold uppercase">Waktu</p>
-                        <p class="text-sm font-bold text-slate-900">{{ now()->format('H:i') }} WIB</p>
+                        <p class="text-sm font-bold text-slate-900">{{ now('Asia/Jakarta')->format('H:i') }} WIB</p>
                     </div>
                     <a href="{{ route('transaksis.index') }}" class="px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-50 transition-all flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

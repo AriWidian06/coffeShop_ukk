@@ -58,8 +58,8 @@
                                     {{ $promo->maks_diskon !== null ? 'Rp ' . number_format((float) $promo->maks_diskon, 0, ',', '.') : '-' }}
                                 </td>
                                 <td class="px-4 py-3 text-slate-600 text-xs">
-                                    {{ optional($promo->tanggal_mulai)->format('d/m/Y') ?? 'mulai sekarang' }} -
-                                    {{ optional($promo->tanggal_berakhir)->format('d/m/Y') ?? 'tanpa batas' }}
+                                    {{ $promo->tanggal_mulai?->copy()->timezone('Asia/Jakarta')->format('d/m/Y H:i') ?? 'mulai sekarang' }} WIB -
+                                    {{ $promo->tanggal_berakhir?->copy()->timezone('Asia/Jakarta')->format('d/m/Y H:i') ?? 'tanpa batas' }} WIB
                                 </td>
                                 <td class="px-4 py-3 text-slate-700">
                                     {{ $promo->kuota_terpakai }}{{ $promo->kuota ? '/' . $promo->kuota : '' }}

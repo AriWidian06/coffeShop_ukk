@@ -311,6 +311,205 @@
         }
         const qrLockedMejaId = {{ $mejaAktif ? $mejaAktif->id : 'null' }};
 
+        // --- LIVE ORDER STATUS ---
+        let myOrderPollTimer = null;
+        let myOrderLoading = false;
+
+        function stopMyOrderPolling() {
+            if (myOrderPollTimer) {
+                clearInterval(myOrderPollTimer);
+                myOrderPollTimer = null;
+            }
+        }
+
+        function startMyOrderPolling() {
+            stopMyOrderPolling();
+            myOrderPollTimer = setInterval(() => {
+                if (activeTab !== 'status' || document.hidden) return;
+                refreshMyOrder(false);
+            }, 5000);
+        }
+
+        function setStatusRefreshSpinning(spinning) {
+            const icon = document.getElementById('status-refresh-icon');
+            if (icon) icon.classList.toggle('animate-spin', spinning);
+            const btn = document.getElementById('status-refresh-btn');
+            if (btn) btn.disabled = spinning;
+        }
+
+        async function refreshMyOrder(showLoading = false) {
+            if (myOrderLoading) return;
+            myOrderLoading = true;
+            setStatusRefreshSpinning(true);
+
+            const loadingEl = document.getElementById('status-loading');
+            const contentEl = document.getElementById('status-content');
+            const emptyEl = document.getElementById('status-empty');
+
+            if (showLoading && contentEl.classList.contains('hidden')) {
+                loadingEl.classList.remove('hidden');
+                emptyEl.classList.add('hidden');
+            }
+
+            try {
+                const params = new URLSearchParams();
+                if (promoSessionId) params.set('session_id', promoSessionId);
+                if (qrLockedMejaId) params.set('meja_id', qrLockedMejaId);
+
+                const response = await fetch('/api/pesanan-saya?' + params.toString(), {
+                    headers: { 'Accept': 'application/json' },
+                });
+                const result = await response.json().catch(() => ({}));
+
+                if (response.status === 404) {
+                    renderMyOrder(null);
+                    stopMyOrderPolling();
+                    return;
+                }
+
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || 'Gagal memuat status pesanan.');
+                }
+
+                renderMyOrder(result.data);
+            } catch (error) {
+                if (contentEl.classList.contains('hidden')) {
+                    renderMyOrder(null, error.message || 'Gagal memuat status. Periksa koneksi Anda.');
+                }
+            } finally {
+                myOrderLoading = false;
+                setStatusRefreshSpinning(false);
+            }
+        }
+
+        function applyStatusStep(step, status) {
+            for (let i = 1; i <= 4; i++) {
+                const dot = document.getElementById('status-dot-' + i);
+                const label = document.getElementById('status-step-label-' + i);
+                if (!dot || !label) continue;
+
+                if (i < step || (i === step && status === 'completed')) {
+                    dot.className = 'w-10 h-10 rounded-full bg-primary-600 text-white flex items-center justify-center shadow-md shadow-primary-600/30 font-bold';
+                    label.className = 'text-xs font-bold text-slate-900 mt-2';
+                } else if (i === step) {
+                    dot.className = 'w-10 h-10 rounded-full bg-primary-600 text-white flex items-center justify-center shadow-md shadow-primary-600/30 font-bold ring-4 ring-primary-100 animate-pulse';
+                    label.className = 'text-xs font-extrabold text-primary-600 mt-2';
+                } else {
+                    dot.className = 'w-10 h-10 rounded-full bg-slate-100 border-2 border-slate-200 text-slate-400 flex items-center justify-center font-bold';
+                    label.className = 'text-xs font-medium text-slate-400 mt-2';
+                }
+            }
+
+            const fill = document.getElementById('status-progress-fill');
+            if (fill) fill.style.width = (((step - 1) / 3) * 100) + '%';
+            const badge = document.getElementById('status-step-badge');
+            if (badge) badge.textContent = 'Langkah ' + Math.min(step, 4) + ' dari 4';
+        }
+
+        function renderMyOrder(order, emptyMessage) {
+            const loadingEl = document.getElementById('status-loading');
+            const contentEl = document.getElementById('status-content');
+            const emptyEl = document.getElementById('status-empty');
+            const titleEl = document.getElementById('status-page-title');
+            const subtitleEl = document.getElementById('status-page-subtitle');
+            const emptyMessageEl = document.getElementById('status-empty-message');
+
+            loadingEl.classList.add('hidden');
+
+            if (!order) {
+                contentEl.classList.add('hidden');
+                emptyEl.classList.remove('hidden');
+                titleEl.textContent = 'Status Pesanan';
+                subtitleEl.textContent = 'Belum ada pesanan aktif';
+                emptyMessageEl.textContent = emptyMessage || 'Pesanan yang sedang diproses akan muncul di sini secara otomatis.';
+                return;
+            }
+
+            emptyEl.classList.add('hidden');
+            contentEl.classList.remove('hidden');
+
+            const statusMap = {
+                pending: {
+                    desc: 'Pesanan diterima dan menunggu konfirmasi kasir.',
+                    icon: '<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                },
+                prosesed: {
+                    desc: 'Pesanan sedang diracik oleh barista kami.',
+                    icon: '<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                },
+                ready: {
+                    desc: 'Pesanan siap diantar ke meja Anda.',
+                    icon: '<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>',
+                },
+                completed: {
+                    desc: 'Pesanan telah selesai. Terima kasih sudah mampir!',
+                    icon: '<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>',
+                },
+            };
+            const meta = statusMap[order.status_pesanan] || statusMap.pending;
+            const isTakeAway = order.tipe_pesanan === 'take-away';
+            const tableLabel = order.nomor_meja ? 'Meja ' + order.nomor_meja : 'Take Away';
+
+            titleEl.textContent = 'Status Pesanan (' + tableLabel + ')';
+            subtitleEl.textContent = '#' + order.id + ' • ' + order.status_label;
+            document.getElementById('status-current-label').textContent = order.status_label;
+            document.getElementById('status-current-desc').textContent = meta.desc;
+            document.getElementById('status-current-icon').innerHTML = meta.icon;
+            document.getElementById('status-order-type').textContent = isTakeAway ? 'Take Away' : 'Dine-in';
+            document.getElementById('status-live-dot').classList.toggle('hidden', order.status_pesanan === 'completed');
+
+            applyStatusStep(order.status_step || 1, order.status_pesanan);
+
+            const items = order.items || [];
+            const totalQty = items.reduce((total, item) => total + Number(item.qty || 0), 0);
+            document.getElementById('status-item-count').textContent = totalQty + ' Item';
+            document.getElementById('status-total').textContent = formatRupiah(order.total_harga);
+            document.getElementById('status-order-number').textContent = '#' + order.id;
+            document.getElementById('status-order-time').textContent = order.waktu_transaksi
+                ? new Date(order.waktu_transaksi).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }) + ' WIB'
+                : '-';
+            document.getElementById('status-order-table').textContent = tableLabel;
+
+            const payment = order.pembayaran;
+            let paymentText = 'Menunggu Pembayaran';
+            if (payment && payment.status_pembayaran === 'paid') {
+                paymentText = 'Lunas via ' + (payment.metode_pembayaran || 'Kasir');
+            } else if (payment && payment.metode_pembayaran) {
+                paymentText = 'Menunggu Pembayaran ' + payment.metode_pembayaran;
+            } else if (order.status_pesanan === 'completed') {
+                paymentText = 'Pembayaran Selesai';
+            }
+            document.getElementById('status-payment-tag').textContent = paymentText;
+
+            document.getElementById('status-items').innerHTML = items.length
+                ? items.map((item, index) => {
+                    const image = item.gambar
+                        ? '<img src="' + escapeHtml(item.gambar) + '" alt="' + escapeHtml(item.nama_produk) + '" class="w-14 h-14 rounded-xl object-cover shrink-0 border border-slate-100">'
+                        : '<div class="w-14 h-14 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center shrink-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M6 8v10a2 2 0 002 2h8a2 2 0 002-2V8M9 8V6a3 3 0 016 0v2"/></svg></div>';
+                    return '<div class="flex items-center gap-3' + (index > 0 ? ' border-t border-slate-100 pt-3' : '') + '">' + image +
+                        '<div class="flex-1 min-w-0"><h4 class="font-bold text-slate-900 text-xs leading-tight">' + item.qty + 'x ' + escapeHtml(item.nama_produk) + '</h4>' +
+                        (item.customization ? '<p class="text-[11px] text-slate-500 mt-0.5">' + escapeHtml(item.customization) + '</p>' : '') +
+                        '</div><span class="text-xs font-bold text-slate-900 shrink-0">' + formatRupiah(item.subtotal) + '</span></div>';
+                }).join('')
+                : '<p class="text-xs text-slate-500">Rincian menu tidak tersedia.</p>';
+
+            const notesEl = document.getElementById('status-notes');
+            if (order.catatan) {
+                document.getElementById('status-notes-text').textContent = order.catatan;
+                notesEl.classList.remove('hidden');
+            } else {
+                notesEl.classList.add('hidden');
+            }
+
+            document.getElementById('status-last-update').textContent = 'Status diperbarui ' +
+                new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Jakarta' }) +
+                ' WIB • otomatis setiap 5 detik';
+
+            if (order.status_pesanan === 'completed') {
+                stopMyOrderPolling();
+            }
+        }
+
         // --- TAB SWITCHING FUNCTIONS ---
         function switchTab(tabName) {
             activeTab = tabName;
@@ -335,6 +534,8 @@
                 navPesan.classList.remove('text-primary-600');
                 navPesan.classList.add('text-slate-400');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                startMyOrderPolling();
+                refreshMyOrder(true);
             } else {
                 tabStatus.classList.add('hidden');
                 tabPesan.classList.remove('hidden');
@@ -347,6 +548,7 @@
                 navStatus.classList.remove('text-primary-600');
                 navStatus.classList.add('text-slate-400');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                stopMyOrderPolling();
             }
         }
 
@@ -868,7 +1070,7 @@
                 }
 
                 const order = result.data || result.transaksi;
-                document.getElementById('receipt-date').textContent = new Date(order.waktu_transaksi).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('receipt-date').textContent = new Date(order.waktu_transaksi).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }) + ' WIB';
                 document.getElementById('receipt-number').textContent = `#${order.id}`;
                 document.getElementById('receipt-order-type').textContent = currentOrderType === 'dine-in' ? 'Dine-in' : 'Takeaway';
 
@@ -965,6 +1167,7 @@
             nextCartLineId = 1;
             renderCart();
             updateHeaderCart();
+            switchTab('status');
         }
 
         function setCategory(category, activeBtn) {
@@ -1009,6 +1212,13 @@
         renderCart();
         updateHeaderCart();
         setOrderType('dine-in');
+
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden && activeTab === 'status') {
+                refreshMyOrder(false);
+                startMyOrderPolling();
+            }
+        });
 
         // Lock table selection if coming from QR scan
         @if(isset($mejaAktif))

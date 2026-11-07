@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PromoKode;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -67,6 +68,15 @@ class PromoKodeController extends Controller
 
         $validated['kode'] = strtoupper(trim($validated['kode']));
         $validated['is_aktif'] = $request->has('is_aktif');
+
+        // Input tanggal dari admin menggunakan WIB, simpan ke database sebagai UTC.
+        if (! empty($validated['tanggal_mulai'])) {
+            $validated['tanggal_mulai'] = Carbon::parse($validated['tanggal_mulai'], 'Asia/Jakarta')->utc();
+        }
+
+        if (! empty($validated['tanggal_berakhir'])) {
+            $validated['tanggal_berakhir'] = Carbon::parse($validated['tanggal_berakhir'], 'Asia/Jakarta')->utc();
+        }
 
         return $validated;
     }
