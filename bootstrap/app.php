@@ -17,5 +17,31 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
+            if ($request->expectsJson()) {
+                return null;
+            }
+
+            if ($e instanceof \Illuminate\Auth\AuthenticationException
+                || $e instanceof \Illuminate\Validation\ValidationException) {
+                return null;
+            }
+
+            if (config('app.debug')) {
+                return null;
+            }
+
+            $status = $e instanceof \Symfony\Component\HttpKernel\Exception\HttpException
+                ? $e->getStatusCode()
+                : 500;
+
+            $view = \Illuminate\Support\Facades\View::exists('errors.' . $status)
+                ? 'errors.' . $status
+                : 'errors.generic';
+
+            return response()->view($view, [
+                'exception' => $e,
+                'status' => $status,
+            ], $status);
+        });
     })->create();

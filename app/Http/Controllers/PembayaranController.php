@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Pembayaran;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 
 class PembayaranController extends Controller
 {
@@ -18,7 +17,7 @@ class PembayaranController extends Controller
         ]);
 
         $transaksi = Transaksi::findOrFail($request->transaksi_id);
-        Gate::authorize('view-transaction', $transaksi);
+        $this->authorize('view', $transaksi);
 
         if ($request->jumlah_bayar < $transaksi->total_harga) {
             if ($request->wantsJson() || $request->ajax()) {
@@ -63,7 +62,7 @@ class PembayaranController extends Controller
 
     public function printReceipt(Transaksi $transaksi)
     {
-        Gate::authorize('view-transaction', $transaksi);
+        $this->authorize('view', $transaksi);
 
         $transaksi->load(['meja', 'karyawan', 'detail_transaksis.produk', 'pembayaran']);
         return view('transaksis.receipt', compact('transaksi'));

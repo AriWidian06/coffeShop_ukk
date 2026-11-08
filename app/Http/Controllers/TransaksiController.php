@@ -7,7 +7,6 @@ use App\Models\DetailTransaksi;
 use App\Models\Produk;
 use App\Models\Meja;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\DB;
 use App\Services\PaymentService;
 use Illuminate\Validation\ValidationException;
@@ -179,7 +178,7 @@ class TransaksiController extends Controller
 
     public function show(Transaksi $transaksi)
     {
-        Gate::authorize('view-transaction', $transaksi);
+        $this->authorize('view', $transaksi);
 
         $transaksi->load(['meja', 'karyawan', 'detail_transaksis.produk', 'pembayaran']);
         return view('transaksis.show', compact('transaksi'));
@@ -187,7 +186,7 @@ class TransaksiController extends Controller
 
     public function updateStatus(Request $request, Transaksi $transaksi)
     {
-        Gate::authorize('view-transaction', $transaksi);
+        $this->authorize('view', $transaksi);
 
         $request->validate([
             'status_pesanan' => 'required|in:pending,ready,prosesed,completed',
@@ -237,6 +236,7 @@ class TransaksiController extends Controller
     public function showQrisPayment($id)
     {
         $transaksi = Transaksi::with(['detail_transaksis.produk', 'meja', 'karyawan', 'pembayaran'])->findOrFail($id);
+        $this->authorize('view', $transaksi);
 
         try {
             $paymentService = new PaymentService();
@@ -255,6 +255,7 @@ class TransaksiController extends Controller
     public function checkQrisPayment(Request $request, $id, PaymentService $paymentService)
     {
         $transaksi = Transaksi::findOrFail($id);
+        $this->authorize('view', $transaksi);
 
         $validated = $request->validate([
             'order_id' => 'required|string',
@@ -285,7 +286,7 @@ class TransaksiController extends Controller
 
     public function destroy(Transaksi $transaksi)
     {
-        Gate::authorize('view-transaction', $transaksi);
+        $this->authorize('delete', $transaksi);
 
         $transaksi->delete();
         return redirect()->route('transaksis.index')->with('success', 'Transaksi berhasil dihapus.');

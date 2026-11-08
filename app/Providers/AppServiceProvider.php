@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Transaksi;
+use App\Policies\TransaksiPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,6 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::policy(Transaksi::class, TransaksiPolicy::class);
+
         Gate::define('access-admin-panel', function ($user = null) {
             $user = auth('karyawan')->user();
             return $user && strtolower($user->role) === 'admin';
@@ -34,24 +37,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('view-transactions', function ($user = null) {
             $user = auth('karyawan')->user();
             return $user && in_array(strtolower($user->role), ['kasir', 'manager', 'admin'], false);
-        });
-
-        Gate::define('view-transaction', function ($user = null, Transaksi $transaksi) {
-            $user = auth('karyawan')->user();
-            
-            if (!$user) {
-                return false;
-            }
-
-            if (in_array(strtolower($user->role), ['manager', 'admin'], false)) {
-                return true;
-            }
-
-            if (strtolower($user->role) === 'kasir') {
-                return true;
-            }
-
-            return false;
         });
 
         Gate::define('access-pos', function ($user = null) {

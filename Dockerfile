@@ -43,8 +43,7 @@ RUN composer install --no-dev --no-interaction --optimize-autoloader
 # Atur permission storage dan cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Buat symbolic link storage dan bersihkan cache config/view
-RUN php artisan storage:link
+# Bersihkan cache config/view (perintah storage:link di build dihapus agar tidak duplikat)
 RUN php artisan view:clear && php artisan config:clear
 
 # Ubah document root Apache ke folder public Laravel
@@ -58,5 +57,5 @@ RUN a2enmod rewrite
 # Expose port 80 untuk web server
 EXPOSE 80
 
-# Jalankan migrate + seeder lalu Apache di foreground
-CMD php artisan migrate --seed --force && php artisan storage:link || true && apache2-foreground
+# Jalankan migrate + storage:link dengan --force lalu Apache di foreground
+CMD php artisan migrate --seed --force && php artisan storage:link --force || true && apache2-foreground
