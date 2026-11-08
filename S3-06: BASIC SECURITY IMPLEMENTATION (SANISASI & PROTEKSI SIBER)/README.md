@@ -60,34 +60,38 @@ Pada Java Swing: Komponen `JLabel.setText(nama)` secara alami menampilkan teks m
 ## C. Proteksi File Upload (Anti-Web Shell)
 
 ```php
-// app/Http/Controllers/Web/PaymentController.php
-public function uploadReceipt(Request $request, $bookingCode)
+// app/Http/Controllers/ProdukController.php
+public function store(Request $request)
 {
-    $request->validate([
-        'receipt_file' => [
-            'required',
-            'file',
-            'mimes:jpg,jpeg,png,webp',
-            'mimetypes:image/jpeg,image/png,image/webp',
-            'max:2048'
-        ]
+    $validated = $request->validate([
+        'nama_produk' => 'required|string|max:255',
+        'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
     ]);
 
-    $file = $request->file('receipt_file');
+    if ($request->hasFile('gambar')) {
+        $path = $request->file('gambar')->store('produks', 'public');
+        $validated['gambar'] = $path;
+    }
 
-    // Beri nama acak aman agar tidak bisa ditimpa atau mengeksekusi shell
-    $safeFileName = 'receipt_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $file->getClientOriginalExtension();
+    Produk::create($validated);
+}
 
-    // Simpan di direktori privat storage
-    $path = $file->storeAs('receipts', $safeFileName, 'public');
-
-    // Update database
-    Reservation::where('booking_code', $bookingCode)->update([
-        'receipt_path' => $path,
-        'status'       => 'WAITING_VERIFICATION'
+public function update(Request $request, Produk $produk)
+{
+    $validated = $request->validate([
+        'nama_produk' => 'required|string|max:255',
+        'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
     ]);
 
-    return redirect()->back()->with('success', 'Bukti bayar berhasil diunggah.');
+    if ($request->hasFile('gambar')) {
+        if ($produk->gambar) {
+            Storage::disk('public')->delete($produk->gambar);
+        }
+
+        $validated['gambar'] = $request->file('gambar')->store('produks', 'public');
+    }
+
+    $produk->update($validated);
 }
 ```
 

@@ -2,7 +2,7 @@
 
 /**
  * Excerpt dari: app/Policies/TransaksiPolicy.php
- * Fokus: authorization object-level dan anti-IDOR.
+ * Fokus: authorization object-level dan anti-IDOR (implementasi final).
  */
 
 namespace App\Policies;
@@ -27,12 +27,16 @@ class TransaksiPolicy
 
         return false;
     }
+
+    public function delete(Karyawan $user, Transaksi $transaksi): bool
+    {
+        return $this->view($user, $transaksi);
+    }
 }
 
 // Pola controller:
 // $this->authorize('view', $transaksi);
 // $this->authorize('delete', $transaksi);
 
-// Endpoint QRIS juga harus memanggil:
+// Endpoint QRIS juga memanggil:
 // $this->authorize('view', $transaksi);
-```
