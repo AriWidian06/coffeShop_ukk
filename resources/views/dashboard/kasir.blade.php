@@ -33,28 +33,28 @@
     };
 @endphp
 
-<div class="h-screen flex flex-col bg-slate-50 overflow-hidden">
+<div class="min-h-screen lg:h-screen flex flex-col bg-slate-50 lg:overflow-hidden">
 
     {{-- ═══════════════════════════════════════════════════════════════
         TOP BAR — Terminal title, shift info, kasir, time, tab buttons
         ═══════════════════════════════════════════════════════════════ --}}
     <header class="bg-white border-b border-slate-200 flex-shrink-0 z-20">
-        <div class="px-5 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <h1 class="text-xl font-bold text-slate-900">Terminal POS</h1>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold">
+        <div class="px-3 sm:px-5 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                <h1 class="text-lg sm:text-xl font-bold text-slate-900 whitespace-nowrap">Terminal POS</h1>
+                <span class="inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[10px] sm:text-xs font-bold whitespace-nowrap">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
                     Station #01
                 </span>
             </div>
-            <div class="flex items-center gap-2">
-                <div class="kasir-badge">
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <div class="kasir-badge hidden xl:inline-flex">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     Shift {{ $shift }}
                 </div>
-                <div class="kasir-badge">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                    {{ auth('karyawan')->user()->nama_karyawan }}
+                <div class="kasir-badge hidden sm:inline-flex max-w-[160px]">
+                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                    <span class="truncate">{{ auth('karyawan')->user()->nama_karyawan }}</span>
                 </div>
                 <div class="kasir-badge" id="live-clock">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -67,22 +67,22 @@
     {{-- ═══════════════════════════════════════════════════════════════
          TAB CONTENT AREA — fills remaining height
     ═══════════════════════════════════════════════════════════════ --}}
-    <div class="flex-1 overflow-hidden">
+    <div class="flex-1 lg:overflow-hidden">
 
         {{-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
              TAB 1: KASIR & MENU — POS Ordering Interface
         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ --}}
-        <div id="tab-kasir" class="h-full">
+        <div id="tab-kasir" class="flex flex-col lg:h-full lg:min-h-0">
             {{-- Search & Category Filter Bar --}}
-            <div class="bg-white border-b border-slate-200 px-5 py-3 flex-shrink-0">
-                <div class="flex items-center gap-4">
+            <div class="bg-white border-b border-slate-200 px-3 sm:px-5 py-3 flex-shrink-0">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
                     <div class="flex-1 relative">
                         <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                         <input id="pos-search" type="search" placeholder="Cari nama menu atau kategori..." class="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                     </div>
-                    <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar">
+                    <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-0.5">
                         <button class="pos-category-tab active" data-category="all">
                             Semua Menu <span class="ml-1 bg-white/20 px-1.5 py-0.5 rounded-full text-[10px]">{{ $produks->count() }}</span>
                         </button>
@@ -96,10 +96,10 @@
             </div>
 
             {{-- Split layout: Catalog (left 2/3) + Cart (right 1/3) --}}
-            <div class="h-[calc(100%-60px)] flex">
+            <div class="flex flex-col lg:flex-row lg:flex-1 lg:min-h-0 lg:overflow-hidden">
 
                 {{-- Product Catalog (scrollable) --}}
-                <section class="flex-1 lg:w-2/3 overflow-y-auto p-5" id="catalog-section">
+                <section class="flex-1 lg:w-2/3 lg:overflow-y-auto p-3 sm:p-5" id="catalog-section">
                     @if ($produks->isEmpty())
                         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-12 text-center">
                             <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -160,7 +160,7 @@
                 </section>
 
                 {{-- Order Panel / Cart (sticky right) --}}
-                <aside class="pos-order-panel w-full lg:w-[380px] flex-shrink-0 border-l border-slate-200 flex flex-col bg-white" id="pos-order" aria-labelledby="pos-order-title">
+                <aside class="pos-order-panel w-full lg:w-[380px] flex-shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200 flex flex-col bg-white" id="pos-order" aria-labelledby="pos-order-title">
                     <div class="p-4 border-b border-slate-200 flex items-center justify-between flex-shrink-0">
                         <div>
                             <h2 id="pos-order-title" class="font-bold text-slate-900">Pesanan Baru</h2>
@@ -247,15 +247,15 @@
         {{-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
              TAB 2: DENAH MEJA — Live Floor Plan Terminal
         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ --}}
-        <div id="tab-meja" class="h-full overflow-hidden hidden flex flex-col">
+        <div id="tab-meja" class="lg:h-full lg:overflow-hidden hidden flex flex-col">
             {{-- Top summary bar for Denah --}}
-            <div class="bg-white border-b border-slate-200 px-6 py-3 flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
-                <div class="flex items-center gap-4">
+            <div class="bg-white border-b border-slate-200 px-3 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-4 min-w-0">
                     <h2 class="font-bold text-slate-900 text-base flex items-center gap-2">
                         <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                         Terminal Denah Meja
                     </h2>
-                    <div class="flex items-center gap-1.5 text-xs bg-slate-100 p-1 rounded-xl">
+                    <div class="flex items-center gap-1.5 text-xs bg-slate-100 p-1 rounded-xl overflow-x-auto hide-scrollbar max-w-full">
                         <button type="button" class="table-filter-pill active" data-filter="all" onclick="filterTables('all')">
                             Semua (<span id="count-all-tables">{{ $mejas->count() }}</span>)
                         </button>
@@ -267,7 +267,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="flex items-center gap-3 text-xs font-semibold">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-semibold">
                     <span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
                         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                         Tersedia (Siap Pakai)
@@ -280,10 +280,10 @@
             </div>
 
             {{-- Split Layout: Tables Grid (Left 2/3) + Table Detail & Cashier Panel (Right 1/3) --}}
-            <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+            <div class="flex-1 flex flex-col lg:flex-row lg:overflow-hidden">
                 
                 {{-- LEFT: Live Table Floor Plan Grid (Tanpa pindah halaman) --}}
-                <div class="flex-1 lg:w-2/3 overflow-y-auto p-6 bg-slate-50">
+                <div class="flex-1 lg:w-2/3 lg:overflow-y-auto p-3 sm:p-6 bg-slate-50">
                     @if($mejas->isEmpty())
                         <div class="p-12 text-center bg-white rounded-2xl border border-slate-200">
                             <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
@@ -345,7 +345,7 @@
                 </div>
 
                 {{-- RIGHT: Table Action Terminal Panel (Live Inspector & Kasir) --}}
-                <aside class="w-full lg:w-96 bg-white border-l border-slate-200 flex flex-col flex-shrink-0 h-full overflow-hidden shadow-lg" id="table-inspector-panel">
+                <aside class="w-full lg:w-96 bg-white border-t lg:border-t-0 lg:border-l border-slate-200 flex flex-col flex-shrink-0 lg:h-full min-h-[280px] lg:min-h-0 overflow-hidden shadow-lg" id="table-inspector-panel">
                     {{-- Default empty placeholder --}}
                     <div id="inspector-placeholder" class="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-400">
                         <div class="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-3">
@@ -387,10 +387,10 @@
         {{-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
              TAB 3: PESANAN AKTIF — Active Orders Queue (KDS & POS Terminal)
         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ --}}
-        <div id="tab-transaksi" class="h-full flex flex-col overflow-hidden bg-slate-50 hidden">
+        <div id="tab-transaksi" class="lg:h-full flex flex-col lg:overflow-hidden bg-slate-50 hidden">
             {{-- Toolbar: Status Filters, Search, Sync, and Link to History --}}
-            <div class="px-5 py-3 bg-white border-b border-slate-200 flex-shrink-0 flex flex-wrap items-center justify-between gap-3">
-                <div class="flex items-center gap-1.5 overflow-x-auto hide-scrollbar">
+            <div class="px-3 sm:px-5 py-3 bg-white border-b border-slate-200 flex-shrink-0 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-1.5 overflow-x-auto hide-scrollbar max-w-full pb-0.5">
                     <button type="button" onclick="filterActiveOrders('all')"
                         class="order-filter-pill active" data-filter="all">
                         Semua Aktif <span id="count-all" class="ml-1.5 bg-slate-800 text-white px-2 py-0.5 rounded-full text-[10px] font-bold">{{ $pesananAktif->count() }}</span>
@@ -412,8 +412,8 @@
                     </button>
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <div class="relative w-56 md:w-72">
+                <div class="flex flex-wrap items-center gap-2">
+                    <div class="relative flex-1 min-w-[180px] sm:flex-none sm:w-56 md:w-72">
                         <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
@@ -439,7 +439,7 @@
             </div>
 
             {{-- Main Orders Grid Container --}}
-            <div class="flex-1 overflow-y-auto p-5">
+            <div class="flex-1 lg:overflow-y-auto p-3 sm:p-5">
                 <div id="active-orders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
                     @forelse ($pesananAktif as $order)
                         @php
@@ -568,7 +568,7 @@
 
                                 {{-- Action Buttons --}}
                                 <div class="space-y-2">
-                                    <div class="flex items-center gap-2">
+                                    <div class="flex flex-wrap items-center gap-2">
                                         {{-- 1-Click Main Progression Button --}}
                                         @if ($status === 'pending')
                                             <button type="button" onclick="quickUpdateStatus({{ $order->id }}, 'prosesed')"
@@ -661,8 +661,8 @@
      IN-TERMINAL QUICK PAY MODAL
 ═══════════════════════════════════════════════════════════════════ --}}
 <div id="quick-pay-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 hidden">
-    <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden transform transition-all">
-        <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+    <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto transform transition-all">
+        <div class="px-4 sm:px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
             <div>
                 <h3 class="font-bold text-slate-900 text-base" id="qp-title">Pembayaran Kasir</h3>
                 <p class="text-xs text-slate-500 mt-0.5" id="qp-subtitle">Pesanan # --</p>
@@ -672,7 +672,7 @@
             </button>
         </div>
 
-        <form id="qp-form" onsubmit="submitQuickPay(event)" class="p-6 space-y-4">
+        <form id="qp-form" onsubmit="submitQuickPay(event)" class="p-4 sm:p-6 space-y-4">
             <input type="hidden" id="qp-order-id" name="transaksi_id" value="">
             <input type="hidden" id="qp-total-harga" value="0">
 
@@ -1662,7 +1662,7 @@
                         </div>
 
                         <div class="space-y-2">
-                            <div class="flex items-center gap-2">
+                            <div class="flex flex-wrap items-center gap-2">
                                 ${mainActionBtn}
                                 ${payBtnExtra}
 

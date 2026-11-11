@@ -20,7 +20,7 @@
         <!-- ============================================ -->
         <!-- PANEL KIRI: Branding & Informasi (Biru) -->
         <!-- ============================================ -->
-        <div class="login-blue-panel lg:w-5/12 p-8 sm:p-10 lg:p-12 text-white flex flex-col justify-between relative z-10">
+        <div class="login-blue-panel lg:w-5/12 p-6 sm:p-10 lg:p-12 text-white flex flex-col justify-between relative z-10">
 
             <!-- Logo -->
             <div class="flex items-center gap-3">
@@ -35,13 +35,13 @@
             </div>
 
             <!-- Konten Tengah -->
-            <div class="my-10 lg:my-0">
+            <div class="my-8 lg:my-0">
                 <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-xs font-semibold mb-6">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                     KONSOL ROASTERY V2.4
                 </div>
 
-                <h1 class="font-bold text-3xl lg:text-4xl leading-tight mb-4">
+                <h1 class="font-bold text-2xl sm:text-3xl lg:text-4xl leading-tight mb-4">
                     Presisi Artisan dalam<br>Setiap Takaran & Batch
                 </h1>
 
@@ -51,7 +51,7 @@
             </div>
 
             <!-- Card Bawah: Statistik -->
-            <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 flex items-center justify-between">
+            <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-2">
                 <div class="flex items-center gap-3">
                     <svg class="w-5 h-5 text-blue-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -65,7 +65,7 @@
         <!-- ============================================ -->
         <!-- PANEL KANAN: Form Login (Putih) -->
         <!-- ============================================ -->
-        <div class="lg:w-7/12 p-8 sm:p-10 lg:p-12 bg-white">
+        <div class="lg:w-7/12 p-6 sm:p-10 lg:p-12 bg-white">
 
             <!-- Badge Akses -->
             <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-50 border border-primary-200 text-xs font-bold text-primary-700 mb-6">
@@ -74,7 +74,7 @@
             </div>
 
             <!-- Heading -->
-            <h2 class="font-bold text-3xl lg:text-4xl text-slate-900 mb-2">Selamat Datang Kembali</h2>
+            <h2 class="font-bold text-2xl sm:text-3xl lg:text-4xl text-slate-900 mb-2">Selamat Datang Kembali</h2>
             <p class="text-slate-500 text-sm mb-8">
                 Gunakan kredensial resmi manajemen internal Karsa Roastery untuk melanjutkan.
             </p>
@@ -107,7 +107,7 @@
 
                 <!-- Username -->
                 <div>
-                    <div class="flex items-center justify-between mb-2">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
                         <label for="username" class="text-sm font-bold text-slate-700">
                             Email Pegawai / Akun Roaster
                         </label>
@@ -133,7 +133,7 @@
 
                 <!-- Password -->
                 <div>
-                    <div class="flex items-center justify-between mb-2">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
                         <label for="password" class="text-sm font-bold text-slate-700">
                             Kata Sandi Akun
                         </label>
@@ -181,7 +181,7 @@
             </form>
 
             <!-- Quick Access Card -->
-            <div class="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+            <div class="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div class="flex items-center gap-2 text-sm text-slate-600">
                     <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -197,7 +197,7 @@
             </div>
 
             <!-- Footer Security -->
-            <div class="mt-6 flex items-center justify-between text-xs text-slate-400">
+            <div class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-slate-400">
                 <div class="flex items-center gap-1.5">
                     <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />

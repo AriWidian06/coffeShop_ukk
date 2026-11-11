@@ -14,11 +14,15 @@
             padding: 20px;
         }
         .receipt-container {
+            width: 100%;
             max-width: 300px;
+            box-sizing: border-box;
             margin: 0 auto;
             background: #fff;
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow-wrap: break-word;
+            word-wrap: break-word;
         }
         .header { text-align: center; margin-bottom: 15px; }
         .header h1 { font-size: 16px; margin: 0 0 5px 0; font-weight: bold; }
@@ -55,6 +59,11 @@
             body { background: #fff; padding: 0; }
             .receipt-container { box-shadow: none; padding: 0; max-width: 100%; }
             .print-btn { display: none !important; }
+        }
+
+        @media (max-width: 360px) {
+            body { padding: 12px; }
+            .receipt-container { padding: 14px; }
         }
     </style>
 </head>

@@ -51,20 +51,29 @@
     </div>
 
     <!-- Status Aktif -->
-    <div class="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
-        <input 
-            type="checkbox" 
-            id="status_aktif"
-            name="status_aktif" 
-            value="1"
-            @checked(old('status_aktif', $meja->status_aktif ?? true))
-            class="w-5 h-5 text-primary-600 rounded border-slate-300 focus:ring-primary-500 cursor-pointer"
-        >
-        <div class="flex-1">
-            <label for="status_aktif" class="text-sm font-bold text-slate-900 cursor-pointer">
-                Meja Aktif
-            </label>
-            <p class="text-xs text-slate-500">Meja yang aktif akan ditampilkan di sistem self-order dan dapat dipesan pelanggan.</p>
+    <div>
+        <div class="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+            <input type="hidden" name="status_aktif" value="0">
+            <input 
+                type="checkbox" 
+                id="status_aktif"
+                name="status_aktif" 
+                value="1"
+                @checked(old('status_aktif', $meja->status_aktif ?? true))
+                class="w-5 h-5 text-primary-600 rounded border-slate-300 focus:ring-primary-500 cursor-pointer"
+            >
+            <div class="flex-1">
+                <label for="status_aktif" class="text-sm font-bold text-slate-900 cursor-pointer">
+                    Meja Aktif
+                </label>
+                <p class="text-xs text-slate-500">Meja yang aktif akan ditampilkan di sistem self-order dan dapat dipesan pelanggan.</p>
+            </div>
         </div>
+        @error('status_aktif')
+            <p class="text-red-500 text-xs mt-2 flex items-center gap-1">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                {{ $message }}
+            </p>
+        @enderror
     </div>
 </div>

@@ -90,7 +90,7 @@
             </div>
 
             <!-- Total Pembayaran Section -->
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex items-center justify-between">
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Pembayaran</p>
                     <h4 id="receipt-grand-total" class="text-xl font-extrabold text-primary-600 mt-0.5">Rp 0</h4>

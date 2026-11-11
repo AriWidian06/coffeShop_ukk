@@ -19,20 +19,20 @@
     
     <!-- TOP HEADER -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-20">
-        <div class="px-6 py-4">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <div class="flex items-center gap-3 mb-1">
-                        <h1 class="text-2xl font-bold text-slate-900">Terminal Kasir</h1>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold">
+        <div class="px-3 sm:px-6 py-3 sm:py-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+                <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-1">
+                        <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Terminal Kasir</h1>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold whitespace-nowrap">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
                             Station #01
                         </span>
                     </div>
                     <p class="text-sm text-slate-500">Pilih menu, atur kustomisasi, lalu simpan pesanan.</p>
                 </div>
-                <div class="flex items-center gap-3">
-                    <div class="px-3 py-2 bg-slate-50 rounded-lg border border-slate-200">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <div class="hidden sm:block px-3 py-2 bg-slate-50 rounded-lg border border-slate-200">
                         <p class="text-[10px] text-slate-500 font-semibold uppercase">Kasir</p>
                         <p class="text-sm font-bold text-slate-900">{{ auth('karyawan')->user()->nama_karyawan }}</p>
                     </div>
@@ -40,7 +40,7 @@
                         <p class="text-[10px] text-slate-500 font-semibold uppercase">Waktu</p>
                         <p class="text-sm font-bold text-slate-900">{{ now('Asia/Jakarta')->format('H:i') }} WIB</p>
                     </div>
-                    <a href="{{ route('transaksis.index') }}" class="px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-50 transition-all flex items-center gap-2">
+                    <a href="{{ route('transaksis.index') }}" class="px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
@@ -50,8 +50,8 @@
             </div>
 
             <!-- View Switcher (Katalog Menu vs Denah Meja) -->
-            <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
-                <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl">
+            <div class="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-3 pt-3 border-t border-slate-100">
+                <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl overflow-x-auto hide-scrollbar max-w-full">
                     <button type="button" id="tab-btn-menu" class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all bg-white text-slate-900 shadow-sm" onclick="switchPosView('menu')">
                         <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -76,7 +76,7 @@
                     </button>
                 </div>
 
-                <div id="denah-legend-bar" class="hidden items-center gap-3 text-xs font-semibold">
+                <div id="denah-legend-bar" class="hidden flex-wrap items-center gap-2 sm:gap-3 text-xs font-semibold">
                     <span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
                         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                         Tersedia (Siap Pakai)
@@ -102,9 +102,9 @@
 
     <!-- PRODUCT CUSTOMIZATION MODAL (Gaya Web Pelanggan) -->
     <div id="product-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full mx-4 overflow-hidden border border-slate-200 flex flex-col md:flex-row max-h-[90vh]">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full mx-3 sm:mx-4 overflow-hidden border border-slate-200 flex flex-col md:flex-row max-h-[90dvh]">
             <!-- Left: Image -->
-            <div class="md:w-1/2 bg-slate-100 relative min-h-[220px] md:min-h-full">
+            <div class="md:w-1/2 bg-slate-100 relative min-h-[180px] sm:min-h-[220px] md:min-h-full">
                 <img id="modal-product-img" src="" alt="" class="w-full h-full object-cover hidden">
                 <div id="modal-product-placeholder" class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-100 to-primary-200 text-primary-400">
                     <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -113,13 +113,13 @@
                 </div>
             </div>
             <!-- Right: Details & Options -->
-            <div class="md:w-1/2 p-6 flex flex-col justify-between overflow-y-auto">
+            <div class="md:w-1/2 p-4 sm:p-6 flex flex-col justify-between overflow-y-auto">
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <span id="modal-product-category" class="text-xs font-bold text-primary-600 uppercase tracking-wider">Kategori</span>
                         <button type="button" id="modal-close-btn" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center font-bold">✕</button>
                     </div>
-                    <h3 id="modal-product-name" class="text-xl font-bold text-slate-900 mb-1">Nama Produk</h3>
+                    <h3 id="modal-product-name" class="text-lg sm:text-xl font-bold text-slate-900 mb-1">Nama Produk</h3>
                     <p id="modal-product-desc" class="text-xs text-slate-500 mb-4 line-clamp-2">Deskripsi produk...</p>
                     
                     <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100">
@@ -158,8 +158,8 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <main class="p-6">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <main class="p-4 sm:p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             
             <!-- SECTION KIRI: KATALOG MENU & DENAH MEJA -->
             <section class="lg:col-span-2">
@@ -197,7 +197,7 @@
                             <p class="text-sm text-slate-500">Aktifkan produk bertipe jual untuk menerima pesanan.</p>
                         </div>
                     @else
-                        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4" data-pos-products>
+                        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4" data-pos-products>
                             @foreach ($produks as $produk)
                                 <article class="pos-product-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col justify-between hover:border-primary-400 hover:shadow-md transition cursor-pointer" 
                                          data-pos-product 
@@ -247,8 +247,8 @@
 
                 <!-- 2. VIEW DENAH MEJA -->
                 <div id="pos-view-denah" class="hidden space-y-4">
-                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-                        <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100">
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-4 border-b border-slate-100">
                             <div>
                                 <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
                                     <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -338,7 +338,7 @@
 
             <!-- PANEL ORDER / KERANJANG -->
             <aside class="pos-order-panel bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col h-fit sticky top-24" id="pos-order" aria-labelledby="pos-order-title">
-                <div class="p-4 border-b border-slate-200 flex items-center justify-between">
+                <div class="p-3 sm:p-4 border-b border-slate-200 flex items-center justify-between">
                     <div>
                         <h2 id="pos-order-title" class="font-bold text-slate-900">Pesanan Baru</h2>
                         <p class="text-xs text-slate-500 mt-0.5">Periksa item sebelum disimpan</p>
@@ -349,9 +349,9 @@
                 <p class="pos-cart-empty text-center py-12 text-slate-500 text-sm" data-cart-empty>
                     Keranjang kosong.<br>Tambahkan menu dari katalog.
                 </p>
-                <div class="pos-cart-lines max-h-80 overflow-y-auto p-4 space-y-3" data-cart-lines aria-live="polite"></div>
+                <div class="pos-cart-lines max-h-80 overflow-y-auto p-3 sm:p-4 space-y-3" data-cart-lines aria-live="polite"></div>
 
-                <form class="pos-order-form p-4 border-t border-slate-200" id="pos-form" method="post" action="{{ route('transaksis.store') }}">
+                <form class="pos-order-form p-3 sm:p-4 border-t border-slate-200" id="pos-form" method="post" action="{{ route('transaksis.store') }}">
                     @csrf
                     <div data-cart-inputs></div>
 

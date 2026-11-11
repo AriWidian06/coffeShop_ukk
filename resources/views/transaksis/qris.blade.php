@@ -3,15 +3,15 @@
 @section('title', 'Pembayaran QRIS')
 
 @section('content')
-<div class="min-h-screen bg-slate-50 py-10 px-4 flex items-center justify-center">
-    <div class="max-w-md w-full bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden p-8 text-center">
+<div class="min-h-screen bg-slate-50 py-6 sm:py-10 px-4 flex items-center justify-center">
+    <div class="max-w-md w-full bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden p-5 sm:p-8 text-center">
         
         <!-- Header -->
         <div class="mb-6">
             <span class="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-bold rounded-full uppercase tracking-wider">
                 Scan QRIS Otomatis
             </span>
-            <h2 class="text-2xl font-black text-slate-900 mt-2">Struk Transaksi #{{ $transaksi->id }}</h2>
+            <h2 class="text-xl sm:text-2xl font-black text-slate-900 mt-2 break-words">Struk Transaksi #{{ $transaksi->id }}</h2>
             <p class="text-xs text-slate-500 mt-1">
                 Meja: {{ $transaksi->meja->nomor_meja ?? 'Takeaway' }} • Kasir: {{ auth('karyawan')->user()->nama_karyawan ?? 'Kasir' }}
             </p>
@@ -20,7 +20,7 @@
         <!-- Total Harga -->
         <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 mb-6 shadow-inner">
             <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Total Tagihan Pembayaran</p>
-            <div class="text-3xl font-black text-primary-600 mt-1">
+            <div class="text-2xl sm:text-3xl font-black text-primary-600 mt-1 break-words">
                 Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}
             </div>
         </div>
@@ -53,7 +53,7 @@
         </div>
 
         <!-- Tombol Aksi -->
-        <div class="flex gap-3">
+        <div class="flex flex-col sm:flex-row gap-3">
             <a href="{{ route('transaksis.index') }}" 
                class="flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition text-sm text-center flex items-center justify-center">
                 Kembali

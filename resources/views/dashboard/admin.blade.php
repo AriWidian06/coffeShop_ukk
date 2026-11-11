@@ -5,16 +5,16 @@
 
     <!-- TOP HEADER -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-20">
-        <div class="px-6 py-4">
-            <div class="flex items-center justify-between">
+        <div class="px-4 sm:px-6 py-3 sm:py-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <!-- Breadcrumb & Title -->
-                <div>
+                <div class="min-w-0">
                     <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">Operasional / <span class="text-primary-600">Dashboard</span></p>
-                    <h1 class="text-2xl font-bold text-slate-900">Ringkasan Operasional Hari Ini</h1>
+                    <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Ringkasan Operasional Hari Ini</h1>
                 </div>
 
                 <!-- Right Actions -->
-                <div class="flex items-center gap-3">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
                     <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-200">
                         <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -23,7 +23,7 @@
                         <span class="text-slate-300">•</span>
                         <span class="text-sm font-bold text-primary-600 tabular-nums" id="admin-live-clock">{{ $nowWib->format('H:i:s') }} WIB</span>
                     </div>
-                    <a href="{{ route('laporan.export') }}" class="px-4 py-2 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20 flex items-center gap-2">
+                    <a href="{{ route('laporan.export') }}" class="px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20 flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>
@@ -35,18 +35,18 @@
     </header>
 
     <!-- MAIN DASHBOARD CONTENT -->
-    <main class="p-6 space-y-6">
+    <main class="p-4 sm:p-6 space-y-4 sm:space-y-6">
 
         <!-- TOP SECTION: Stats & Table Map -->
-        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
             <!-- Stats Cards (Left/Center) -->
-            <div class="xl:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="xl:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <!-- Total Penjualan -->
-                <div class="stat-card-blue rounded-2xl p-6">
+                <div class="stat-card-blue rounded-2xl p-5 sm:p-6">
                     <div class="flex items-start justify-between mb-4">
                         <div>
                             <p class="text-primary-100 text-xs font-bold uppercase tracking-wider mb-1">Total Penjualan Hari Ini</p>
-                            <h3 class="text-3xl font-bold">Rp {{ number_format($totalPenjualan, 0, ',', '.') }}</h3>
+                            <h3 class="text-2xl sm:text-3xl font-bold break-words">Rp {{ number_format($totalPenjualan, 0, ',', '.') }}</h3>
                         </div>
                         <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -61,11 +61,11 @@
                 </div>
 
                 <!-- Total Pesanan -->
-                <div class="stat-card rounded-2xl p-6">
+                <div class="stat-card rounded-2xl p-5 sm:p-6">
                     <div class="flex items-start justify-between mb-4">
                         <div>
                             <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Total Pesanan Selesai</p>
-                            <h3 class="text-3xl font-bold text-slate-900">{{ $totalPesanan }} <span class="text-sm font-normal text-slate-500">Tiket</span></h3>
+                            <h3 class="text-2xl sm:text-3xl font-bold text-slate-900">{{ $totalPesanan }} <span class="text-sm font-normal text-slate-500">Tiket</span></h3>
                         </div>
                         <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,11 +82,11 @@
                 </div>
 
                 <!-- Status Meja -->
-                <div class="stat-card rounded-2xl p-6">
+                <div class="stat-card rounded-2xl p-5 sm:p-6">
                     <div class="flex items-start justify-between mb-4">
                         <div>
                             <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Status Meja Terisi</p>
-                            <h3 class="text-3xl font-bold text-slate-900">{{ $mejaTerisi }} <span class="text-sm font-normal text-slate-500">/ {{ $totalMeja }} Meja</span></h3>
+                            <h3 class="text-2xl sm:text-3xl font-bold text-slate-900">{{ $mejaTerisi }} <span class="text-sm font-normal text-slate-500">/ {{ $totalMeja }} Meja</span></h3>
                         </div>
                         <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,11 +106,11 @@
                 </div>
 
                 <!-- Peringatan Inventori -->
-                <div class="stat-card border-red-200 rounded-2xl p-6">
+                <div class="stat-card border-red-200 rounded-2xl p-5 sm:p-6">
                     <div class="flex items-start justify-between mb-4">
                         <div>
                             <p class="text-red-600 text-xs font-bold uppercase tracking-wider mb-1">Peringatan Inventori</p>
-                            <h3 class="text-3xl font-bold text-red-600">{{ $stokHabis }} <span class="text-sm font-normal text-slate-500">Bahan Baku</span></h3>
+                            <h3 class="text-2xl sm:text-3xl font-bold text-red-600">{{ $stokHabis }} <span class="text-sm font-normal text-slate-500">Bahan Baku</span></h3>
                         </div>
                         <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,8 +126,8 @@
             </div>
 
             <!-- Live Table Map (Admin) -->
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-                <div class="flex items-center justify-between mb-6">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4 sm:mb-6">
                     <div>
                         <h3 class="font-bold text-slate-900 text-lg">Pantauan Meja Live</h3>
                         <p class="text-xs text-slate-500">Status okupansi meja saat ini</p>
@@ -173,10 +173,10 @@
         </div>
 
         <!-- SECOND SECTION: Analytics & Table -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             <!-- Penjualan per Jam -->
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 lg:col-span-2">
-                <div class="flex items-center justify-between mb-6">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6 lg:col-span-2">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
                     <div>
                         <h3 class="font-bold text-slate-900 text-lg">Penjualan Real-time per Jam</h3>
                         <p class="text-xs text-slate-500">Distribusi transaksi aktif berdasarkan periode shift</p>
@@ -188,24 +188,26 @@
                 </div>
 
                 <!-- Simple Bar Chart Representation -->
-                <div class="flex items-end justify-between gap-4 h-48 px-4">
-                    @php
-                        $maxSales = $salesByHour->max() ?? 1;
-                    @endphp
-                    @for ($hour = 0; $hour < 24; $hour++)
+                <div class="manager-chart-scroll overflow-x-auto -mx-2 px-2">
+                    <div class="flex items-end justify-between gap-2 sm:gap-4 h-48 min-w-[640px] px-2 sm:px-4">
                         @php
-                            $value = $salesByHour->get($hour, 0);
-                            $height = ($value / $maxSales) * 100;
-                            $isPeak = ($hour == $peakHour);
+                            $maxSales = $salesByHour->max() ?? 1;
                         @endphp
-                        <div class="flex-1 flex flex-col items-center gap-2 group relative">
-                            <div class="w-full {{ $isPeak ? 'bg-primary-600' : 'bg-primary-200' }} rounded-t-sm transition-all hover:bg-primary-400" style="height: {{ $height }}%"></div>
-                            <span class="text-[10px] text-slate-400 font-semibold">{{ sprintf('%02d', $hour) }}</span>
-                            @if($isPeak)
-                                <span class="absolute -top-6 text-[10px] font-bold text-primary-600">Peak</span>
-                            @endif
-                        </div>
-                    @endfor
+                        @for ($hour = 0; $hour < 24; $hour++)
+                            @php
+                                $value = $salesByHour->get($hour, 0);
+                                $height = ($value / $maxSales) * 100;
+                                $isPeak = ($hour == $peakHour);
+                            @endphp
+                            <div class="flex-1 flex flex-col items-center gap-2 group relative">
+                                <div class="w-full {{ $isPeak ? 'bg-primary-600' : 'bg-primary-200' }} rounded-t-sm transition-all hover:bg-primary-400" style="height: {{ $height }}%"></div>
+                                <span class="text-[10px] text-slate-400 font-semibold">{{ sprintf('%02d', $hour) }}</span>
+                                @if($isPeak)
+                                    <span class="absolute -top-6 text-[10px] font-bold text-primary-600">Peak</span>
+                                @endif
+                            </div>
+                        @endfor
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-4 border-t border-slate-200">
@@ -229,7 +231,7 @@
             </div>
 
             <!-- Kategori Terlaris -->
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6">
                 <h3 class="font-bold text-slate-900 text-lg mb-1">Kategori Terlaris</h3>
                 <p class="text-xs text-slate-500 mb-6">Porsi kontribusi omzet shift</p>
 
@@ -278,18 +280,18 @@
 
         <!-- RECENT ORDERS TABLE -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="p-6 border-b border-slate-200 flex items-center justify-between">
+            <div class="p-4 sm:p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
                     <h3 class="font-bold text-slate-900 text-lg">Daftar Pesanan Terkini</h3>
                     <p class="text-xs text-slate-500">Aktivitas pesanan pelanggan masuk dan status dapur live</p>
                 </div>
-                <a href="{{ route('transaksis.index') }}" class="text-xs font-bold text-primary-600 hover:text-primary-700 bg-primary-50 px-3 py-1.5 rounded-lg">
+                <a href="{{ route('transaksis.index') }}" class="text-xs font-bold text-primary-600 hover:text-primary-700 bg-primary-50 px-3 py-1.5 rounded-lg inline-flex items-center justify-center self-start sm:self-auto shrink-0">
                     Lihat Semua KDS
                 </a>
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full">
+                <table class="w-full min-w-[900px]">
                     <thead class="bg-slate-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase">No. Meja</th>
@@ -357,8 +359,8 @@
         </div>
 
         <!-- STAFF ON DUTY -->
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-            <div class="flex items-center justify-between mb-6">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4 sm:mb-6">
                 <div>
                     <h3 class="font-bold text-slate-900 text-lg">Karyawan Bertugas</h3>
                     <p class="text-xs text-slate-500">Metrik kinerja staf operasional hari ini</p>

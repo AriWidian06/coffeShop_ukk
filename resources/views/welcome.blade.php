@@ -13,7 +13,7 @@
 
     <!-- Mobile Header -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
-        <div class="px-4 py-3">
+        <div class="px-4 py-3 max-w-md mx-auto">
             <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-2.5">
                     <div class="w-10 h-10 rounded-2xl bg-primary-600 text-white flex items-center justify-center shadow-md shadow-primary-600/20 overflow-hidden shrink-0">

@@ -3,17 +3,17 @@
 @section('content')
 <div class="min-h-screen bg-slate-50">
     <!-- Header -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-20">
-        <div class="px-6 py-4">
-            <div class="flex items-center justify-between">
-                <div>
+    <header class="bg-white border-b border-slate-200 z-20 lg:sticky lg:top-0">
+        <div class="px-4 sm:px-6 py-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="min-w-0">
                     <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">
                         Operasional Outlet / <span class="text-primary-600">Edit Meja</span>
                     </p>
-                    <h1 class="text-2xl font-bold text-slate-900">Edit Meja #{{ str_pad($meja->nomor_meja, 2, '0', STR_PAD_LEFT) }}</h1>
+                    <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Edit Meja #{{ str_pad($meja->nomor_meja, 2, '0', STR_PAD_LEFT) }}</h1>
                     <p class="text-sm text-slate-500 mt-1">Perbarui informasi meja dan pengaturan QR code.</p>
                 </div>
-                <a href="{{ route('mejas.index') }}" class="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-50 transition-all flex items-center gap-2">
+                <a href="{{ route('mejas.index') }}" class="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2 self-start">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
@@ -24,17 +24,17 @@
     </header>
 
     <!-- Form Content -->
-    <main class="p-6 max-w-2xl mx-auto">
-        <form method="post" action="{{ route('mejas.update', $meja) }}" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 space-y-6">
+    <main class="p-4 sm:p-6 max-w-2xl mx-auto">
+        <form method="post" action="{{ route('mejas.update', $meja) }}" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-8 space-y-6">
             @csrf
             @method('PUT')
             @include('mejas.form')
             
-            <div class="flex items-center justify-end gap-3 pt-6 border-t border-slate-200">
-                <a href="{{ route('mejas.index') }}" class="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-50 transition-all">
+            <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-3 pt-6 border-t border-slate-200">
+                <a href="{{ route('mejas.index') }}" class="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-50 transition-all text-center">
                     Batal
                 </a>
-                <button type="submit" class="px-6 py-2.5 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20 flex items-center gap-2">
+                <button type="submit" class="px-6 py-2.5 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20 flex items-center justify-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>

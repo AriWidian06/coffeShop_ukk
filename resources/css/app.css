@@ -494,6 +494,17 @@
     @apply bg-white rounded-2xl border border-slate-200 shadow-sm sticky top-24;
 }
 
+@media (max-width: 1023.98px) {
+    .pos-order-panel {
+        position: static;
+        border-radius: 0;
+    }
+
+    .pos-cart-lines {
+        max-height: 50vh;
+    }
+}
+
 .pos-cart-item {
     @apply flex items-center justify-between p-3 bg-slate-50 rounded-xl mb-2 border border-slate-100;
 }
@@ -532,4 +543,122 @@
 
 .pos-customization-preset input {
     @apply w-3.5 h-3.5 accent-primary-600;
+}
+
+/* App & Kasir Console Responsive Drawer */
+.app-sidebar {
+    transition: transform 0.3s ease, visibility 0.3s ease;
+    will-change: transform;
+}
+
+.app-sidebar-overlay {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
+.app-sidebar-overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+@media (max-width: 1023.98px) {
+    .app-sidebar {
+        visibility: hidden;
+        transform: translateX(-100%);
+    }
+
+    .app-sidebar.is-open {
+        visibility: visible;
+        transform: translateX(0);
+    }
+}
+
+@media (min-width: 1024px) {
+    .app-sidebar {
+        visibility: visible !important;
+        transform: none !important;
+    }
+}
+
+body.app-drawer-open {
+    overflow: hidden;
+}
+
+/* Manager Console Responsive Styles */
+.manager-sidebar {
+    transition: transform 0.3s ease, visibility 0.3s ease;
+    will-change: transform;
+}
+
+.manager-sidebar-overlay {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
+.manager-sidebar-overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Drawer hanya berlaku di layar kecil; desktop selalu terlihat */
+@media (max-width: 1023.98px) {
+    .manager-sidebar {
+        visibility: hidden;
+        transform: translateX(-100%);
+    }
+
+    .manager-sidebar.is-open {
+        visibility: visible;
+        transform: translateX(0);
+    }
+}
+
+@media (min-width: 1024px) {
+    .manager-sidebar {
+        visibility: visible !important;
+        transform: none !important;
+    }
+}
+
+body.manager-drawer-open {
+    overflow: hidden;
+}
+
+/* Cegah konten dashboard melebar keluar layar HP */
+.manager-dashboard {
+    overflow-x: clip;
+}
+
+.manager-dashboard .tabular-nums {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Area grafik bisa digeser halus di layar sentuh */
+.manager-chart-scroll {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+.manager-chart-scroll::-webkit-scrollbar {
+    height: 4px;
+}
+
+.manager-chart-scroll::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 9999px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app-sidebar,
+    .app-sidebar-overlay,
+    .manager-sidebar,
+    .manager-sidebar-overlay {
+        transition: none;
+    }
 }

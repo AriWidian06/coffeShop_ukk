@@ -5,28 +5,28 @@
     
     <!-- TOP HEADER -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-20">
-        <div class="px-6 py-4">
-            <div class="flex items-center justify-between mb-4">
+        <div class="px-4 sm:px-6 py-4">
+            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
                 <!-- Breadcrumb & Title -->
-                <div>
+                <div class="min-w-0">
                     <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">
                         Katalog Utama / <span class="text-primary-600">Outlet Bagi Kopi</span>
                     </p>
-                    <h1 class="text-2xl font-bold text-slate-900">Manajemen Katalog Produk & Menu</h1>
+                    <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Manajemen Katalog Produk & Menu</h1>
                     <p class="text-sm text-slate-500 mt-1">
                         Kelola seluruh sajian minuman, makanan, beans, dan bahan baku produksi dengan sinkronisasi langsung ke sistem kasir dan QR table ordering.
                     </p>
                 </div>
 
                 <!-- Right Actions -->
-                <div class="flex items-center gap-3">
-                    <button class="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-50 transition-all flex items-center gap-2">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <button class="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>
                         Ekspor CSV
                     </button>
-                    <a href="{{ route('produks.create') }}" class="px-4 py-2 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20 flex items-center gap-2">
+                    <a href="{{ route('produks.create') }}" class="px-4 py-2 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20 flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
@@ -105,7 +105,7 @@
     </header>
 
     <!-- MAIN CONTENT -->
-    <main class="p-6">
+    <main class="p-4 sm:p-6">
         
         <!-- Search & Filters -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-6">
@@ -120,7 +120,7 @@
                 </div>
 
                 <!-- Category Filter -->
-                <select name="kategori_id" class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500">
+                <select name="kategori_id" class="w-full lg:w-auto px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500">
                     <option value="">Semua Kategori</option>
                     @foreach ($kategoriProduks as $kategori)
                         <option value="{{ $kategori->id }}" {{ request('kategori_id') == $kategori->id ? 'selected' : '' }}>
@@ -130,7 +130,7 @@
                 </select>
 
                 <!-- Type Filter Pills -->
-                <div class="flex gap-2">
+                <div class="flex flex-wrap gap-2">
                     <button type="submit" name="tipe" value="" class="filter-pill {{ !request('tipe') ? 'active' : 'inactive' }}">
                         Semua
                     </button>
@@ -143,7 +143,7 @@
                 </div>
 
                 <!-- Stock Status Filter -->
-                <select name="stock_status" class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500">
+                <select name="stock_status" class="w-full lg:w-auto px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500">
                     <option value="">Semua Status Stok</option>
                     <option value="tersedia" {{ request('stock_status') == 'tersedia' ? 'selected' : '' }}>Tersedia</option>
                     <option value="menipis" {{ request('stock_status') == 'menipis' ? 'selected' : '' }}>Menipis</option>
@@ -155,7 +155,7 @@
         <!-- Products Table -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="product-table">
+                <table class="product-table min-w-[900px]">
                     <thead>
                         <tr>
                             <th class="w-20">Foto</th>
@@ -274,18 +274,18 @@
 
             <!-- Pagination -->
             @if ($produks->hasPages())
-                <div class="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
+                <div class="px-4 sm:px-6 py-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <p class="text-sm text-slate-600">
                         Menampilkan <span class="font-bold">{{ $produks->firstItem() }}</span> - <span class="font-bold">{{ $produks->lastItem() }}</span> dari <span class="font-bold">{{ $produks->total() }}</span> produk
                     </p>
-                    {{ $produks->withQueryString()->links() }}
+                    <div class="overflow-x-auto">{{ $produks->withQueryString()->links() }}</div>
                 </div>
             @endif
         </div>
 
         <!-- Bottom Banner -->
-        <div class="mt-6 bg-linear-to-r from-primary-50 to-blue-50 border border-primary-200 rounded-2xl p-6 flex items-center justify-between">
-            <div class="flex items-center gap-4">
+        <div class="mt-6 bg-linear-to-r from-primary-50 to-blue-50 border border-primary-200 rounded-2xl p-4 sm:p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="flex items-start sm:items-center gap-4">
                 <div class="w-12 h-12 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -296,7 +296,7 @@
                     <p class="text-sm text-slate-600">Lakukan stock opname cepat untuk produk pastry & biji sangrai tanpa perlu mengedit item satu per satu.</p>
                 </div>
             </div>
-            <button class="px-5 py-2.5 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20">
+            <button class="px-5 py-2.5 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20 shrink-0">
                 Buka Mode Stock Opname
             </button>
         </div>

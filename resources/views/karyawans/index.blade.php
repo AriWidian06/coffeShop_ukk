@@ -4,13 +4,13 @@
 <div class="min-h-screen bg-slate-50">
     <!-- TOP HEADER -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-20">
-        <div class="px-6 py-4">
+        <div class="px-4 sm:px-6 py-4">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-                <div>
+                <div class="min-w-0">
                     <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">
                         Operasional Outlet / <span class="text-primary-600">Manajemen Karyawan</span>
                     </p>
-                    <h1 class="text-2xl font-bold text-slate-900">Daftar Akun & Staf</h1>
+                    <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Daftar Akun & Staf</h1>
                     <p class="text-sm text-slate-500 mt-1">Kelola hak akses, jabatan, dan data kontak seluruh tim operasional.</p>
                 </div>
                 <a href="{{ route('karyawans.create') }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20 shrink-0">
@@ -22,7 +22,7 @@
             </div>
             
             <!-- Stat Card -->
-            <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center justify-between max-w-xs">
+            <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center justify-between gap-3 w-full max-w-xs">
                 <div>
                     <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Karyawan Aktif</p>
                     <h3 class="text-3xl font-bold text-slate-900">{{ $karyawans->total() }}</h3>
@@ -37,10 +37,10 @@
     </header>
 
     <!-- MAIN CONTENT -->
-    <main class="p-6 max-w-7xl mx-auto">
+    <main class="p-4 sm:p-6 max-w-7xl mx-auto">
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="karyawan-table w-full">
+                <table class="karyawan-table w-full min-w-[820px]">
                     <thead>
                         <tr class="bg-slate-50 border-b border-slate-200">
                             <th class="w-16 text-center px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">No</th>
@@ -131,7 +131,7 @@
             
             <!-- Pagination -->
             @if ($karyawans->hasPages())
-                <div class="px-6 py-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-slate-50">
+                <div class="px-4 sm:px-6 py-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-slate-50">
                     <p class="text-sm text-slate-600">
                         Menampilkan <span class="font-bold text-slate-900">{{ $karyawans->firstItem() }}</span> - <span class="font-bold text-slate-900">{{ $karyawans->lastItem() }}</span> dari <span class="font-bold text-slate-900">{{ $karyawans->total() }}</span> data
                     </p>

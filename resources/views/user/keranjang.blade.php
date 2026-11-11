@@ -64,9 +64,9 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-2">Kode Promo Diskon</label>
                         <div class="flex gap-2">
-                            <input id="promo-code" type="text" placeholder="Contoh: DISKON10" class="flex-1 uppercase text-sm bg-white border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-primary-500 focus:outline-none">
-                            <button type="button" onclick="applyPromo()" class="px-4 py-3 bg-primary-600 text-white rounded-xl text-sm font-bold hover:bg-primary-700 transition">Terapkan</button>
-                            <button type="button" onclick="removePromo()" id="remove-promo-btn" class="px-3 py-3 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 hidden">X</button>
+                            <input id="promo-code" type="text" placeholder="Contoh: DISKON10" class="flex-1 min-w-0 uppercase text-sm bg-white border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                            <button type="button" onclick="applyPromo()" class="shrink-0 px-4 py-3 bg-primary-600 text-white rounded-xl text-sm font-bold hover:bg-primary-700 transition">Terapkan</button>
+                            <button type="button" onclick="removePromo()" id="remove-promo-btn" class="shrink-0 px-3 py-3 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 hidden">X</button>
                         </div>
                         <p id="promo-status" class="text-xs text-slate-500 mt-2"></p>
                         <div id="promo-summary" class="hidden mt-2 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-sm text-emerald-700 font-semibold"></div>

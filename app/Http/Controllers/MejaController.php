@@ -7,16 +7,36 @@ use Illuminate\Http\Request;
 
 class MejaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $mejas = Meja::orderBy('nomor_meja', 'asc')->paginate(12);
+        $area = $request->query('area');
+        $query = Meja::orderBy('nomor_meja', 'asc');
+
+        if ($area === 'lantai1') {
+            $query->where('nomor_meja', '<=', 10);
+        } elseif ($area === 'lantai2') {
+            $query->where('nomor_meja', '>', 10);
+        }
+
+        $mejas = $query->paginate(12)->withQueryString();
         
-        // Hitung statistik
+        // Hitung statistik dari seluruh data, bukan hanya halaman aktif
         $totalMeja = Meja::count();
         $mejaAktif = Meja::where('status_aktif', true)->count();
         $mejaNonaktif = Meja::where('status_aktif', false)->count();
+        $totalKapasitas = Meja::sum('kapasitas');
+        $lantai1Count = Meja::where('nomor_meja', '<=', 10)->count();
+        $lantai2Count = Meja::where('nomor_meja', '>', 10)->count();
         
-        return view('mejas.index', compact('mejas', 'totalMeja', 'mejaAktif', 'mejaNonaktif'));
+        return view('mejas.index', compact(
+            'mejas',
+            'totalMeja',
+            'mejaAktif',
+            'mejaNonaktif',
+            'totalKapasitas',
+            'lantai1Count',
+            'lantai2Count'
+        ));
     }
 
     public function create()

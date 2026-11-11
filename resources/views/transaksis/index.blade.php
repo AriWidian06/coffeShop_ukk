@@ -17,16 +17,16 @@
 @extends($activeLayout)
 
 @section('content')
-<div class="min-h-screen bg-slate-50 p-6">
+<div class="min-h-screen bg-slate-50 p-4 sm:p-6">
     
     <!-- TOP HEADER -->
-    <header class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <div>
+    <header class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 sm:mb-6">
+            <div class="min-w-0">
                 <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">
                     Operasional / <span class="text-primary-600">Laporan Transaksi</span>
                 </p>
-                <h1 class="text-2xl font-bold text-slate-900">Riwayat Pesanan</h1>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Riwayat Pesanan</h1>
                 <p class="text-sm text-slate-500 mt-1">Pantau semua transaksi dari POS kasir dan pemesanan web.</p>
             </div>
             @if (in_array($role, ['kasir', 'admin'], true))
@@ -40,7 +40,7 @@
         </div>
 
         <!-- Filters -->
-        <form method="get" action="{{ route('transaksis.index') }}" class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col lg:flex-row gap-4 items-end">
+        <form method="get" action="{{ route('transaksis.index') }}" class="bg-slate-50 rounded-xl p-3 sm:p-4 border border-slate-200 flex flex-col lg:flex-row gap-3 sm:gap-4 items-stretch lg:items-end">
             <div class="flex-1 w-full">
                 <label class="block text-xs font-bold text-slate-700 mb-1.5">Cari Transaksi / Meja</label>
                 <div class="relative">
@@ -83,7 +83,7 @@
         @if (isset($transaksis) && $transaksis->count())
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left border-collapse min-w-[900px]">
                         <thead>
                             <tr class="border-b border-slate-200 bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
                                 <th class="py-3 px-4 font-bold">Transaksi</th>
@@ -188,16 +188,16 @@
 
                 <!-- Pagination -->
                 @if ($transaksis->hasPages())
-                    <div class="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
+                    <div class="px-4 sm:px-6 py-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <p class="text-sm text-slate-600">
                             Halaman {{ $transaksis->currentPage() }} dari {{ $transaksis->lastPage() }}
                         </p>
-                        {{ $transaksis->links() }}
+                        <div class="overflow-x-auto">{{ $transaksis->links() }}</div>
                     </div>
                 @endif
             </div>
         @else
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-12 text-center">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 sm:p-12 text-center">
                 <h3 class="text-lg font-bold text-slate-900 mb-1">Belum ada transaksi</h3>
                 <p class="text-sm text-slate-500 mb-4">Pesanan dari POS dan web kafe akan muncul di sini.</p>
             </div>

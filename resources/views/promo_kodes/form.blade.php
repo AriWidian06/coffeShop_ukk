@@ -3,21 +3,21 @@
 @section('content')
 <div class="min-h-screen bg-slate-50">
     <header class="bg-white border-b border-slate-200 sticky top-0 z-20">
-        <div class="px-6 py-4">
-            <div class="flex items-center justify-between">
-                <div>
+        <div class="px-4 sm:px-6 py-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="min-w-0">
                     <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">
                         Promo / <span class="text-primary-600">Kode Promo</span>
                     </p>
-                    <h1 class="text-2xl font-bold text-slate-900">{{ isset($promoKode) ? 'Edit Kode Promo' : 'Tambah Kode Promo' }}</h1>
+                    <h1 class="text-xl sm:text-2xl font-bold text-slate-900">{{ isset($promoKode) ? 'Edit Kode Promo' : 'Tambah Kode Promo' }}</h1>
                 </div>
-                <a href="{{ route('promo-kodes.index') }}" class="px-3.5 py-1.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50">Kembali</a>
+                <a href="{{ route('promo-kodes.index') }}" class="px-3.5 py-1.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 self-start shrink-0">Kembali</a>
             </div>
         </div>
     </header>
 
-    <main class="p-6 max-w-3xl mx-auto">
-        <form method="POST" action="{{ isset($promoKode) ? route('promo-kodes.update', $promoKode) : route('promo-kodes.store') }}" class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
+    <main class="p-4 sm:p-6 max-w-3xl mx-auto">
+        <form method="POST" action="{{ isset($promoKode) ? route('promo-kodes.update', $promoKode) : route('promo-kodes.store') }}" class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 space-y-4 shadow-sm">
             @csrf
             @if (isset($promoKode))
                 @method('PUT')
@@ -73,8 +73,8 @@
                 Promo aktif
             </label>
 
-            <div class="flex justify-end gap-2 pt-2">
-                <a href="{{ route('promo-kodes.index') }}" class="px-4 py-2.5 border border-slate-200 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-50">Batal</a>
+            <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+                <a href="{{ route('promo-kodes.index') }}" class="px-4 py-2.5 border border-slate-200 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-50 text-center">Batal</a>
                 <button class="px-4 py-2.5 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 shadow-md shadow-primary-600/20" type="submit">
                     {{ isset($promoKode) ? 'Simpan Perubahan' : 'Simpan Promo' }}
                 </button>

@@ -5,16 +5,16 @@
     
     <!-- TOP HEADER -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-20">
-        <div class="px-6 py-4">
-            <div class="flex items-center justify-between">
-                <div>
+        <div class="px-4 sm:px-6 py-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="min-w-0">
                     <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">
                         Katalog Utama / <span class="text-primary-600">Kategori Produk</span>
                     </p>
-                    <h1 class="text-2xl font-bold text-slate-900">Manajemen Kategori</h1>
+                    <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Manajemen Kategori</h1>
                     <p class="text-sm text-slate-500 mt-1">Kelola pengelompokan menu dan bahan baku untuk memudahkan navigasi.</p>
                 </div>
-                <a href="{{ route('kategori-produks.create') }}" class="px-4 py-2.5 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20 flex items-center gap-2">
+                <a href="{{ route('kategori-produks.create') }}" class="px-4 py-2.5 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20 flex items-center justify-center gap-2 self-start shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
@@ -25,10 +25,10 @@
     </header>
 
     <!-- MAIN CONTENT -->
-    <main class="p-6 max-w-6xl mx-auto space-y-6">
+    <main class="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
         
         <!-- Stat Card -->
-        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center justify-between gap-3">
             <div>
                 <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Kategori Aktif</p>
                 <h3 class="text-3xl font-bold text-slate-900">{{ $kategoriProduks->total() }}</h3>
@@ -43,7 +43,7 @@
         <!-- Table -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="category-table">
+                <table class="category-table min-w-[600px]">
                     <thead>
                         <tr>
                             <th class="w-16 text-center">No</th>
@@ -102,11 +102,11 @@
 
             <!-- Pagination -->
             @if ($kategoriProduks->hasPages())
-                <div class="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
+                <div class="px-4 sm:px-6 py-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <p class="text-sm text-slate-600">
                         Menampilkan <span class="font-bold">{{ $kategoriProduks->firstItem() }}</span> - <span class="font-bold">{{ $kategoriProduks->lastItem() }}</span> dari <span class="font-bold">{{ $kategoriProduks->total() }}</span> data
                     </p>
-                    {{ $kategoriProduks->links() }}
+                    <div class="overflow-x-auto">{{ $kategoriProduks->links() }}</div>
                 </div>
             @endif
         </div>

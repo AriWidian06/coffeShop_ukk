@@ -4,16 +4,16 @@
 <div class="min-h-screen bg-slate-50">
 
     <header class="bg-white border-b border-slate-200 sticky top-0 z-20">
-        <div class="px-6 py-4">
-            <div class="flex items-center justify-between">
-                <div>
+        <div class="px-4 sm:px-6 py-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="min-w-0">
                     <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">
                         Promo / <span class="text-primary-600">Kombinasi Diskon</span>
                     </p>
-                    <h1 class="text-2xl font-bold text-slate-900">Pengelolaan Kode Promo Diskon</h1>
+                    <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Pengelolaan Kode Promo Diskon</h1>
                     <p class="text-sm text-slate-500 mt-1">Kelola kode promo persentase, batas pemakaian, dan periode aktif.</p>
                 </div>
-                <a href="{{ route('promo-kodes.create') }}" class="px-4 py-2.5 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20 flex items-center gap-2">
+                <a href="{{ route('promo-kodes.create') }}" class="px-4 py-2.5 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20 flex items-center justify-center gap-2 self-start shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
@@ -23,7 +23,7 @@
         </div>
     </header>
 
-    <main class="p-6 max-w-7xl mx-auto space-y-6">
+    <main class="p-4 sm:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6">
 
         @if (session('success'))
             <div class="rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 text-sm font-medium">
@@ -33,7 +33,7 @@
 
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-sm">
+                <table class="w-full text-sm min-w-[900px]">
                     <thead class="bg-slate-50 text-slate-600">
                         <tr>
                             <th class="px-4 py-3 text-left">Kode</th>
@@ -88,7 +88,7 @@
             </div>
         </div>
 
-        <div>{{ $promoKodes->links() }}</div>
+        <div class="overflow-x-auto">{{ $promoKodes->links() }}</div>
     </main>
 </div>
 @endsection
