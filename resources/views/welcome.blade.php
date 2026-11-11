@@ -314,6 +314,8 @@
         // --- LIVE ORDER STATUS ---
         let myOrderPollTimer = null;
         let myOrderLoading = false;
+        let lastOrderWasCompleted = false;
+        const COMPLETED_MESSAGE = 'Pesanan sebelumnya sudah selesai. Silakan buat pesanan baru.';
 
         function stopMyOrderPolling() {
             if (myOrderPollTimer) {
@@ -362,13 +364,20 @@
                 const result = await response.json().catch(() => ({}));
 
                 if (response.status === 404) {
-                    renderMyOrder(null);
-                    stopMyOrderPolling();
+                    renderMyOrder(null, lastOrderWasCompleted ? COMPLETED_MESSAGE : undefined);
                     return;
                 }
 
                 if (!response.ok || !result.success) {
                     throw new Error(result.message || 'Gagal memuat status pesanan.');
+                }
+
+                // Backend mengirim data = null ketika pesanan terakhir sudah selesai.
+                // Halaman status langsung di-reset ke tampilan "belum ada pesanan aktif".
+                if (!result.data) {
+                    lastOrderWasCompleted = !!result.completed;
+                    renderMyOrder(null, result.message || (lastOrderWasCompleted ? COMPLETED_MESSAGE : undefined));
+                    return;
                 }
 
                 renderMyOrder(result.data);
@@ -406,6 +415,28 @@
             if (badge) badge.textContent = 'Langkah ' + Math.min(step, 4) + ' dari 4';
         }
 
+        function clearStatusOrderDetails() {
+            const itemsEl = document.getElementById('status-items');
+            if (itemsEl) itemsEl.innerHTML = '';
+
+            const setText = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = value;
+            };
+
+            setText('status-item-count', '0 Item');
+            setText('status-total', 'Rp 0');
+            setText('status-order-number', '#-');
+            setText('status-order-time', '-');
+            setText('status-order-table', '-');
+            setText('status-payment-tag', 'Menunggu Pembayaran');
+            setText('status-current-label', 'Memuat...');
+            setText('status-current-desc', 'Mohon tunggu sebentar.');
+
+            document.getElementById('status-notes')?.classList.add('hidden');
+            document.getElementById('status-live-dot')?.classList.remove('hidden');
+        }
+
         function renderMyOrder(order, emptyMessage) {
             const loadingEl = document.getElementById('status-loading');
             const contentEl = document.getElementById('status-content');
@@ -422,8 +453,20 @@
                 titleEl.textContent = 'Status Pesanan';
                 subtitleEl.textContent = 'Belum ada pesanan aktif';
                 emptyMessageEl.textContent = emptyMessage || 'Pesanan yang sedang diproses akan muncul di sini secara otomatis.';
+                clearStatusOrderDetails();
                 return;
             }
+
+            // Pesanan sudah selesai -> halaman status langsung di-reset otomatis
+            // supaya pelanggan berikutnya tidak melihat status pesanan lama.
+            // Polling tetap jalan supaya pesanan baru langsung muncul otomatis.
+            if (order.status_pesanan === 'completed') {
+                lastOrderWasCompleted = true;
+                renderMyOrder(null, COMPLETED_MESSAGE);
+                return;
+            }
+
+            lastOrderWasCompleted = false;
 
             emptyEl.classList.add('hidden');
             contentEl.classList.remove('hidden');
@@ -504,10 +547,6 @@
             document.getElementById('status-last-update').textContent = 'Status diperbarui ' +
                 new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Jakarta' }) +
                 ' WIB • otomatis setiap 5 detik';
-
-            if (order.status_pesanan === 'completed') {
-                stopMyOrderPolling();
-            }
         }
 
         // --- TAB SWITCHING FUNCTIONS ---

@@ -235,6 +235,8 @@ class TransaksiController extends Controller
         if (! $transaksi) {
             return response()->json([
                 'success' => false,
+                'data' => null,
+                'completed' => false,
                 'message' => 'Belum ada pesanan aktif.',
             ], 404);
         }
