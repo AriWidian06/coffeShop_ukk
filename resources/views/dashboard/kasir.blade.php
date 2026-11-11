@@ -783,6 +783,13 @@
     const productsOptionsData = @json($produksData);
     let activeOrdersData = @json($activeOrders);
     let pesananAktifList = @json($pesananAktif);
+    let currentInspectedMejaId = null;
+    let currentInspectedOrderId = null;
+    let currentTableFilter = 'all';
+    const TABLE_CARD_CLASS = {
+        terisi: 'terminal-table-card relative p-4 rounded-2xl border-2 transition-all duration-200 text-center cursor-pointer select-none border-amber-200 bg-amber-50/70 hover:border-amber-400 shadow-sm',
+        kosong: 'terminal-table-card relative p-4 rounded-2xl border-2 transition-all duration-200 text-center cursor-pointer select-none border-slate-200 bg-white hover:border-primary-400 hover:shadow-md shadow-sm',
+    };
     const csrfToken = '{{ csrf_token() }}';
     const routeStorePembayaran = '{{ route('pembayarans.store') }}';
     const routeUpdateStatus = '{{ url('/transaksis') }}';
@@ -839,6 +846,8 @@
     // FILTER TABLES IN FLOOR PLAN
     // ─────────────────────────────────────────────────────────
     function filterTables(filterType) {
+        currentTableFilter = filterType;
+
         document.querySelectorAll('.table-filter-pill').forEach(pill => {
             if (pill.dataset.filter === filterType) {
                 pill.classList.remove('inactive');
@@ -861,12 +870,68 @@
     }
 
     // ─────────────────────────────────────────────────────────
+    // RENDER ULANG KARTU MEJA (STATUS TERISI/KOSONG + RINCIAN)
+    // Dipakai setiap sinkronisasi agar status lama tidak tertinggal
+    // ketika pesanan sudah selesai.
+    // ─────────────────────────────────────────────────────────
+    function renderTableCard(mejaId, order) {
+        const card = document.getElementById('table-node-' + mejaId);
+        const meja = mejaData[mejaId];
+        if (!card || !meja) return;
+
+        const isOccupied = !!order;
+        const isHighlighted = card.classList.contains('ring-4');
+        const isHidden = card.classList.contains('hidden');
+
+        card.className = (isOccupied ? TABLE_CARD_CLASS.terisi : TABLE_CARD_CLASS.kosong)
+            + (isHighlighted ? ' ring-4 ring-primary-500' : '')
+            + (isHidden ? ' hidden' : '');
+        card.dataset.status = isOccupied ? 'terisi' : 'kosong';
+
+        const nomor = String(meja.nomor_meja).padStart(2, '0');
+        const header = `
+            <div class="flex items-center justify-between text-xs mb-1">
+                <span class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Meja</span>
+                <span class="text-[10px] text-slate-500 font-semibold">${meja.kapasitas} Kursi</span>
+            </div>
+            <div class="text-3xl font-black my-1 ${isOccupied ? 'text-amber-700' : 'text-slate-900'}">${nomor}</div>`;
+
+        if (isOccupied) {
+            const itemCount = order.detail_transaksis ? order.detail_transaksis.length : 0;
+            card.innerHTML = header + `
+                <div class="mt-2 space-y-1">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                        Terisi
+                    </span>
+                    <div class="text-xs font-bold text-slate-900 mt-1">
+                        Rp ${formatNumber(order.total_harga)}
+                    </div>
+                    <div class="text-[10px] text-slate-500">
+                        ${itemCount} item · #${order.id}
+                    </div>
+                </div>`;
+        } else {
+            card.innerHTML = header + `
+                <div class="mt-2">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        Tersedia
+                    </span>
+                    <div class="text-[10px] text-slate-400 mt-1">Klik untuk kelola</div>
+                </div>`;
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────
     // CLOSE TABLE INSPECTOR
     // ─────────────────────────────────────────────────────────
     function closeInspector() {
         document.querySelectorAll('.terminal-table-card').forEach(c => c.classList.remove('ring-4', 'ring-primary-500'));
         document.getElementById('inspector-content')?.classList.add('hidden');
         document.getElementById('inspector-placeholder')?.classList.remove('hidden');
+        currentInspectedMejaId = null;
+        currentInspectedOrderId = null;
     }
 
     // ─────────────────────────────────────────────────────────
@@ -886,6 +951,9 @@
 
         const order = activeOrdersData[mejaId];
         const isOccupied = !!order;
+
+        currentInspectedMejaId = mejaId;
+        currentInspectedOrderId = order ? order.id : null;
 
         document.getElementById('inspector-placeholder')?.classList.add('hidden');
         document.getElementById('inspector-content')?.classList.remove('hidden');
@@ -1425,18 +1493,34 @@
                 });
                 activeOrdersData = newActiveByMeja;
 
-                // Update floor plan table card badges
-                document.querySelectorAll('.terminal-table-card').forEach(c => {
-                    const mId = c.dataset.mejaId;
-                    const ord = activeOrdersData[mId];
-                    if (ord) {
-                        c.dataset.status = 'terisi';
-                        c.className = 'terminal-table-card rounded-2xl p-4 transition-all duration-200 cursor-pointer text-left relative flex flex-col justify-between border-2 bg-amber-50/70 border-amber-300 hover:border-amber-400 hover:shadow-md';
-                    } else {
-                        c.dataset.status = 'kosong';
-                        c.className = 'terminal-table-card rounded-2xl p-4 transition-all duration-200 cursor-pointer text-left relative flex flex-col justify-between border-2 bg-white border-slate-200 hover:border-primary-400 hover:shadow-md';
-                    }
+                // Update floor plan table card badges (isi kartu ikut di-render ulang)
+                let terisiCount = 0;
+                Object.keys(mejaData).forEach((mejaId) => {
+                    const ord = activeOrdersData[mejaId];
+                    if (ord) terisiCount++;
+                    renderTableCard(mejaId, ord);
                 });
+
+                // Update counter Tersedia / Terisi
+                const totalMeja = Object.keys(mejaData).length;
+                const countKosongEl = document.getElementById('count-kosong-tables');
+                const countTerisiEl = document.getElementById('count-terisi-tables');
+                if (countKosongEl) countKosongEl.textContent = Math.max(0, totalMeja - terisiCount);
+                if (countTerisiEl) countTerisiEl.textContent = terisiCount;
+
+                // Terapkan kembali filter denah (Tersedia / Terisi) sesuai status terbaru
+                filterTables(currentTableFilter);
+
+                // Refresh panel inspector bila meja yang sedang dibuka berubah statusnya
+                if (currentInspectedMejaId !== null) {
+                    const newestOrderId = activeOrdersData[currentInspectedMejaId]
+                        ? activeOrdersData[currentInspectedMejaId].id
+                        : null;
+
+                    if (newestOrderId !== currentInspectedOrderId) {
+                        inspectTable(currentInspectedMejaId);
+                    }
+                }
 
                 // Re-render order cards if modal is not open
                 if (!currentQpOrder) {
