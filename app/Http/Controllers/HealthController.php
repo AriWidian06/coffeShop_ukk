@@ -12,20 +12,24 @@ class HealthController extends Controller
      */
     public function check()
     {
+        $dbStatus = 'CONNECTED';
+        $activeMeja = 0;
+        $activeProducts = 0;
+
         try {
             DB::connection()->getPdo();
-            $dbStatus = 'CONNECTED';
-            $roomCount = DB::table('rooms')->count();
+            $activeMeja = DB::table('mejas')->where('status_aktif', true)->count();
+            $activeProducts = DB::table('produks')->where('status_aktif', true)->count();
         } catch (Exception $e) {
-            $dbStatus = 'DISCONNECTED: '.$e->getMessage();
-            $roomCount = 0;
+            $dbStatus = 'DISCONNECTED: ' . $e->getMessage();
         }
 
         return response()->json([
-            'system_name' => 'PerkociEatery Core System',
-            'sprint_stage' => 'Sprint 1 - Foundation Ready',
+            'system_name' => 'Perkoci Eatery - Bagi Kopi Order System',
+            'sprint_stage' => 'Sprint 3 - Functional, Security & Performance Refinement',
             'database_status' => $dbStatus,
-            'active_rooms_seeded' => $roomCount,
+            'active_tables' => $activeMeja,
+            'active_products' => $activeProducts,
             'timestamp' => now()->toIso8601String(),
         ]);
     }
