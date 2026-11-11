@@ -59,4 +59,42 @@ class Transaksi extends Model
     {
         return $this->hasOne(Pembayaran::class);
     }
+
+    /**
+     * Kembalikan stok produk ke semula.
+     * Dipanggil saat transaksi dibatalkan/dihapus karena saat dibuat stok sudah dikurangi.
+     */
+    public function restoreStock(): void
+    {
+        $this->loadMissing('detail_transaksis');
+
+        foreach ($this->detail_transaksis as $detail) {
+            if ($detail->produk_id) {
+                Produk::where('id', $detail->produk_id)->increment('stock', (int) $detail->QTY);
+            }
+        }
+    }
+
+    /**
+     * Lepaskan pemakaian kode promo (kuota + kunci meja/sesi) saat pesanan dibatalkan.
+     */
+    public function releasePromoUsage(): void
+    {
+        $usage = PromoUsage::where('transaksi_id', $this->id)->first();
+
+        if (! $usage) {
+            return;
+        }
+
+        if ($usage->promo_kode_id) {
+            PromoKode::where('id', $usage->promo_kode_id)
+                ->where('kuota_terpakai', '>', 0)
+                ->decrement('kuota_terpakai');
+        }
+
+        $usage->update([
+            'status' => 'released',
+            'released_at' => now(),
+        ]);
+    }
 }

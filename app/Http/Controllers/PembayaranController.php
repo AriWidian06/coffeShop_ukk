@@ -19,6 +19,18 @@ class PembayaranController extends Controller
         $transaksi = Transaksi::findOrFail($request->transaksi_id);
         $this->authorize('view', $transaksi);
 
+        // Transaksi yang sudah dibayar tidak boleh dibayar lagi.
+        if ($transaksi->pembayaran) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Transaksi ini sudah memiliki pembayaran.'
+                ], 422);
+            }
+
+            return back()->withErrors(['transaksi_id' => 'Transaksi ini sudah memiliki pembayaran.']);
+        }
+
         if ($request->jumlah_bayar < $transaksi->total_harga) {
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json([

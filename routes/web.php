@@ -52,7 +52,7 @@ Route::get('/', function (Request $request) {
 
 Route::get('/health', [HealthController::class, 'check']);
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.store');
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login')->name('login.store');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // ==========================================

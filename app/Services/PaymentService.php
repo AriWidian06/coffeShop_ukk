@@ -8,6 +8,7 @@ use Midtrans\Snap;
 use Midtrans\Transaction;
 use App\Models\Transaksi;
 use App\Models\Pembayaran;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class PaymentService
@@ -201,6 +202,8 @@ class PaymentService
 
             $this->markAsPaid($transaksi);
         } elseif (in_array($transactionStatus, ['deny', 'expire', 'cancel'])) {
+            $this->markAsCancelled($transaksi);
+
             Log::info('Transaction failed: ' . $orderId . ' status: ' . $transactionStatus);
         }
 
@@ -209,6 +212,15 @@ class PaymentService
 
     protected function isValidSignature(array $notification)
     {
+        $serverKey = (string) config('services.midtrans.server_key');
+
+        // Tanpa server key, signature apa pun bisa dihitung penyerang.
+        // Tolak keras agar transaksi tidak ditandai lunas tanpa pembayaran nyata.
+        if ($serverKey === '') {
+            Log::error('Midtrans server key belum dikonfigurasi, notifikasi ditolak.');
+            return false;
+        }
+
         if (empty($notification['signature_key'])) {
             return false;
         }
@@ -218,7 +230,7 @@ class PaymentService
             ($notification['order_id'] ?? '') .
             ($notification['status_code'] ?? '') .
             ($notification['gross_amount'] ?? '') .
-            config('services.midtrans.server_key')
+            $serverKey
         );
 
         return hash_equals($expected, $notification['signature_key']);
@@ -238,5 +250,24 @@ class PaymentService
                 'waktu_pembayaran' => now(),
             ]
         );
+    }
+
+    /**
+     * Batalkan pesanan yang pembayaran QRIS-nya gagal/expired.
+     * Stok produk dikembalikan supaya bisa dijual kembali, dan promo dilepas.
+     */
+    protected function markAsCancelled(Transaksi $transaksi)
+    {
+        // Idempoten: hanya proses pesanan yang masih aktif.
+        if (! in_array($transaksi->status_pesanan, ['pending', 'prosesed', 'ready'], true)) {
+            return;
+        }
+
+        DB::transaction(function () use ($transaksi) {
+            $transaksi->restoreStock();
+            $transaksi->releasePromoUsage();
+
+            $transaksi->update(['status_pesanan' => 'cancelled']);
+        });
     }
 }

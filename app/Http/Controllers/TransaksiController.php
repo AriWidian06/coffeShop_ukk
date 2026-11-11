@@ -89,6 +89,21 @@ class TransaksiController extends Controller
         ]);
 
         return DB::transaction(function () use ($request) {
+            // Cegah double booking: satu meja tidak boleh punya dua pesanan aktif.
+            if ($request->filled('meja_id')) {
+                $mejaTerisi = Transaksi::query()
+                    ->where('meja_id', $request->meja_id)
+                    ->whereIn('status_pesanan', ['pending', 'ready', 'prosesed'])
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($mejaTerisi) {
+                    throw ValidationException::withMessages([
+                        'meja_id' => 'Meja ini sudah memiliki pesanan aktif. Silakan pilih meja lain.',
+                    ]);
+                }
+            }
+
             $subtotalHarga = 0;
             $detailItems = [];
 
@@ -216,9 +231,11 @@ class TransaksiController extends Controller
 
     public function activeOrdersJson()
     {
+        // Antrean kasir harus FIFO: pesanan paling awal ditampilkan lebih dulu.
         $activeOrders = Transaksi::with(['meja', 'karyawan', 'detail_transaksis.produk', 'pembayaran'])
             ->whereIn('status_pesanan', ['pending', 'ready', 'prosesed'])
-            ->latest('waktu_transaksi')
+            ->orderBy('waktu_transaksi')
+            ->orderBy('id')
             ->get();
 
         return response()->json([
@@ -288,7 +305,16 @@ class TransaksiController extends Controller
     {
         $this->authorize('delete', $transaksi);
 
-        $transaksi->delete();
+        DB::transaction(function () use ($transaksi) {
+            // Kembalikan stok produk ke semula; saat transaksi dibuat stok sudah dikurangi.
+            $transaksi->restoreStock();
+
+            // Lepaskan pemakaian kode promo agar kuota & kunci meja/sesi tidak terkunci selamanya.
+            $transaksi->releasePromoUsage();
+
+            $transaksi->delete();
+        });
+
         return redirect()->route('transaksis.index')->with('success', 'Transaksi berhasil dihapus.');
     }
 }
