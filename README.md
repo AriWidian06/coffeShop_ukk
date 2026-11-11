@@ -1,6 +1,6 @@
 <div align="center">
 
-# ☕ Bagi Kopi — Coffee Shop Order System
+# ☕ Coffee Shop Order System
 
 **Sistem Pemesanan & Point of Sale (POS) untuk kedai kopi "Perkoci Eatery"**  
 Order mandiri dari meja (QR Code) + terminal kasir + dashboard admin/manager.
@@ -9,7 +9,7 @@ Order mandiri dari meja (QR Code) + terminal kasir + dashboard admin/manager.
 [![PHP](https://img.shields.io/badge/PHP-%5E8.2-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/Database-MySQL%2FMariaDB-4479A1?style=flat-square&logo=mysql&logoColor=white)](https://www.mysql.com)
-[![Tests](https://github.com/AriWidian06/coffeShop_ukk/actions/workflows/tests.yml/badge.svg)](https://github.com/AriWidian06/coffeShop_ukk/actions/workflows/tests.yml)
+[![Tests](https://github.com/AriWidian06/Coffee_Shop_Order_System/actions/workflows/tests.yml/badge.svg)](https://github.com/AriWidian06/Coffee_Shop_Order_System/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
 🌐 **Demo Online:** [bagikopiordersystem.onrender.com](https://bagikopiordersystem.onrender.com)
@@ -149,8 +149,8 @@ Aplikasi dijalankan dengan **Laravel 12** (MVC + Blade) di sisi server, **Tailwi
 
 ```bash
 # 1. Ambil kode
-git clone https://github.com/AriWidian06/coffeShop_ukk.git
-cd coffeShop_ukk
+git clone https://github.com/AriWidian06/Coffee_Shop_Order_System.git
+cd Coffee_Shop_Order_System
 
 # 2. Dependency PHP & JS
 composer install
@@ -410,6 +410,6 @@ Proyek ini berada di bawah lisensi **MIT**.
 <div align="center">
 
 **☕ Dari Kopi, Untuk Kopi.**  
-*Dibangun dengan Laravel 12 oleh tim Perkoci Eatery.*
+*Coffee Shop Order System — dibangun dengan Laravel 12 untuk Perkoci Eatery.*
 
 </div>

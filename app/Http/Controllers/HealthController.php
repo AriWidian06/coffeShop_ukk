@@ -25,7 +25,7 @@ class HealthController extends Controller
         }
 
         return response()->json([
-            'system_name' => 'Perkoci Eatery - Bagi Kopi Order System',
+            'system_name' => 'Coffee Shop Order System',
             'sprint_stage' => 'Sprint 3 - Functional, Security & Performance Refinement',
             'database_status' => $dbStatus,
             'active_tables' => $activeMeja,
