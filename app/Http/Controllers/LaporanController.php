@@ -83,6 +83,9 @@ class LaporanController extends Controller
 
         $transaksis = Transaksi::with(['karyawan', 'meja', 'detail_transaksis.produk.kategoriProduk', 'pembayaran'])
             ->whereBetween('waktu_transaksi', [$startUtc, $endUtc])
+            // Transaksi berstatus 'cancelled' (batal, belum dibayar) tidak masuk
+            // laporan: tidak menambah pendapatan, jumlah transaksi, maupun omzet produk.
+            ->where('status_pesanan', '!=', 'cancelled')
             ->orderBy('waktu_transaksi', 'desc')
             ->get();
 

@@ -238,6 +238,8 @@ php artisan test --configuration=phpunit.sprint3.xml
 |---|---|---|
 | Feature | `tests/Feature/FunctionalReportTest.php` | 15 skenario fungsional laporan Sprint 3 + alur pembayaran, error page, upload |
 | Feature | `tests/Feature/RoleDashboardAccessTest.php` | Pembatasan akses dashboard per peran |
+| Feature | `tests/Feature/SecurityFixTest.php` | 8 regression test keamanan & integritas data (anti-forgery, rate limit, stok, double booking) |
+| Feature | `tests/Feature/ReleaseCandidateTest.php` | 7 regression test Release Candidate v1.0.0-rc (RC-01 … RC-05) |
 | Sprint 3 | `tests/Sprint3/Sprint3FunctionalTest.php` | FT-01 … FT-15 (alur order, promo, QRIS, FIFO) + NT-01 … NT-14 (skenario negatif/IDOR/injection) |
 
 > Otomasi CI (GitHub Actions) menjalankan kedua suite tersebut pada setiap *push* dan *pull request*.
@@ -258,9 +260,11 @@ php artisan test --configuration=phpunit.sprint3.xml
 ├── bootstrap/app.php              # Routing, pengecualian CSRF webhook, custom error page
 ├── config/                        # Konfigurasi Laravel
 ├── database/
-│   ├── migrations/                # 18 migration (tabel + index)
+│   ├── migrations/                # 19 migration (tabel + index + status pesanan)
 │   └── seeders/                   # DatabaseSeeder, AdminUserSeeder, MasterDataSeeder
 ├── pemodelan/                     # ERD, use case, activity, flowchart, user flow per peran
+├── S3-04: ISSUE TRACKING & RESOLVED BUGS LOG/   # Papan issue tracker Sprint 3 (18 tiket, 18 CLOSED)
+├── S4-01: RELEASE CANDIDATE v1.0.0-rc/          # Release notes kandidat rilis v1.0.0-rc
 ├── public/                        # Entry point web + hasil build Vite
 ├── resources/
 │   ├── css/app.css                # Tailwind + utility responsif
@@ -269,7 +273,7 @@ php artisan test --configuration=phpunit.sprint3.xml
 ├── routes/
 │   ├── web.php                    # Rute web + rute peran (auth, gate)
 │   └── api.php                    # Rute JSON untuk pelanggan
-├── tests/                         # Feature, Unit, Sprint3
+├── tests/                         # Feature, Unit, Sprint3 (termasuk regression test Release Candidate)
 ├── Dockerfile                     # Multi-stage build (Node → Apache)
 └── phpunit.sprint3.xml            # Konfigurasi suite Sprint 3
 ```

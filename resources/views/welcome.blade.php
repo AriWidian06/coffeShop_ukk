@@ -316,6 +316,7 @@
         let myOrderLoading = false;
         let lastOrderWasCompleted = false;
         const COMPLETED_MESSAGE = 'Pesanan sebelumnya sudah selesai. Silakan buat pesanan baru.';
+        const CANCELLED_MESSAGE = 'Pesanan Anda dibatalkan karena pembayaran tidak berhasil. Silakan buat pesanan baru.';
 
         function stopMyOrderPolling() {
             if (myOrderPollTimer) {
@@ -463,6 +464,14 @@
             if (order.status_pesanan === 'completed') {
                 lastOrderWasCompleted = true;
                 renderMyOrder(null, COMPLETED_MESSAGE);
+                return;
+            }
+
+            // Pesanan dibatalkan (mis. QRIS expired/ditolak) -> tampilkan kondisi
+            // batal, bukan "Menunggu Konfirmasi" yang menyesatkan pelanggan.
+            if (order.status_pesanan === 'cancelled') {
+                lastOrderWasCompleted = false;
+                renderMyOrder(null, CANCELLED_MESSAGE);
                 return;
             }
 

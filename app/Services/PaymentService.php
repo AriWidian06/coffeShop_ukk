@@ -264,8 +264,9 @@ class PaymentService
         }
 
         DB::transaction(function () use ($transaksi) {
-            $transaksi->restoreStock();
-            $transaksi->releasePromoUsage();
+            // Kembalikan stok & lepaskan kuota promo hanya satu kali, agar tidak
+            // terbalik lagi bila transaksi ini kemudian dihapus oleh kasir.
+            $transaksi->reverseStockAndPromo();
 
             $transaksi->update(['status_pesanan' => 'cancelled']);
         });

@@ -307,10 +307,9 @@ class TransaksiController extends Controller
 
         DB::transaction(function () use ($transaksi) {
             // Kembalikan stok produk ke semula; saat transaksi dibuat stok sudah dikurangi.
-            $transaksi->restoreStock();
-
-            // Lepaskan pemakaian kode promo agar kuota & kunci meja/sesi tidak terkunci selamanya.
-            $transaksi->releasePromoUsage();
+            // Pemotongan stok & kuota promo hanya boleh dibalik satu kali, jadi
+            // transaksi yang sudah dibatalkan (mis. QRIS expired) tidak dibalik lagi.
+            $transaksi->reverseStockAndPromo();
 
             $transaksi->delete();
         });

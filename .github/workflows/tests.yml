@@ -25,7 +25,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['8.2', '8.3']
+        # Hanya PHP 8.3: dependensi dev laravel/pint v1.32.1 memerlukan PHP ^8.3.
+        # Image Docker produksi memakai php:8.2-apache dengan `composer install --no-dev`
+        # sehingga paket dev (termasuk pint) tidak ikut terpasang saat deploy.
+        php: ['8.3']
 
     services:
       mysql:

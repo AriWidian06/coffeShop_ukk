@@ -26,6 +26,7 @@ class Transaksi extends Model
         'total_harga' => 'decimal:2',
         'diskon' => 'decimal:2',
         'waktu_transaksi' => 'datetime',
+        'sudah_dibalik' => 'boolean',
     ];
 
     public function promo()
@@ -96,5 +97,29 @@ class Transaksi extends Model
             'status' => 'released',
             'released_at' => now(),
         ]);
+    }
+
+    /**
+     * Kembalikan stok produk & lepaskan kuota promo dalam satu kali saja.
+     *
+     * Pemotongan stok terjadi saat pesanan dibuat. Sebaliknya stok dikembalikan
+     * ketika pesanan dibatalkan (mis. notifikasi QRIS expired/deny/cancel) dan
+     * ketika transaksi dihapus kasir. Kedua jalur tersebut dapat terjadi
+     * berurutan pada transaksi yang sama sehingga stok sempat terbalik dua kali
+     * dan jumlah stok produk naik melebihi jumlah sebenarnya.
+     *
+     * Kolom `sudah_dibalik` menjadi penanda tunggal supaya pembalikan bersifat
+     * idempoten dan aman dipanggil dari mana saja.
+     */
+    public function reverseStockAndPromo(): void
+    {
+        if ($this->sudah_dibalik) {
+            return;
+        }
+
+        $this->restoreStock();
+        $this->releasePromoUsage();
+
+        $this->forceFill(['sudah_dibalik' => true])->saveQuietly();
     }
 }

@@ -22,8 +22,9 @@ class DashboardController extends Controller
             $today = Carbon::today();
             
             // Hitung pendapatan & transaksi hari ini
-            $totalPendapatanHariIni = Transaksi::whereDate('waktu_transaksi', $today)->sum('total_harga');
-            $totalTransaksiHariIni = Transaksi::whereDate('waktu_transaksi', $today)->count();
+            // Transaksi berstatus 'cancelled' (batal, belum dibayar) tidak dihitung.
+            $totalPendapatanHariIni = Transaksi::whereDate('waktu_transaksi', $today)->where('status_pesanan', '!=', 'cancelled')->sum('total_harga');
+            $totalTransaksiHariIni = Transaksi::whereDate('waktu_transaksi', $today)->where('status_pesanan', '!=', 'cancelled')->count();
 
             // Produk terlaris hari ini (Menggunakan QTY huruf besar sesuai struktur DB kamu)
             $produkTerlaris = DetailTransaksi::select('produk_id', DB::raw('SUM(QTY) as total_qty'))
@@ -38,10 +39,12 @@ class DashboardController extends Controller
             // Pendapatan & Transaksi Bulan Ini
             $totalPendapatanBulanIni = Transaksi::whereMonth('waktu_transaksi', $today->month)
                 ->whereYear('waktu_transaksi', $today->year)
+                ->where('status_pesanan', '!=', 'cancelled')
                 ->sum('total_harga');
 
             $totalTransaksiBulanIni = Transaksi::whereMonth('waktu_transaksi', $today->month)
                 ->whereYear('waktu_transaksi', $today->year)
+                ->where('status_pesanan', '!=', 'cancelled')
                 ->count();
 
             // Rata-rata Nilai Transaksi (Average Transaction Value)

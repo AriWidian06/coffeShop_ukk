@@ -116,15 +116,17 @@ Route::middleware('auth:karyawan')->group(function () {
             $todayEndUtc = $nowWib->copy()->endOfDay()->utc();
 
             // Snapshot real-time hari ini (WIB)
-            $totalPendapatanHariIni = Transaksi::whereBetween('waktu_transaksi', [$todayStartUtc, $todayEndUtc])->sum('total_harga');
-            $totalTransaksiHariIni = Transaksi::whereBetween('waktu_transaksi', [$todayStartUtc, $todayEndUtc])->count();
-            $totalItemHariIni = DetailTransaksi::whereHas('transaksi', fn ($q) => $q->whereBetween('waktu_transaksi', [$todayStartUtc, $todayEndUtc]))->sum('QTY');
+            // Transaksi berstatus 'cancelled' (batal, belum dibayar) tidak dihitung
+            // sebagai pendapatan maupun jumlah transaksi.
+            $totalPendapatanHariIni = Transaksi::whereBetween('waktu_transaksi', [$todayStartUtc, $todayEndUtc])->where('status_pesanan', '!=', 'cancelled')->sum('total_harga');
+            $totalTransaksiHariIni = Transaksi::whereBetween('waktu_transaksi', [$todayStartUtc, $todayEndUtc])->where('status_pesanan', '!=', 'cancelled')->count();
+            $totalItemHariIni = DetailTransaksi::whereHas('transaksi', fn ($q) => $q->whereBetween('waktu_transaksi', [$todayStartUtc, $todayEndUtc])->where('status_pesanan', '!=', 'cancelled'))->sum('QTY');
 
             // Statistik periode terpilih
-            $totalPendapatanPeriode = Transaksi::whereBetween('waktu_transaksi', [$startUtc, $endUtc])->sum('total_harga');
-            $totalTransaksiPeriode = Transaksi::whereBetween('waktu_transaksi', [$startUtc, $endUtc])->count();
+            $totalPendapatanPeriode = Transaksi::whereBetween('waktu_transaksi', [$startUtc, $endUtc])->where('status_pesanan', '!=', 'cancelled')->sum('total_harga');
+            $totalTransaksiPeriode = Transaksi::whereBetween('waktu_transaksi', [$startUtc, $endUtc])->where('status_pesanan', '!=', 'cancelled')->count();
             $averageTransactionValue = $totalTransaksiPeriode > 0 ? round($totalPendapatanPeriode / $totalTransaksiPeriode) : 0;
-            $totalItemPeriode = DetailTransaksi::whereHas('transaksi', fn ($q) => $q->whereBetween('waktu_transaksi', [$startUtc, $endUtc]))->sum('QTY');
+            $totalItemPeriode = DetailTransaksi::whereHas('transaksi', fn ($q) => $q->whereBetween('waktu_transaksi', [$startUtc, $endUtc])->where('status_pesanan', '!=', 'cancelled'))->sum('QTY');
 
             // Pembanding periode sebelumnya
             $prevStart = match ($periode) {
@@ -133,13 +135,14 @@ Route::middleware('auth:karyawan')->group(function () {
                 default => $start->copy()->subMonthNoOverflow(),
             };
             $prevEnd = $start->copy()->subSecond();
-            $pendapatanSebelumnya = Transaksi::whereBetween('waktu_transaksi', [$prevStart->copy()->utc(), $prevEnd->copy()->utc()])->sum('total_harga');
+            $pendapatanSebelumnya = Transaksi::whereBetween('waktu_transaksi', [$prevStart->copy()->utc(), $prevEnd->copy()->utc()])->where('status_pesanan', '!=', 'cancelled')->sum('total_harga');
             $pendapatanGrowth = $pendapatanSebelumnya > 0
                 ? round((($totalPendapatanPeriode - $pendapatanSebelumnya) / $pendapatanSebelumnya) * 100, 1)
                 : null;
 
             // Omzet & jumlah transaksi per jam (WIB)
             $hourlyRows = Transaksi::whereBetween('waktu_transaksi', [$startUtc, $endUtc])
+                ->where('status_pesanan', '!=', 'cancelled')
                 ->selectRaw('HOUR(waktu_transaksi) as jam, COUNT(*) as jumlah, SUM(total_harga) as total')
                 ->groupBy('jam')
                 ->orderBy('jam')
@@ -165,7 +168,7 @@ Route::middleware('auth:karyawan')->group(function () {
             $produkTerlaris = DetailTransaksi::query()
                 ->with('produk.kategoriProduk')
                 ->select('produk_id', DB::raw('SUM(QTY) as total_qty'), DB::raw('SUM(subtotal) as total_revenue'))
-                ->whereHas('transaksi', fn ($q) => $q->whereBetween('waktu_transaksi', [$startUtc, $endUtc]))
+                ->whereHas('transaksi', fn ($q) => $q->whereBetween('waktu_transaksi', [$startUtc, $endUtc])->where('status_pesanan', '!=', 'cancelled'))
                 ->groupBy('produk_id')
                 ->orderByDesc('total_qty')
                 ->limit(5)
@@ -173,7 +176,7 @@ Route::middleware('auth:karyawan')->group(function () {
 
             // Distribusi metode pembayaran
             $paymentStats = Pembayaran::query()
-                ->whereHas('transaksi', fn ($q) => $q->whereBetween('waktu_transaksi', [$startUtc, $endUtc]))
+                ->whereHas('transaksi', fn ($q) => $q->whereBetween('waktu_transaksi', [$startUtc, $endUtc])->where('status_pesanan', '!=', 'cancelled'))
                 ->selectRaw('metode_pembayaran, COUNT(*) as jumlah, SUM(jumlah_bayar) as total')
                 ->groupBy('metode_pembayaran')
                 ->get();
@@ -234,7 +237,9 @@ Route::middleware('auth:karyawan')->group(function () {
             $todayStartUtc = $nowWib->copy()->startOfDay()->utc();
             $todayEndUtc = $nowWib->copy()->endOfDay()->utc();
 
-            $totalPenjualan = Transaksi::whereBetween('waktu_transaksi', [$todayStartUtc, $todayEndUtc])->sum('total_harga');
+            // Transaksi berstatus 'cancelled' (batal, belum dibayar) tidak dihitung
+            // sebagai penjualan maupun omzet.
+            $totalPenjualan = Transaksi::whereBetween('waktu_transaksi', [$todayStartUtc, $todayEndUtc])->where('status_pesanan', '!=', 'cancelled')->sum('total_harga');
             $totalPesanan = Transaksi::whereBetween('waktu_transaksi', [$todayStartUtc, $todayEndUtc])
                                     ->where('status_pesanan', 'completed')->count();
 
@@ -265,6 +270,7 @@ Route::middleware('auth:karyawan')->group(function () {
             });
 
             $salesByHour = Transaksi::whereBetween('waktu_transaksi', [$todayStartUtc, $todayEndUtc])
+                ->where('status_pesanan', '!=', 'cancelled')
                 ->selectRaw('HOUR(waktu_transaksi) as hour, SUM(total_harga) as total')
                 ->groupBy('hour')
                 ->orderBy('hour')
@@ -283,7 +289,7 @@ Route::middleware('auth:karyawan')->group(function () {
                 : 'Belum ada data';
 
             $metodeTerbanyak = Pembayaran::query()
-                ->whereHas('transaksi', fn ($q) => $q->whereBetween('waktu_transaksi', [$todayStartUtc, $todayEndUtc]))
+                ->whereHas('transaksi', fn ($q) => $q->whereBetween('waktu_transaksi', [$todayStartUtc, $todayEndUtc])->where('status_pesanan', '!=', 'cancelled'))
                 ->selectRaw('metode_pembayaran, COUNT(*) as jumlah')
                 ->groupBy('metode_pembayaran')
                 ->orderByDesc('jumlah')
@@ -293,6 +299,7 @@ Route::middleware('auth:karyawan')->group(function () {
                 ->join('kategori_produks', 'produks.kategori_produk_id', '=', 'kategori_produks.id')
                 ->join('transaksis', 'detail_transaksis.transaksi_id', '=', 'transaksis.id')
                 ->whereBetween('transaksis.waktu_transaksi', [$todayStartUtc, $todayEndUtc])
+                ->where('transaksis.status_pesanan', '!=', 'cancelled')
                 ->selectRaw('kategori_produks.nama_kategori, SUM(detail_transaksis.QTY) as total_qty, SUM(detail_transaksis.subtotal) as total_revenue')
                 ->groupBy('kategori_produks.nama_kategori')
                 ->orderByDesc('total_qty')

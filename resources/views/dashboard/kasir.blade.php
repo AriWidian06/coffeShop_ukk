@@ -23,6 +23,7 @@
         'ready' => 'Siap',
         'prosesed' => 'Diproses',
         'completed' => 'Selesai',
+        'cancelled' => 'Dibatalkan',
     ];
 
     $hour = now('Asia/Jakarta')->hour;

@@ -246,6 +246,7 @@ class TransaksiController extends Controller
             'prosesed' => ['label' => 'Sedang Dibuat', 'step' => 2],
             'ready' => ['label' => 'Siap Diantar', 'step' => 3],
             'completed' => ['label' => 'Selesai', 'step' => 4],
+            'cancelled' => ['label' => 'Dibatalkan', 'step' => 0],
         ];
         $meta = $statusMeta[$transaksi->status_pesanan] ?? ['label' => 'Menunggu Konfirmasi', 'step' => 1];
         $waktuWib = $transaksi->waktu_transaksi?->copy()->timezone('Asia/Jakarta');
