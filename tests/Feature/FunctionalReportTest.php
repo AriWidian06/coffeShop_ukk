@@ -184,6 +184,121 @@ class FunctionalReportTest extends TestCase
         ]);
     }
 
+    public function test_produk_index_shows_qr_menu_status_as_text(): void
+    {
+        $admin = $this->makeKaryawan('admin', 'admin-status');
+        $aktif = $this->makeProduk();
+        Produk::create([
+            'supplier_id' => $aktif->supplier_id,
+            'kategori_produk_id' => $aktif->kategori_produk_id,
+            'nama_produk' => 'Americano Nonaktif',
+            'deskripsi' => 'Produk nonaktif test',
+            'harga_jual' => 15000,
+            'harga_beli' => 8000,
+            'tipe' => 'jual',
+            'satuan' => 'cup',
+            'stock' => 10,
+            'status_aktif' => false,
+        ]);
+
+        $this->actingAs($admin, 'karyawan')
+            ->get('/produks')
+            ->assertOk()
+            ->assertSee('Aktif')
+            ->assertSee('Non-aktif')
+            ->assertDontSee('toggle-switch');
+    }
+
+    public function test_admin_sales_chart_returns_hourly_revenue_and_volume_without_cancelled_orders(): void
+    {
+        $admin = $this->makeKaryawan('admin', 'admin-chart');
+        $meja = $this->makeMeja();
+        $hour = (int) now('Asia/Jakarta')->hour;
+        $timestamp = now('Asia/Jakarta')->startOfHour()->addMinutes(10)->utc();
+
+        Transaksi::create([
+            'meja_id' => $meja->id,
+            'karyawan_id' => $admin->id,
+            'tipe_pesanan' => 'dine-in',
+            'total_harga' => 12000,
+            'status_pesanan' => 'completed',
+            'waktu_transaksi' => $timestamp,
+        ]);
+        Transaksi::create([
+            'meja_id' => $meja->id,
+            'karyawan_id' => $admin->id,
+            'tipe_pesanan' => 'dine-in',
+            'total_harga' => 9000,
+            'status_pesanan' => 'cancelled',
+            'waktu_transaksi' => $timestamp,
+        ]);
+
+        $response = $this->actingAs($admin, 'karyawan')
+            ->getJson(route('dashboard.sales-chart'))
+            ->assertOk()
+            ->assertJsonCount(24, 'sales')
+            ->assertJsonCount(24, 'volume')
+            ->assertJsonPath('peak_hour', $hour)
+            ->assertJsonPath('peak_hour_label', sprintf('%02d:00 - %02d:00 WIB', $hour, ($hour + 1) % 24));
+
+        $this->assertEquals(12000.0, $response->json("sales.{$hour}"));
+        $this->assertSame(1, $response->json("volume.{$hour}"));
+
+        $this->actingAs($admin, 'karyawan')
+            ->get('/dashboard')
+            ->assertOk()
+            ->assertSee('Penjualan Real-time per Jam')
+            ->assertSee('data-chart-series="volume"', false)
+            ->assertSee('Belum ada transaksi hari ini. Grafik diperbarui otomatis.');
+    }
+
+    public function test_manager_sales_chart_tracks_selected_period_and_denies_kasir(): void
+    {
+        $manager = $this->makeKaryawan('manager', 'manager-chart');
+        $kasir = $this->makeKaryawan('kasir', 'kasir-chart');
+        $meja = $this->makeMeja();
+        $date = now('Asia/Jakarta')->subDays(10)->toDateString();
+        $hour = 15;
+        $timestamp = \Carbon\Carbon::parse($date, 'Asia/Jakarta')->setHour($hour)->addMinutes(10)->utc();
+
+        Transaksi::create([
+            'meja_id' => $meja->id,
+            'karyawan_id' => $manager->id,
+            'tipe_pesanan' => 'dine-in',
+            'total_harga' => 18000,
+            'status_pesanan' => 'completed',
+            'waktu_transaksi' => $timestamp,
+        ]);
+        Transaksi::create([
+            'meja_id' => $meja->id,
+            'karyawan_id' => $manager->id,
+            'tipe_pesanan' => 'dine-in',
+            'total_harga' => 7000,
+            'status_pesanan' => 'cancelled',
+            'waktu_transaksi' => $timestamp,
+        ]);
+
+        $response = $this->actingAs($manager, 'karyawan')
+            ->getJson(route('dashboard.manager-sales-chart', ['periode' => 'harian', 'tanggal' => $date]))
+            ->assertOk()
+            ->assertJsonCount(24, 'sales')
+            ->assertJsonCount(24, 'volume')
+            ->assertJsonPath('peak_hour', $hour)
+            ->assertJsonPath('peak_hour_label', '15:00 - 16:00 WIB');
+
+        $this->assertEquals(18000.0, $response->json("sales.{$hour}"));
+        $this->assertSame(1, $response->json("volume.{$hour}"));
+
+        $this->actingAs($manager, 'karyawan')
+            ->get('/dashboard?periode=harian&tanggal='.$date)
+            ->assertOk()
+            ->assertSee('data-manager-chart-series="volume"', false);
+
+        $this->actingAs($kasir, 'karyawan')
+            ->getJson(route('dashboard.manager-sales-chart', ['periode' => 'harian', 'tanggal' => $date]))
+            ->assertForbidden();
+    }
+
     public function test_tc_meja_01_admin_can_create_and_deactivate_table(): void
     {
         $admin = $this->makeKaryawan('admin', 'admin2');

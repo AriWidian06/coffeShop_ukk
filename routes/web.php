@@ -18,6 +18,7 @@ use App\Models\Pembayaran;
 use App\Models\Transaksi;
 use App\Models\KategoriProduk; 
 use App\Models\Produk;
+use App\Support\DashboardSalesChart;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
@@ -159,28 +160,14 @@ Route::middleware('auth:karyawan')->group(function () {
                 : null;
 
             // Omzet & jumlah transaksi per jam (WIB)
-            $hourlyRows = Transaksi::whereBetween('waktu_transaksi', [$startUtc, $endUtc])
-                ->where('status_pesanan', '!=', 'cancelled')
-                ->selectRaw('HOUR(waktu_transaksi) as jam, COUNT(*) as jumlah, SUM(total_harga) as total')
-                ->groupBy('jam')
-                ->orderBy('jam')
-                ->get()
-                ->map(function ($row) {
-                    $row->jam = ((int) $row->jam + 7) % 24;
-                    $row->total = (float) $row->total;
-                    $row->jumlah = (int) $row->jumlah;
-                    return $row;
-                })
-                ->sortBy('jam')
-                ->values();
-
-            $transaksiPerJam = $hourlyRows;
-            $salesByHour = $hourlyRows->mapWithKeys(fn ($row) => [(int) $row->jam => (float) $row->total])->sortKeys();
-            $peakRow = $hourlyRows->sortByDesc('total')->first();
-            $peakHour = $peakRow ? (int) $peakRow->jam : null;
+            $chartData = DashboardSalesChart::forRange($start, $end);
+            $salesByHour = collect($chartData['sales']);
+            $volumeByHour = $chartData['volume'];
+            $peakHour = $chartData['peak_hour'];
             $peakHourLabel = $peakHour !== null
                 ? sprintf('%02d:00 - %02d:00 WIB', $peakHour, ($peakHour + 1) % 24)
                 : 'Belum ada data';
+            $chartUpdatedAt = $chartData['updated_at'];
 
             // Top 5 produk sesuai periode
             $produkTerlaris = DetailTransaksi::query()
@@ -209,7 +196,7 @@ Route::middleware('auth:karyawan')->group(function () {
                 'totalPendapatanHariIni', 'totalTransaksiHariIni', 'totalItemHariIni',
                 'totalPendapatanPeriode', 'totalTransaksiPeriode', 'totalItemPeriode',
                 'averageTransactionValue', 'pendapatanGrowth', 'pendapatanSebelumnya',
-                'transaksiPerJam', 'salesByHour', 'peakHour', 'peakHourLabel',
+                'salesByHour', 'volumeByHour', 'peakHour', 'peakHourLabel', 'chartUpdatedAt',
                 'produkTerlaris', 'paymentStats',
                 'periode', 'periodeLabel', 'selectedDate', 'prevReference', 'nextReference', 'shift', 'nowWib',
                 'start', 'end'
@@ -287,21 +274,11 @@ Route::middleware('auth:karyawan')->group(function () {
                 return $k;
             });
 
-            $salesByHour = Transaksi::whereBetween('waktu_transaksi', [$todayStartUtc, $todayEndUtc])
-                ->where('status_pesanan', '!=', 'cancelled')
-                ->selectRaw('HOUR(waktu_transaksi) as hour, SUM(total_harga) as total')
-                ->groupBy('hour')
-                ->orderBy('hour')
-                ->get()
-                ->mapWithKeys(function ($row) {
-                    $hour = ((int) $row->hour + 7) % 24;
-                    return [$hour => (float) $row->total];
-                })
-                ->sortKeys();
-
-            $peakHour = $salesByHour->isNotEmpty()
-                ? (int) $salesByHour->sortDesc()->keys()->first()
-                : null;
+            $chartData = DashboardSalesChart::forDay($nowWib);
+            $salesByHour = collect($chartData['sales']);
+            $volumeByHour = $chartData['volume'];
+            $peakHour = $chartData['peak_hour'];
+            $chartUpdatedAt = $chartData['updated_at'];
             $peakHourLabel = $peakHour !== null
                 ? sprintf('%02d:00 - %02d:00 WIB', $peakHour, ($peakHour + 1) % 24)
                 : 'Belum ada data';
@@ -334,8 +311,10 @@ Route::middleware('auth:karyawan')->group(function () {
                 'transaksiTerbaru',
                 'karyawans',
                 'salesByHour',
+                'volumeByHour',
                 'peakHour',
                 'peakHourLabel',
+                'chartUpdatedAt',
                 'metodeTerbanyak',
                 'topCategories',
                 'nowWib'
@@ -345,6 +324,54 @@ Route::middleware('auth:karyawan')->group(function () {
         // Fallback jika role tidak terdaftar atau tidak cocok
         return redirect()->route('welcome')->with('error', 'Role pengguna tidak dikenali.');
     })->name('dashboard');
+
+    Route::get('/dashboard/manager-sales-chart', function (Request $request) {
+        $tz = 'Asia/Jakarta';
+        $periode = $request->query('periode', 'bulanan');
+        if (! in_array($periode, ['harian', 'mingguan', 'bulanan'], true)) {
+            $periode = 'bulanan';
+        }
+
+        $selectedDate = Carbon::now($tz);
+        $tanggal = $request->query('tanggal');
+        if (is_string($tanggal) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal)) {
+            $parsedDate = Carbon::createFromFormat('!Y-m-d', $tanggal, $tz);
+            if ($parsedDate && $parsedDate->format('Y-m-d') === $tanggal) {
+                $selectedDate = $parsedDate;
+            }
+        }
+
+        [$start, $end] = match ($periode) {
+            'harian' => [$selectedDate->copy()->startOfDay(), $selectedDate->copy()->endOfDay()],
+            'mingguan' => [
+                $selectedDate->copy()->startOfWeek(Carbon::MONDAY)->startOfDay(),
+                $selectedDate->copy()->endOfWeek(Carbon::SUNDAY)->endOfDay(),
+            ],
+            default => [$selectedDate->copy()->startOfMonth()->startOfDay(), $selectedDate->copy()->endOfMonth()->endOfDay()],
+        };
+
+        $data = DashboardSalesChart::forRange($start, $end);
+        $peakHour = $data['peak_hour'];
+
+        return response()->json([
+            ...$data,
+            'peak_hour_label' => $peakHour !== null
+                ? sprintf('%02d:00 - %02d:00 WIB', $peakHour, ($peakHour + 1) % 24)
+                : 'Belum ada data',
+        ]);
+    })->middleware('can:view-sales-report')->name('dashboard.manager-sales-chart');
+
+    Route::get('/dashboard/sales-chart', function () {
+        $data = DashboardSalesChart::forDay(Carbon::now('Asia/Jakarta'));
+        $peakHour = $data['peak_hour'];
+
+        return response()->json([
+            ...$data,
+            'peak_hour_label' => $peakHour !== null
+                ? sprintf('%02d:00 - %02d:00 WIB', $peakHour, ($peakHour + 1) % 24)
+                : 'Belum ada data',
+        ]);
+    })->middleware('can:access-admin-panel')->name('dashboard.sales-chart');
 
     // Halaman Index Denah Meja (Bisa diakses Kasir, Admin, & Manager)
     Route::get('/mejas', [MejaController::class, 'index'])->name('mejas.index');

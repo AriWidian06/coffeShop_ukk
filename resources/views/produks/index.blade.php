@@ -230,9 +230,11 @@
                                     </div>
                                 </td>
 
-                                <!-- QR Menu Toggle -->
+                                <!-- Status QR Menu -->
                                 <td class="text-center">
-                                    <div class="toggle-switch {{ $produk->status_aktif ? 'enabled' : 'disabled' }} mx-auto"></div>
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold {{ $produk->status_aktif ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700' }}">
+                                        {{ $produk->status_aktif ? 'Aktif' : 'Non-aktif' }}
+                                    </span>
                                 </td>
 
                                 <!-- Aksi -->

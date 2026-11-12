@@ -179,41 +179,43 @@
                 <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
                     <div>
                         <h3 class="font-bold text-slate-900 text-lg">Penjualan Real-time per Jam</h3>
-                        <p class="text-xs text-slate-500">Distribusi transaksi aktif berdasarkan periode shift</p>
+                        <p class="text-xs text-slate-500">Omzet dan jumlah pesanan hari ini, WIB</p>
                     </div>
-                    <div class="flex gap-2">
-                        <button class="px-3 py-1.5 bg-primary-50 text-primary-700 text-xs font-bold rounded-lg">Nilai (Rp)</button>
-                        <button class="px-3 py-1.5 text-slate-600 text-xs font-bold rounded-lg hover:bg-slate-50">Volume</button>
+                    <div class="flex gap-2" role="group" aria-label="Pilih data grafik">
+                        <button type="button" data-chart-series="sales" aria-pressed="true" class="min-h-11 cursor-pointer px-4 bg-primary-50 text-primary-700 text-xs font-bold rounded-lg hover:bg-primary-100 active:bg-primary-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600">Nilai (Rp)</button>
+                        <button type="button" data-chart-series="volume" aria-pressed="false" class="min-h-11 cursor-pointer px-4 text-slate-600 text-xs font-bold rounded-lg hover:bg-slate-50 active:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600">Volume</button>
                     </div>
                 </div>
 
-                <!-- Simple Bar Chart Representation -->
-                <div class="manager-chart-scroll overflow-x-auto -mx-2 px-2">
-                    <div class="flex items-end justify-between gap-2 sm:gap-4 h-48 min-w-[640px] px-2 sm:px-4">
-                        @php
-                            $maxSales = $salesByHour->max() ?? 1;
-                        @endphp
-                        @for ($hour = 0; $hour < 24; $hour++)
+                <div id="sales-chart" data-endpoint="{{ route('dashboard.sales-chart') }}" data-series="sales" class="relative">
+                    <p id="chart-empty-state" class="hidden absolute inset-x-0 top-16 z-10 text-center text-sm text-slate-500" aria-live="polite">
+                        Belum ada transaksi hari ini. Grafik diperbarui otomatis.
+                    </p>
+                    <div class="manager-chart-scroll overflow-x-auto -mx-2 px-2">
+                        <div id="chart-bars" role="img" aria-label="Grafik omzet per jam hari ini" class="flex items-end justify-between gap-2 sm:gap-4 h-48 min-w-[640px] px-2 sm:px-4 border-b border-slate-200">
                             @php
-                                $value = $salesByHour->get($hour, 0);
-                                $height = ($value / $maxSales) * 100;
-                                $isPeak = ($hour == $peakHour);
+                                $maxSales = max($salesByHour->max() ?? 0, 1);
                             @endphp
-                            <div class="flex-1 flex flex-col items-center gap-2 group relative">
-                                <div class="w-full {{ $isPeak ? 'bg-primary-600' : 'bg-primary-200' }} rounded-t-sm transition-all hover:bg-primary-400" style="height: {{ $height }}%"></div>
-                                <span class="text-[10px] text-slate-400 font-semibold">{{ sprintf('%02d', $hour) }}</span>
-                                @if($isPeak)
-                                    <span class="absolute -top-6 text-[10px] font-bold text-primary-600">Peak</span>
-                                @endif
-                            </div>
-                        @endfor
+                            @for ($hour = 0; $hour < 24; $hour++)
+                                @php
+                                    $value = $salesByHour->get($hour, 0);
+                                    $height = ($value / $maxSales) * 100;
+                                    $isPeak = ($hour === $peakHour);
+                                @endphp
+                                <div class="hour-column flex-1 h-full flex flex-col items-center justify-end gap-2 group relative" data-hour="{{ $hour }}">
+                                    <div class="hour-bar w-full {{ $isPeak ? 'bg-primary-600' : 'bg-primary-200' }} rounded-t-sm hover:bg-primary-400" style="height: {{ $height }}%" title="Jam {{ sprintf('%02d', $hour) }}: Rp {{ number_format($value, 0, ',', '.') }}"></div>
+                                    <span class="text-[10px] text-slate-500 font-semibold">{{ sprintf('%02d', $hour) }}</span>
+                                </div>
+                            @endfor
+                        </div>
                     </div>
+                    <p id="chart-update-status" class="mt-2 text-right text-xs text-slate-500" aria-live="polite">Diperbarui {{ $chartUpdatedAt }} WIB</p>
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-4 border-t border-slate-200">
                     <div>
                         <p class="text-xs text-slate-500">Puncak Transaksi</p>
-                        <p class="text-sm font-bold text-slate-900">{{ $peakHourLabel }}</p>
+                        <p id="peak-hour-label" class="text-sm font-bold text-slate-900">{{ $peakHourLabel }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-slate-500">Avg Ticket Size</p>
@@ -401,9 +403,8 @@
 <script>
     (function () {
         const clock = document.getElementById('admin-live-clock');
-        if (!clock) return;
-
         const renderClock = () => {
+            if (!clock) return;
             const time = new Date().toLocaleTimeString('id-ID', {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -416,6 +417,96 @@
 
         renderClock();
         setInterval(renderClock, 1000);
+
+        const chart = document.getElementById('sales-chart');
+        if (!chart) return;
+
+        const bars = [...chart.querySelectorAll('.hour-column')];
+        const buttons = [...document.querySelectorAll('[data-chart-series]')];
+        const emptyState = document.getElementById('chart-empty-state');
+        const updateStatus = document.getElementById('chart-update-status');
+        let chartData = {
+            sales: @json(array_values($salesByHour->all())),
+            volume: @json(array_values($volumeByHour)),
+            peakHour: @json($peakHour),
+        };
+        let activeSeries = 'sales';
+
+        const formatRupiah = (value) => 'Rp ' + new Intl.NumberFormat('id-ID', {
+            maximumFractionDigits: 0,
+        }).format(value);
+
+        const renderChart = () => {
+            const values = chartData[activeSeries];
+            const maxValue = Math.max(...values);
+            const hasData = maxValue > 0;
+            emptyState.classList.toggle('hidden', hasData);
+            chart.setAttribute('data-series', activeSeries);
+            document.getElementById('chart-bars').setAttribute(
+                'aria-label',
+                activeSeries === 'sales' ? 'Grafik omzet per jam hari ini' : 'Grafik jumlah pesanan per jam hari ini'
+            );
+
+            bars.forEach((bar, hour) => {
+                const value = values[hour];
+                const fill = maxValue > 0 ? (value / maxValue) * 100 : 0;
+                const barFill = bar.querySelector('.hour-bar');
+                const isPeak = activeSeries === 'sales' && hour === chartData.peakHour;
+                barFill.style.height = fill + '%';
+                barFill.classList.toggle('bg-primary-600', isPeak);
+                barFill.classList.toggle('bg-primary-200', !isPeak);
+                barFill.title = activeSeries === 'sales'
+                    ? `Jam ${String(hour).padStart(2, '0')}: ${formatRupiah(value)}`
+                    : `Jam ${String(hour).padStart(2, '0')}: ${value} pesanan`;
+            });
+
+            buttons.forEach((button) => {
+                const selected = button.dataset.chartSeries === activeSeries;
+                button.setAttribute('aria-pressed', String(selected));
+                button.classList.toggle('bg-primary-50', selected);
+                button.classList.toggle('text-primary-700', selected);
+                button.classList.toggle('text-slate-600', !selected);
+            });
+        };
+
+        buttons.forEach((button) => {
+            button.addEventListener('click', () => {
+                activeSeries = button.dataset.chartSeries;
+                renderChart();
+            });
+        });
+
+        const refreshChart = async () => {
+            if (document.hidden) return;
+
+            updateStatus.textContent = 'Memperbarui grafik...';
+            try {
+                const response = await fetch(chart.dataset.endpoint, {
+                    headers: { Accept: 'application/json' },
+                    credentials: 'same-origin',
+                });
+                if (!response.ok) throw new Error('Chart request failed');
+
+                const data = await response.json();
+                if (!Array.isArray(data.sales) || !Array.isArray(data.volume) || data.sales.length !== 24 || data.volume.length !== 24) {
+                    throw new Error('Invalid chart response');
+                }
+
+                chartData = {
+                    sales: data.sales.map(Number),
+                    volume: data.volume.map(Number),
+                    peakHour: data.peak_hour,
+                };
+                document.getElementById('peak-hour-label').textContent = data.peak_hour_label;
+                updateStatus.textContent = `Diperbarui ${data.updated_at} WIB`;
+                renderChart();
+            } catch (error) {
+                console.error('Gagal memperbarui grafik penjualan admin.', error);
+            }
+        };
+
+        renderChart();
+        setInterval(refreshChart, 30000);
     })();
 </script>
 @endsection

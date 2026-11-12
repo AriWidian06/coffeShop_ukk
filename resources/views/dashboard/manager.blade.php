@@ -182,48 +182,61 @@
                     <div class="w-2 h-2 rounded-full bg-primary-600 shrink-0"></div>
                     <h3 class="font-bold text-slate-900 text-sm sm:text-base">Kurva Penjualan per Jam</h3>
                 </div>
-                <p class="text-[11px] sm:text-xs text-slate-500 mb-6">Distribusi omzet per jam WIB • {{ $periodeLabel }}</p>
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <p class="text-[11px] sm:text-xs text-slate-500">Distribusi transaksi per jam WIB • {{ $periodeLabel }}</p>
+                    <div class="flex gap-2" role="group" aria-label="Pilih data grafik penjualan">
+                        <button type="button" data-manager-chart-series="sales" aria-pressed="true" class="min-h-11 cursor-pointer px-4 bg-primary-50 text-primary-700 text-xs font-bold rounded-lg hover:bg-primary-100 active:bg-primary-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600">Nilai (Rp)</button>
+                        <button type="button" data-manager-chart-series="volume" aria-pressed="false" class="min-h-11 cursor-pointer px-4 text-slate-600 text-xs font-bold rounded-lg hover:bg-slate-50 active:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600">Volume</button>
+                    </div>
+                </div>
 
                 @php
                     $maxOmzetJam = max(1, (float) $salesByHour->max());
                 @endphp
-                <div class="manager-chart-scroll overflow-x-auto pb-2">
+                <div id="manager-sales-chart"
+                     data-endpoint="{{ route('dashboard.manager-sales-chart', ['periode' => $periode, 'tanggal' => $selectedDate->toDateString()]) }}"
+                     data-series="sales"
+                     class="manager-chart-scroll overflow-x-auto pb-2">
                     <div class="w-full">
-                        <div class="flex items-end gap-px sm:gap-2 h-32 sm:h-40 px-0.5 sm:px-1">
+                        <p id="manager-chart-empty-state" class="hidden py-12 text-center text-xs text-slate-500" aria-live="polite">
+                            Belum ada transaksi pada periode ini.
+                        </p>
+                        <div id="manager-chart-bars" role="img" aria-label="Grafik omzet per jam WIB" class="flex items-end gap-px sm:gap-2 h-32 sm:h-40 px-0.5 sm:px-1">
                             @for ($hour = 0; $hour < 24; $hour++)
                                 @php
-                                    $row = $salesByHour->get($hour);
-                                    $omzet = $row ? (float) $row : 0;
-                                    $jumlah = $transaksiPerJam->firstWhere('jam', $hour)?->jumlah ?? 0;
+                                    $omzet = (float) $salesByHour->get($hour, 0);
+                                    $jumlah = $volumeByHour[$hour] ?? 0;
                                     $height = $omzet > 0 ? ($omzet / $maxOmzetJam) * 100 : 0;
                                     $isPeak = $peakHour === $hour;
                                 @endphp
-                                <div class="flex-1 h-full flex items-end relative group min-w-0"
-                                     title="{{ sprintf('%02d:00', $hour) }} • Rp {{ number_format($omzet, 0, ',', '.') }} • {{ $jumlah }} transaksi">
+                                <div class="manager-hour-column flex-1 h-full flex items-end relative group min-w-0"
+                                     data-hour="{{ $hour }}">
                                     @if($isPeak)
                                         <span class="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-primary-600">Peak</span>
                                     @endif
-                                    <div class="w-full {{ $isPeak ? 'bg-primary-600' : 'bg-primary-300 group-hover:bg-primary-400' }} rounded-t-md transition-all"
+                                    <div class="manager-hour-bar w-full {{ $isPeak ? 'bg-primary-600' : 'bg-primary-300 group-hover:bg-primary-400' }} rounded-t-md"
+                                         title="{{ sprintf('%02d:00', $hour) }} • Rp {{ number_format($omzet, 0, ',', '.') }} • {{ $jumlah }} transaksi"
                                          style="height: {{ $height }}%"></div>
                                 </div>
                             @endfor
                         </div>
                         <div class="flex gap-px sm:gap-2 mt-2 px-0.5 sm:px-1">
                             @for ($hour = 0; $hour < 24; $hour++)
-                                <span class="flex-1 min-w-0 text-center text-[7px] sm:text-[9px] {{ $peakHour === $hour ? 'text-primary-700 font-extrabold' : 'text-slate-400 font-semibold' }}">{{ sprintf('%02d', $hour) }}</span>
+                                <span class="manager-hour-label flex-1 min-w-0 text-center text-[7px] sm:text-[9px] {{ $peakHour === $hour ? 'text-primary-700 font-extrabold' : 'text-slate-400 font-semibold' }}" data-hour="{{ $hour }}">{{ sprintf('%02d', $hour) }}</span>
                             @endfor
                         </div>
                     </div>
                 </div>
+                <p id="manager-chart-update-status" class="mt-2 text-right text-xs text-slate-500" aria-live="polite">Diperbarui {{ $chartUpdatedAt }} WIB</p>
 
                 <div class="flex flex-wrap items-center justify-between gap-3 mt-4 pt-4 border-t border-slate-200 text-[11px] sm:text-xs">
                     <div class="flex items-center gap-2">
-                        <div class="w-3 h-3 rounded bg-primary-300 shrink-0"></div>
-                        <span class="text-slate-600">Omzet per jam</span>
+                        <div id="manager-chart-legend-swatch" class="w-3 h-3 rounded bg-primary-300 shrink-0"></div>
+                        <span id="manager-chart-legend" class="text-slate-600">Omzet per jam</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <div class="w-3 h-3 rounded bg-primary-600 shrink-0"></div>
-                        <span class="text-slate-600">Peak: {{ $peakHourLabel }}</span>
+                        <span id="manager-peak-hour-label" class="text-slate-600">Peak: {{ $peakHourLabel }}</span>
                     </div>
                     <span class="font-bold text-slate-800">Total Rp {{ number_format($totalPendapatanPeriode, 0, ',', '.') }}</span>
                 </div>
@@ -439,6 +452,115 @@
 
         renderClock();
         setInterval(renderClock, 1000);
+
+        const chart = document.getElementById('manager-sales-chart');
+        if (!chart) return;
+
+        const columns = [...chart.querySelectorAll('.manager-hour-column')];
+        const labels = [...chart.querySelectorAll('.manager-hour-label')];
+        const buttons = [...document.querySelectorAll('[data-manager-chart-series]')];
+        const bars = document.getElementById('manager-chart-bars');
+        const emptyState = document.getElementById('manager-chart-empty-state');
+        const updateStatus = document.getElementById('manager-chart-update-status');
+        const peakLabel = document.getElementById('manager-peak-hour-label');
+        const legend = document.getElementById('manager-chart-legend');
+        let chartData = {
+            sales: @json(array_values($salesByHour->all())),
+            volume: @json(array_values($volumeByHour)),
+            peakHour: @json($peakHour),
+        };
+        let activeSeries = 'sales';
+
+        const renderChart = () => {
+            const values = chartData[activeSeries];
+            const maxValue = Math.max(...values);
+            const hasData = maxValue > 0;
+            emptyState.classList.toggle('hidden', hasData);
+            bars.classList.toggle('hidden', !hasData);
+            chart.setAttribute('data-series', activeSeries);
+            bars.setAttribute(
+                'aria-label',
+                activeSeries === 'sales' ? 'Grafik omzet per jam WIB' : 'Grafik jumlah transaksi per jam WIB'
+            );
+            legend.textContent = activeSeries === 'sales' ? 'Omzet per jam' : 'Transaksi per jam';
+            document.getElementById('manager-chart-legend-swatch').classList.toggle('bg-primary-300', activeSeries === 'sales');
+            document.getElementById('manager-chart-legend-swatch').classList.toggle('bg-emerald-500', activeSeries === 'volume');
+
+            columns.forEach((column, hour) => {
+                const value = values[hour];
+                const bar = column.querySelector('.manager-hour-bar');
+                const isPeak = activeSeries === 'sales' && hour === chartData.peakHour;
+                bar.style.height = maxValue > 0 ? `${(value / maxValue) * 100}%` : '0%';
+                bar.classList.toggle('bg-primary-600', isPeak);
+                bar.classList.toggle('bg-primary-300', activeSeries === 'sales' && !isPeak);
+                bar.classList.toggle('group-hover:bg-primary-400', activeSeries === 'sales' && !isPeak);
+                bar.classList.toggle('bg-emerald-500', activeSeries === 'volume');
+                bar.title = activeSeries === 'sales'
+                    ? `${String(hour).padStart(2, '0')}:00 WIB • Rp ${new Intl.NumberFormat('id-ID').format(value)}`
+                    : `${String(hour).padStart(2, '0')}:00 WIB • ${value} transaksi`;
+                column.querySelector('.text-primary-600')?.remove();
+                if (isPeak) {
+                    const peak = document.createElement('span');
+                    peak.className = 'absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-primary-600';
+                    peak.textContent = 'Peak';
+                    column.append(peak);
+                }
+            });
+
+            labels.forEach((label, hour) => {
+                label.classList.toggle('text-primary-700', activeSeries === 'sales' && hour === chartData.peakHour);
+                label.classList.toggle('font-extrabold', activeSeries === 'sales' && hour === chartData.peakHour);
+                label.classList.toggle('text-slate-400', activeSeries !== 'sales' || hour !== chartData.peakHour);
+                label.classList.toggle('font-semibold', activeSeries !== 'sales' || hour !== chartData.peakHour);
+            });
+
+            buttons.forEach((button) => {
+                const selected = button.dataset.managerChartSeries === activeSeries;
+                button.setAttribute('aria-pressed', String(selected));
+                button.classList.toggle('bg-primary-50', selected);
+                button.classList.toggle('text-primary-700', selected);
+                button.classList.toggle('text-slate-600', !selected);
+            });
+        };
+
+        buttons.forEach((button) => {
+            button.addEventListener('click', () => {
+                activeSeries = button.dataset.managerChartSeries;
+                renderChart();
+            });
+        });
+
+        const refreshChart = async () => {
+            if (document.hidden) return;
+
+            updateStatus.textContent = 'Memperbarui grafik...';
+            try {
+                const response = await fetch(chart.dataset.endpoint, {
+                    headers: { Accept: 'application/json' },
+                    credentials: 'same-origin',
+                });
+                if (!response.ok) throw new Error('Chart request failed');
+
+                const data = await response.json();
+                if (!Array.isArray(data.sales) || !Array.isArray(data.volume) || data.sales.length !== 24 || data.volume.length !== 24) {
+                    throw new Error('Invalid chart response');
+                }
+
+                chartData = {
+                    sales: data.sales.map(Number),
+                    volume: data.volume.map(Number),
+                    peakHour: data.peak_hour,
+                };
+                updateStatus.textContent = `Diperbarui ${data.updated_at} WIB`;
+                peakLabel.textContent = `Peak: ${data.peak_hour_label}`;
+                renderChart();
+            } catch (error) {
+                console.error('Gagal memperbarui grafik penjualan manager.', error);
+            }
+        };
+
+        renderChart();
+        setInterval(refreshChart, 30000);
     })();
 </script>
 @endsection
