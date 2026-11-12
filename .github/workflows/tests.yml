@@ -93,7 +93,18 @@ jobs:
           DB_DATABASE: db_perkoci_test
           DB_USERNAME: root
           DB_PASSWORD: root
-        run: php artisan test
+        run: |
+          set -o pipefail
+          php artisan test 2>&1 | tee /tmp/phpunit-main.log
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            echo "### Kegagalan suite utama (Feature + Unit) ###" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            tail -n 100 /tmp/phpunit-main.log >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "::error title=Kegagalan suite utama::$(tail -n 60 /tmp/phpunit-main.log | tr '\n' ' ')"
+          fi
+          exit "$status"
 
       - name: Run Sprint 3 functional test suite
         env:
@@ -103,7 +114,18 @@ jobs:
           DB_DATABASE: db_perkoci_test
           DB_USERNAME: root
           DB_PASSWORD: root
-        run: php artisan test --configuration=phpunit.sprint3.xml
+        run: |
+          set -o pipefail
+          php artisan test --configuration=phpunit.sprint3.xml 2>&1 | tee /tmp/phpunit-sprint3.log
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            echo "### Kegagalan suite Sprint 3 ###" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            tail -n 100 /tmp/phpunit-sprint3.log >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "::error title=Kegagalan suite Sprint 3::$(tail -n 60 /tmp/phpunit-sprint3.log | tr '\n' ' ')"
+          fi
+          exit "$status"
 
   frontend:
     name: Frontend Build (Vite)
