@@ -76,7 +76,7 @@
             <div class="p-4 border-b border-slate-200 shrink-0">
                 <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
                     <p class="text-[10px] text-slate-500 font-semibold uppercase mb-1">Outlet Terhubung</p>
-                    <p class="text-sm font-bold text-slate-900">Senopati, JKT</p>
+                    <p class="text-sm font-bold text-slate-900">Soreang,bandung</p>
                 </div>
             </div>
 
@@ -114,14 +114,6 @@
                     </svg>
                     <span>Riwayat Transaksi</span>
                 </a>
-
-                <a href="#" class="sidebar-link inactive">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v2a2 2 0 002 2h6a2 2 0 002-2v-1" />
-                    </svg>
-                    <span>Kas Masuk/Keluar</span>
-                </a>
-            </nav>
 
             <!-- User Profile Bottom -->
             <div class="p-4 border-t border-slate-200 bg-white shrink-0">
