@@ -34,5 +34,9 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <!-- Kunci Midtrans palsu khusus pengujian. Test tidak boleh bergantung pada
+             kredensial asli/sandbox agar hasilnya deterministik di CI. -->
+        <env name="MIDTRANS_SERVER_KEY" value="dummy-server-key-untuk-test"/>
+        <env name="MIDTRANS_CLIENT_KEY" value="dummy-client-key-untuk-test"/>
     </php>
 </phpunit>

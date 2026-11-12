@@ -12,6 +12,7 @@ use App\Models\PromoKode;
 use App\Models\PromoUsage;
 use App\Models\Supplier;
 use App\Models\Transaksi;
+use App\Services\PaymentService;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -351,6 +352,19 @@ class Sprint3FunctionalTest extends TestCase
 
     public function test_ft07_qris_payment_creates_qr_and_updates_status(): void
     {
+        // Jangan memanggil API Midtrans sungguhan dari test: hasilnya bergantung
+        // pada kredensial sandbox dan koneksi jaringan. Gunakan respons QRIS palsu.
+        $this->mock(PaymentService::class, function ($mock) {
+            $mock->shouldReceive('createQrisCharge')
+                ->once()
+                ->andReturn([
+                    'order_id' => 'TRX-TEST-QRIS',
+                    'qr_url' => 'https://example.test/qris.png',
+                    'qr_string' => 'dummy-qr-string',
+                    'transaction_status' => 'pending',
+                ]);
+        });
+
         $response = $this->postJson('/api/transaksis', $this->apiOrder([
             'metode_pembayaran' => 'QRIS',
             'session_id' => 'SESI-QRIS',

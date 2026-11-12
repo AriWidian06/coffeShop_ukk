@@ -15,7 +15,7 @@ use Illuminate\Validation\ValidationException;
 
 class TransaksiController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request, PaymentService $paymentService)
     {
         $validated = $request->validate([
             'meja_id' => 'nullable|required_if:tipe_pesanan,dine-in|exists:mejas,id',
@@ -193,7 +193,7 @@ class TransaksiController extends Controller
 
         if (($validated['metode_pembayaran'] ?? null) === 'QRIS') {
             try {
-                $data['qris'] = (new PaymentService())->createQrisCharge($result['transaksi']);
+                $data['qris'] = $paymentService->createQrisCharge($result['transaksi']);
             } catch (\Exception $e) {
                 $data['qris_error'] = 'QRIS otomatis gagal dibuat. Silakan bayar di kasir.';
             }
