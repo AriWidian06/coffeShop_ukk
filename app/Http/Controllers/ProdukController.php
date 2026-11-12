@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Produk;
+use App\Models\ProdukGambar;
 use App\Models\ProdukOpsi;
 use App\Models\KategoriProduk;
 use App\Models\Supplier;
@@ -60,6 +61,35 @@ class ProdukController extends Controller
         ));
     }
 
+    /**
+     * Sajikan gambar produk dari database. Dipakai ketika file di
+     * storage/app/public sudah tidak ada (mis. container Render restart).
+     */
+    public function gambar(Produk $produk)
+    {
+        $gambar = $produk->gambarData()->first();
+
+        if ($gambar) {
+            $binary = base64_decode($gambar->data, true);
+
+            if ($binary !== false) {
+                return response($binary, 200, [
+                    'Content-Type' => $gambar->mime ?: 'image/jpeg',
+                    'Cache-Control' => 'public, max-age=86400',
+                ]);
+            }
+        }
+
+        if ($produk->gambar && Storage::disk('public')->exists($produk->gambar)) {
+            return response()->file(
+                Storage::disk('public')->path($produk->gambar),
+                ['Cache-Control' => 'public, max-age=86400']
+            );
+        }
+
+        abort(404);
+    }
+
     public function create()
     {
         $suppliers = Supplier::all();
@@ -93,12 +123,20 @@ class ProdukController extends Controller
         $validated['status_aktif'] = $request->has('status_aktif');
         $validated['is_customizable'] = $request->has('is_customizable');
 
-        if ($request->hasFile('gambar')) {
+        $hasGambar = $request->hasFile('gambar');
+        $path = null;
+        $validated['has_gambar_data'] = $hasGambar;
+
+        if ($hasGambar) {
             $path = $request->file('gambar')->store('produks', 'public');
             $validated['gambar'] = $path;
         }
 
         $produk = Produk::create($validated);
+
+        if ($hasGambar && $path) {
+            $this->simpanGambarData($produk, $path);
+        }
 
         if ($validated['is_customizable'] && $request->has('opsis')) {
             foreach ($request->opsis as $opsi) {
@@ -148,15 +186,23 @@ class ProdukController extends Controller
         $validated['status_aktif'] = $request->has('status_aktif');
         $validated['is_customizable'] = $request->has('is_customizable');
 
-        if ($request->hasFile('gambar')) {
+        $hasGambar = $request->hasFile('gambar');
+        $path = null;
+
+        if ($hasGambar) {
             if ($produk->gambar) {
                 Storage::disk('public')->delete($produk->gambar);
             }
             $path = $request->file('gambar')->store('produks', 'public');
             $validated['gambar'] = $path;
+            $validated['has_gambar_data'] = true;
         }
 
         $produk->update($validated);
+
+        if ($hasGambar && $path) {
+            $this->simpanGambarData($produk, $path);
+        }
 
         if ($validated['is_customizable']) {
             $produk->opsis()->delete();
@@ -178,9 +224,39 @@ class ProdukController extends Controller
         return redirect()->route('produks.index')->with('success', 'Produk berhasil diperbarui.');
     }
 
+    /**
+     * Simpan salinan gambar di database agar tetap ada setelah container
+     * produksi (Render) restart dan filesystem sementara dibersihkan.
+     */
+    private function simpanGambarData(Produk $produk, string $path): void
+    {
+        $disk = Storage::disk('public');
+
+        if (! $disk->exists($path)) {
+            return;
+        }
+
+        ProdukGambar::updateOrCreate(
+            ['produk_id' => $produk->id],
+            [
+                'mime' => $disk->mimeType($path) ?: 'image/jpeg',
+                'data' => base64_encode($disk->get($path)),
+            ]
+        );
+
+        if (! $produk->has_gambar_data) {
+            $produk->forceFill(['has_gambar_data' => true])->save();
+        }
+    }
+
     public function destroy(Produk $produk)
     {
+        if ($produk->gambar) {
+            Storage::disk('public')->delete($produk->gambar);
+        }
+
         $produk->delete();
+
         return redirect()->route('produks.index')->with('success', 'Produk berhasil dihapus.');
     }
 }

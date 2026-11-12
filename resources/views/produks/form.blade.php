@@ -28,9 +28,9 @@
     <div class="md:col-span-2">
         <label class="block text-sm font-bold text-slate-700 mb-2">Foto Produk</label>
         <div class="flex flex-col sm:flex-row items-start gap-4">
-            @if(isset($produk) && $produk->gambar)
+            @if(isset($produk) && $produk->gambar_url)
                 <div class="relative group">
-                    <img src="{{ asset('storage/' . $produk->gambar) }}" alt="Preview" class="w-24 h-24 object-cover rounded-xl border border-slate-200 shadow-sm">
+                    <img src="{{ $produk->gambar_url }}" alt="Preview" class="w-24 h-24 object-cover rounded-xl border border-slate-200 shadow-sm">
                     <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
                         <span class="text-white text-[10px] font-bold">Current</span>
                     </div>

@@ -115,8 +115,8 @@
                         <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4" data-pos-products>
                             @foreach ($produks as $produk)
                                 <article class="pos-product-card" data-pos-product data-search="{{ strtolower($produk->nama_produk . ' ' . ($produk->kategoriProduk->nama_kategori ?? '')) }}" data-category="{{ strtolower($produk->kategoriProduk->nama_kategori ?? '') }}">
-                                    @if($produk->gambar)
-                                        <img src="{{ asset('storage/' . $produk->gambar) }}" alt="{{ $produk->nama_produk }}" class="pos-product-card-img">
+                                    @if($produk->gambar_url)
+                                        <img src="{{ $produk->gambar_url }}" alt="{{ $produk->nama_produk }}" class="pos-product-card-img">
                                     @else
                                         <div class="w-full h-32 bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center border-b border-slate-100">
                                             <svg class="w-12 h-12 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

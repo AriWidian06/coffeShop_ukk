@@ -235,8 +235,20 @@ class Sprint3FunctionalTest extends TestCase
         $produk = Produk::where('nama_produk', 'Produk Uji Baru')->firstOrFail();
         $this->assertNotNull($produk->gambar);
         Storage::disk('public')->assertExists($produk->gambar);
+        $this->assertTrue($produk->has_gambar_data);
+        $this->assertDatabaseHas('produk_gambars', ['produk_id' => $produk->id]);
         $this->assertDatabaseHas('produk_opsis', ['produk_id' => $produk->id, 'nama_opsi' => 'Less Sugar']);
         $this->get('/')->assertOk()->assertSee('Produk Uji Baru')->assertSee('Less Sugar');
+
+        // Simulasikan filesystem container produksi yang dibersihkan saat
+        // restart: gambar harus tetap tersaji dari database.
+        Storage::disk('public')->delete($produk->gambar);
+        $produk->refresh();
+
+        $this->get(route('produks.gambar', $produk))
+            ->assertOk()
+            ->assertHeader('Content-Type', 'image/png');
+        $this->get('/')->assertOk()->assertSee('/produk/'.$produk->id.'/gambar', false);
 
         @unlink($tmp);
     }

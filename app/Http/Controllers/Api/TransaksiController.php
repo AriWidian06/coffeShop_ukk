@@ -271,7 +271,7 @@ class TransaksiController extends Controller
                     'qty' => $detail->QTY,
                     'customization' => $detail->customization,
                     'subtotal' => (float) $detail->subtotal,
-                    'gambar' => $detail->produk?->gambar ? asset('storage/' . $detail->produk->gambar) : null,
+                    'gambar' => $detail->produk?->gambar_url,
                 ])->values(),
                 'pembayaran' => $transaksi->pembayaran ? [
                     'metode_pembayaran' => $transaksi->pembayaran->metode_pembayaran,

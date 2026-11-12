@@ -123,7 +123,7 @@
                         $categorySlug = \Illuminate\Support\Str::slug($produk->kategoriProduk->nama_kategori ?? 'lainnya', '-');
                         $dataName = strtolower($produk->nama_produk);
                         $hargaFormatted = number_format($produk->harga_jual, 0, ',', '.');
-                        $imageUrl = $produk->gambar ? asset('storage/' . $produk->gambar) : 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=600&q=80';
+                        $imageUrl = $produk->gambar_url ?: asset('images/produk-placeholder.jpg');
 
                         $badge = null;
                         $badgeColor = 'bg-blue-600';
@@ -154,7 +154,9 @@
 
                         <div class="flex gap-3">
                             <div class="w-24 h-24 rounded-xl bg-slate-100 overflow-hidden shrink-0 relative shadow-inner">
-                                <img src="{{ $imageUrl }}" alt="{{ $produk->nama_produk }}" class="w-full h-full object-cover">
+                                <img src="{{ $imageUrl }}" alt="{{ $produk->nama_produk }}"
+                                     class="w-full h-full object-cover"
+                                     onerror="this.onerror=null;this.src='{{ asset('images/produk-placeholder.jpg') }}';">
                                 @if($badge)
                                     <span class="absolute top-1 left-1 px-1.5 py-0.5 {{ $badgeColor }} text-white text-[9px] font-extrabold rounded-md shadow-sm">{{ $badge }}</span>
                                 @endif
@@ -998,7 +1000,7 @@
                 html += `
                     <div class="bg-white rounded-2xl border border-slate-200 p-4">
                         <div class="flex gap-3">
-                            <img src="${item.image || 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=200&q=80'}" alt="${item.name}" class="w-20 h-20 rounded-xl object-cover">
+                            <img src="${item.image || '{{ asset('images/produk-placeholder.jpg') }}'}" alt="${item.name}" class="w-20 h-20 rounded-xl object-cover">
                             <div class="flex-1">
                                 <div class="flex items-start justify-between mb-1">
                                     <div>

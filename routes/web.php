@@ -65,6 +65,9 @@ Route::get('/', function (Request $request) {
     return view('welcome', compact('mejaAktif', 'mejas', 'mejaTerisi', 'kategoriProduks', 'produks'));
 })->name('welcome'); 
 
+// Gambar produk dari database (fallback saat file storage sementara hilang).
+Route::get('/produk/{produk}/gambar', [ProdukController::class, 'gambar'])->name('produks.gambar');
+
 Route::get('/health', [HealthController::class, 'check']);
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login')->name('login.store');
