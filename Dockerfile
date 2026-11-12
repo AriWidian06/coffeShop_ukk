@@ -57,5 +57,17 @@ RUN a2enmod rewrite
 # Expose port 80 untuk web server
 EXPOSE 80
 
-# Jalankan migrate + storage:link dengan --force lalu Apache di foreground
-CMD php artisan migrate --seed --force && php artisan storage:link --force || true && apache2-foreground
+# Paksa mode produksi (Environment Variables di Render dapat menimpa nilai ini)
+ENV APP_ENV=production
+ENV APP_DEBUG=false
+
+# Terapkan seluruh langkah S4-02 saat container start, lalu Apache di foreground.
+# Kegagalan migrasi/seeding/cache menggagalkan deployment; storage:link dibuat
+# idempoten dengan --force dan tidak menghalangi startup.
+CMD php artisan migrate --force \
+    && php artisan db:seed --force \
+    && php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache \
+    && (php artisan storage:link --force || true) \
+    && apache2-foreground

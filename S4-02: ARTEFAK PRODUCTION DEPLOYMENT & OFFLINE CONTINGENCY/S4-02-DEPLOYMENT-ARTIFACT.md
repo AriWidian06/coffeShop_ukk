@@ -4,7 +4,7 @@
 
 | Item | Keterangan |
 |---|---|
-| Aplikasi | Bagi Kopi / Perkoci Eatery (Coffee Shop Order System) — Web Laravel |
+| Aplikasi | Bagi Kopi (Coffee Shop Order System) — Web Laravel |
 | Domain publik | `https://bagikopiordersystem.onrender.com` |
 | Server | Render (Platform PaaS) |
 | Offline fallback | Laptop Siswa 2 — `http://192.168.43.100:8000` |
@@ -26,6 +26,9 @@ APP_DEBUG=false
 ```
 
 ### 3. Migrasi, seeding, dan optimasi produksi
+
+Pada deployment Render repositori ini, seluruh perintah di bawah dijalankan
+otomatis oleh `CMD` Dockerfile setiap container start.
 
 Jalankan berurutan di server:
 
