@@ -103,7 +103,7 @@ jobs:
             echo '```' >> "$GITHUB_STEP_SUMMARY"
             tail -n 100 /tmp/phpunit-main.log >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
-            echo "::error title=Kegagalan suite utama::$(tail -n 60 /tmp/phpunit-main.log | tr '\n' ' ' | tr '%' '%25')"
+            echo "::error title=Kegagalan suite utama::$( { grep -E 'FAIL|Tests:|Failed asserting|SQLSTATE|Error|Exception' /tmp/phpunit-main.log | head -40; echo ' --- 40 baris terakhir --- '; tail -n 40 /tmp/phpunit-main.log; } | tr '\n' ' ' | tr '%' '%25' | head -c 6000)"
           fi
           exit "$status"
 
@@ -125,7 +125,7 @@ jobs:
             echo '```' >> "$GITHUB_STEP_SUMMARY"
             tail -n 100 /tmp/phpunit-sprint3.log >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
-            echo "::error title=Kegagalan suite Sprint 3::$(tail -n 60 /tmp/phpunit-sprint3.log | tr '\n' ' ' | tr '%' '%25')"
+            echo "::error title=Kegagalan suite Sprint 3::$( { grep -E 'FAIL|Tests:|Failed asserting|SQLSTATE|Error|Exception' /tmp/phpunit-sprint3.log | head -40; echo ' --- 40 baris terakhir --- '; tail -n 40 /tmp/phpunit-sprint3.log; } | tr '\n' ' ' | tr '%' '%25' | head -c 6000)"
           fi
           exit "$status"
 
