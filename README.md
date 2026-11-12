@@ -103,6 +103,14 @@ Aplikasi dijalankan dengan **Laravel 12** (MVC + Blade) di sisi server, **Tailwi
 - Dashboard ringkas: status meja terisi, omzet, transaksi selesai, produk terlaris, dan aktivitas karyawan.
 - Jalur transaksi lengkap dengan filter pencarian, filter status, dan hapus transaksi.
 
+### 📸 Foto Produk Tersimpan di Database
+
+Karena deployment di Render memakai filesystem sementara (`/tmp`) yang di-reset saat container restart, file upload **tidak otomatis bertahan**. Solusi yang dipakai:
+
+- Upload produk menyimpan file ke disk `public` **sekaligus** menyimpan *binary-nya* ke tabel `produk_gambars` (kolom `data` berupa base64) dan menandai `produks.has_gambar_data = true`.
+- Saat file lokal hilang, gambar disajikan ulang dari database melalui route `GET /produk/{produk}/gambar` (`produks.gambar`).
+- Jika tidak ada gambar sama sekali, fallback ke placeholder `public/images/produk-placeholder.jpg`.
+
 ---
 
 ## 🔐 Peran & Hak Akses
@@ -128,11 +136,23 @@ Aplikasi dijalankan dengan **Laravel 12** (MVC + Blade) di sisi server, **Tailwi
 |---|---|
 | Backend | Laravel 12, PHP ≥ 8.2 |
 | Frontend | Blade Template, Tailwind CSS 4, Vite 7, Alpine/vanilla JS |
-| Basis Data | MySQL 8 / MariaDB 10.11 (14 tabel) |
+| Basis Data | MySQL 8 / MariaDB 10.11 (produks + tabel `produk_gambars`) |
 | Pembayaran | Midtrans Snap (QRIS) — `midtrans/midtrans-php` |
 | Laporan PDF | Dompdf 3.x |
 | Pengujian | PHPUnit 11, Laravel Testing (`RefreshDatabase`) |
 | Deployment | Docker (Apache + Node build stage), Render |
+
+---
+
+## 📸 Foto Produk Tersimpan di Database
+
+Karena deployment di Render memakai filesystem sementara (`/tmp`) yang di-reset saat container restart, file upload **tidak otomatis bertahan**. Solusi yang dipakai:
+
+- Upload produk menyimpan file ke disk `public` **sekaligus** menyimpan *binary-nya* ke tabel `produk_gambars` (kolom `data` berupa base64) dan menandai `produks.has_gambar_data = true`.
+- Saat file lokal hilang, gambar disajikan ulang dari database melalui route `GET /produk/{produk}/gambar` (`produks.gambar`).
+- Jika tidak ada gambar sama sekali, fallback ke placeholder `public/images/produk-placeholder.jpg`.
+
+> Status terkini (12 November 2026): upload → file dihapus dari storage → `GET /produk/{id}/gambar` kembali **HTTP 200** ✅; placeholder `GET /images/produk-placeholder.jpg` kini **HTTP 200** ✅.
 
 ---
 
@@ -242,9 +262,11 @@ vendor/bin/phpunit --configuration=phpunit.sprint3.xml
 |---|---|---|
 | Feature | `tests/Feature/FunctionalReportTest.php` | 15 skenario fungsional laporan Sprint 3 + alur pembayaran, error page, upload |
 | Feature | `tests/Feature/RoleDashboardAccessTest.php` | Pembatasan akses dashboard per peran |
-| Feature | `tests/Feature/SecurityFixTest.php` | 8 regression test keamanan & integritas data (anti-forgery, rate limit, stok, double booking) |
 | Feature | `tests/Feature/ReleaseCandidateTest.php` | 7 regression test Release Candidate v1.0.0-rc (RC-01 … RC-05) |
+| Feature | `tests/Feature/SecurityFixTest.php` | 8 regression keamanan & integritas data (anti-forgery, rate limit, stok, double booking) + 1 regression keamanan QR customer → 403 "Akses Ditolak" |
 | Sprint 3 | `tests/Sprint3/Sprint3FunctionalTest.php` | FT-01 … FT-15 (alur order, promo, QRIS, FIFO) + NT-01 … NT-14 (skenario negatif/IDOR/injection) |
+
+> Suite utama berjalan **38 passed (141 assertions)**; suite Sprint 3 berjalan **29 passed (182 assertions)**.
 
 > Otomasi CI (GitHub Actions) menjalankan kedua suite tersebut pada setiap *push* dan *pull request*.
 
@@ -257,16 +279,20 @@ vendor/bin/phpunit --configuration=phpunit.sprint3.xml
 ├── app/
 │   ├── Http/Controllers/          # Controller web + API (Api/TransaksiController, Api/PromoController)
 │   ├── Http/Middleware/           # RoleMiddleware (RBAC per rute)
-│   ├── Models/                    # Karyawan, Meja, Produk, ProdukOpsi, Transaksi, DetailTransaksi, Pembayaran, PromoKode, PromoUsage, Supplier, KategoriProduk
+│   ├── Models/                    # Karyawan, Meja, Produk, ProdukGambar, ProdukOpsi, Transaksi, DetailTransaksi, Pembayaran, PromoKode, PromoUsage, Supplier, KategoriProduk
 │   ├── Policies/TransaksiPolicy.php   # Otorisasi object-level (anti-IDOR)
 │   ├── Providers/AppServiceProvider.php# Gate per peran + registrasi policy
 │   └── Services/PaymentService.php    # Integrasi Midtrans (Snap, signature, status)
 ├── bootstrap/app.php              # Routing, pengecualian CSRF webhook, custom error page
 ├── config/                        # Konfigurasi Laravel
 ├── database/
-│   ├── migrations/                # 19 migration (tabel + index + status pesanan)
+│   ├── migrations/                # 20 migration (tabel + index + status pesanan + penyimpanan gambar produk)
 │   └── seeders/                   # DatabaseSeeder, AdminUserSeeder, MasterDataSeeder
 ├── pemodelan/                     # ERD, use case, activity, flowchart, user flow per peran
+├── public/
+│   ├── images/produk-placeholder.jpg  # Placeholder gambar produk
+│   ├── build/                      # Hasil build Vite (sudah di-commit)
+│   └── ...                          # Entry point web
 ├── S3-04: ISSUE TRACKING & RESOLVED BUGS LOG/   # Papan issue tracker Sprint 3 (18 tiket, 18 CLOSED)
 ├── S4-01: FINAL BUG FIXING & GIT TAG RELEASE CANDIDATE/   # Release notes + closure log v1.0.0-rc
 ├── public/                        # Entry point web + hasil build Vite
@@ -291,7 +317,8 @@ vendor/bin/phpunit --configuration=phpunit.sprint3.xml
 | `karyawans` | Akun karyawan (admin/kasir/manager) |
 | `mejas` | Data meja café (nomor, kapasitas, status aktif) |
 | `kategori_produks` | Kategori menu |
-| `produks` | Menu/produk (harga, stok, tipe, foto, bisa dikustomisasi) |
+| `produks` | Menu/produk (harga, stok, tipe, foto, bisa dikustomisasi, `has_gambar_data`) |
+| `produk_gambars` | Menyimpan gambar produk (base64) + MIME — fallback saat file storage hilang |
 | `produk_opsis` | Opsi kustomisasi produk + harga tambahan |
 | `suppliers` | Data supplier bahan baku |
 | `transaksis` | Header transaksi (meja, kasir, sumber pesanan, total, status, waktu) |
@@ -327,7 +354,7 @@ Rute JSON pada `routes/api.php` (tanpa login, untuk halaman pelanggan):
 
 | Method | Endpoint | Keterangan |
 |---|---|---|
-| `POST` | `/api/transaksis` | Membuat pesanan dari katalog pelanggan (`session_id`, `meja_id`, `items[]`) |
+| `GET` | `/api/transaksis` | Membuat pesanan dari katalog pelanggan (`session_id`, `meja_id`, `items[]`) |
 | `GET` | `/api/pesanan-saya` | Status pesanan milik sesi pelanggan (`session_id`, `meja_id`) |
 | `POST` | `/api/transaksis/{id}/check-status` | Cek status pembayaran QRIS (Midtrans) |
 | `POST` | `/api/promo/validate` | Validasi kode promo |
@@ -339,6 +366,7 @@ Endpoint pendukung:
 | `GET` | `/health` | Health check koneksi database |
 | `POST` | `/midtrans/notification` | Webhook notifikasi Midtrans (di-exempt dari CSRF) |
 | `GET` | `/pos/active-orders` | JSON pesanan aktif untuk sinkronisasi POS (kasir) |
+| `GET` | `/produk/{produk}/gambar` | Gambar produk dari database (`produks.gambar`) — fallback saat file storage hilang |
 
 ---
 
@@ -351,7 +379,7 @@ Endpoint pendukung:
 | CSRF | Token CSRF pada seluruh form mutasi; webhook Midtrans dikecualikan dan diverifikasi lewat signature hash. |
 | Anti-IDOR | `TransaksiPolicy` memeriksa kepemilikan transaksi (kasir hanya miliknya / pesanan web), dipanggil via `$this->authorize()`. |
 | Mass Assignment | Model membatasi kolom yang dapat diisi lewat `$fillable`. |
-| Upload File | Validasi `image|mimes:jpeg,png,jpg|max:2048`, nama file diacak oleh Laravel `store()`, file lama dihapus saat produk diperbarui. |
+| Upload File | Validasi `image|mimes:jpeg,png,jpg|max:2048`, nama file diacak oleh Laravel `store()`, file lama dihapus saat produk diperbarui, **salinan base64 disimpan di tabel `produk_gambars`** sebagai fallback (lihat fitur foto produk). |
 | Password | Hash bcrypt (`Hash::make`). |
 | Error Page | Custom page 403/404/419/429/500/503 tanpa membocorkan detail exception saat `APP_DEBUG=false`. |
 
@@ -380,6 +408,14 @@ Aplikasi demo berjalan di [bagikopiordersystem.onrender.com](https://bagikopiord
 ```bash
 npm ci && npm run build && composer install --no-dev --optimize-autoloader
 ```
+
+Setelah push ke `main`, Render harus dideploy ulang secara manual (buka dashboard Render → instance → **Manual Deploy**) karena kondisi sebelumnya masih menampilkan perilaku lama (login page untuk pelanggan QR, foto produk 404).
+
+> **Catatan deploy terakhir (12 November 2026):** deploy baru di-*trigger* setelah fix foto produk
+> (penyimpanan di database via tabel `produk_gambars`). Sebelum deploy baru, gambar produk lama
+> (`https://bagikopiordersystem.onrender.com/storage/produks/...`) sudah **tidak bisa dipulihkan**
+> karena file di storage container Render bersifat ephemeral — pelanggan harus **mengunggah ulang
+> foto produk** sekali saja setelah deploy berhasil.
 
 ---
 

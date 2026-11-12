@@ -40,13 +40,34 @@ Tidak ada perubahan fungsional di luar lima perbaikan tersebut.
 
 - `S3-04: ISSUE TRACKING & RESOLVED BUGS LOG/S3-04-ISSUE-TRACKING-RESOLVED-BUGS.md` — dipulihkan (dokumen ini terhapus pada commit `e2755c1`) dan diperbarui: 13 tiket Sprint 3 hasil re-verifikasi + 5 tiket RC baru = **18 tiket, 18 CLOSED, 0 OPEN** (CRITICAL 1, MAJOR 13, MINOR 4).
 
+## Perbaikan Akhir (Pasca Freeze Tag `v1.0.0-rc` — 12 November 2026)
+
+Dua perbaikan akhir dikumpulkan setelah tag `v1.0.0-rc` dilepaskan, sebagai bagian dari
+penutupan Sprint 4 / persiapan deployment produksi:
+
+| ID | Modul Terkait | Deskripsi Masalah | Solusi Penanganan | Commit Hash | Status |
+|---|---|---|---|---|---|
+| FB-01 | Keamanan / Customer | Pelanggan QR meja saat mencoba membuka dashboard/kasir/manager tetap dialihkan ke halaman login alih-alih menampilkan halaman penolakan. | Handler exception + `AuthController` memeriksa session `meja_id` + cookie `qr_meja_id` (7 hari). Auth gagal untuk pelanggan QR kini render halaman **Akses Ditolak** (`errors/403`) dengan link kembali ke meja asal (`?meja_id=N`). Escape `/login?staff=1` untuk staf. | `a5e98d6` | CLOSED |
+| FB-02 | Produk / Foto | Foto produk tidak bertahan setelah refresh/redeploy karena container Render memakai filesystem sementara (`/tmp`) yang di-reset saat restart. | Migration `2026_11_12_000001_add_persistent_gambar_to_produks_table.php` (+ flag `has_gambar_data` + tabel `produk_gambars`), model `ProdukGambar`, `Produk::gambar_url`, route `GET /produk/{produk}/gambar`, fallback placeholder `public/images/produk-placeholder.jpg`. Upload kini menyimpan base64 ke DB. | `763c47a` | CLOSED |
+
 ## Hasil Pengujian
 
 | Suite | Perintah | Hasil |
 |---|---|---|
-| Feature & Unit | `php artisan test` | **37 passed (117 assertions)** |
-| Sprint 3 | `vendor/bin/phpunit --configuration=phpunit.sprint3.xml` | **29 passed (175 assertions)** |
+| Feature & Unit | `php artisan test` | **38 passed (141 assertions)** |
+| Sprint 3 | `vendor/bin/phpunit --configuration=phpunit.sprint3.xml` | **29 passed (182 assertions)** |
 | Regression RC | `php artisan test --filter=ReleaseCandidateTest` | **7 passed (27 assertions)** |
+
+> **Catatan audit akhir (12 November 2026):** hasil pengujian terbaru setelah perbaikan
+> FB-01 (keamanan QR customer) dan FB-02 (persistence foto produk):
+>
+> | Suite | Perintah | Hasil |
+> |---|---|---|
+> | Feature & Unit | `php artisan test` | **38 passed (141 assertions)** |
+> | Sprint 3 | `vendor/bin/phpunit --configuration=phpunit.sprint3.xml` | **29 passed (182 assertions)** |
+>
+> Sebelum perbaikan FB-01/FB-02, suite utama berjalan **37 passed (117 assertions)** dan
+> Sprint 3 berjalan **29 passed (175 assertions)**.
 
 Kedua suite dijalankan pada database `db_perkoci_test` yang **dibuat kosong dari nol**, memakai `.env` hasil salinan `.env.example` + `APP_KEY` baru, dan **tanpa `public/build`** — replikasi persis langkah runner GitHub Actions. Sebelum perbaikan, suite utama gagal karena tabel `mejas` belum tersedia; setelah `RefreshDatabase` diaktifkan, masalah berikutnya adalah `ViteManifestNotFoundException` (job backend tidak membangun aset) yang ditutup dengan `withoutVite()` pada base `TestCase`.
 

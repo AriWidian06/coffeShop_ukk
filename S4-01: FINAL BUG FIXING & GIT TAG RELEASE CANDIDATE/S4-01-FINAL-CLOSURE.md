@@ -29,6 +29,16 @@ Seluruh isu yang tersisa sebelum freeze ditutup dengan commit Git resmi:
 | RC-04 | UI / Kasir | Badge status menampilkan string mentah `cancelled`, bukan bahasa Indonesia. | Menambah `'cancelled' => 'Dibatalkan'` beserta warna badge pada tiga view terkait. | `8f1f4a0` | CLOSED |
 | RC-05 | CI / Pipeline | GitHub Actions merah: `RefreshDatabase` nonaktif, PHP 8.2 tidak memenuhi `laravel/pint`, `Vite manifest` hilang di job backend, dan suite Sprint 3 bergantung kredensial Midtrans. | Mengaktifkan `RefreshDatabase`, `withoutVite()` pada base `TestCase`, matrix PHP 8.3, `composer update --lock`, kunci Midtrans dummy + mock QRIS, dan menjalankan suite Sprint 3 lewat `vendor/bin/phpunit`. | `8f1f4a0`, `3a1637d`, `a7cbfc5`, `c37f9ef` | CLOSED |
 
+### Perbaikan Akhir Pasca Freeze Tag `v1.0.0-rc` (12 November 2026)
+
+Dua perbaikan akhir ditambahkan setelah tag `v1.0.0-rc` dilepaskan untuk menutup tugas
+deployment produksi (S4-02) dan memastikan perilaku keamanan + persistensi foto produk:
+
+| ID | Modul Terkait | Deskripsi Masalah | Solusi Penanganan | Commit Hash | Status |
+|---|---|---|---|---|---|
+| FB-01 | Keamanan / Customer | Pelanggan QR meja saat mencoba membuka dashboard/kasir/manager tetap dialihkan ke halaman login saat auth gagal. | Handler exception + `AuthController` memeriksa session `meja_id` + cookie `qr_meja_id` (7 hari); auth gagal untuk pelanggan QR kini render halaman **Akses Ditolak** dengan link kembali ke meja asal. | `a5e98d6` | CLOSED |
+| FB-02 | Produk / Foto | Foto produk tidak bertahan setelah refresh/redeploy karena container Render memakai filesystem sementara. | Gambar base64 disimpan ke tabel `produk_gambars` + flag `has_gambar_data`; route `GET /produk/{produk}/gambar` sebagai fallback; placeholder `public/images/produk-placeholder.jpg`. | `763c47a` | CLOSED |
+
 ### Padanan tiket BUG-06 / BUG-07 / BUG-08 pada repositori ini
 
 | Nomor Tiket | Modul Terkait | Deskripsi Masalah (aktual) | Solusi Penanganan | Commit Hash | Status |
@@ -59,8 +69,8 @@ git push origin v1.0.0-rc
 
 | Pemeriksaan | Hasil |
 |---|---|
-| `php artisan test` (database uji kosong) | **37 passed (117 assertions)** |
-| `vendor/bin/phpunit --configuration=phpunit.sprint3.xml` | **29 passed (175 assertions)** |
+| `php artisan test` (database uji kosong) | **38 passed (141 assertions)** |
+| `vendor/bin/phpunit --configuration=phpunit.sprint3.xml` | **29 passed (182 assertions)** |
 | Simulasi CI (`.env.example`, `APP_KEY` baru, tanpa `public/build`) | Kedua suite hijau |
 | GitHub Actions `c37f9ef` | **success** — Backend Tests (PHP 8.3), Frontend Build (Vite), Workers Builds |
 | Tag `v1.0.0-rc` | Annotated, menunjuk commit final `main` |
@@ -69,8 +79,8 @@ git push origin v1.0.0-rc
 
 | Kriteria | Status |
 |---|---|
-| Seluruh tiket bug CLOSED | ✅ 18/18 (13 tiket Sprint 3 + 5 tiket RC) |
+| Seluruh tiket bug CLOSED | ✅ 18/18 (13 tiket Sprint 3 + 5 tiket RC) + 2 perbaikan akhir (FB-01, FB-02) |
 | Tidak ada bug CRITICAL/MAJOR tersisa | ✅ |
 | Branch `main` bersih | ✅ |
 | Pipeline CI hijau | ✅ |
-| Tag `v1.0.0-rc` terpasang dan terlihat di GitHub | ✅ |
+| Tag `v1.0.0-rc` terpasang dan terlihat di GitHub | ⚠️ Menunjuk `9178b1d` (sebelum perbaikan akhir FB-01/FB-02) |
