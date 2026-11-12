@@ -2,7 +2,7 @@
 
 # ☕ Coffee Shop Order System
 
-**Sistem Pemesanan & Point of Sale (POS) untuk kedai kopi "Perkoci Eatery"**  
+**Sistem Pemesanan,Dashboard & Point of Sale (POS)"**  
 Order mandiri dari meja (QR Code) + terminal kasir + dashboard admin/manager.
 
 [![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
@@ -41,7 +41,7 @@ Order mandiri dari meja (QR Code) + terminal kasir + dashboard admin/manager.
 
 ## 🎯 Tentang Proyek
 
-**Bagi Kopi** adalah aplikasi pemesanan kedai kopi berbasis web yang dibangun untuk Anglia UKK (Project Work). Aplikasi ini menyatukan tiga alur dalam satu sistem:
+**BagiKopiOrderSystem** adalah aplikasi pemesanan kedai kopi berbasis web yang dibangun untuk Anglia UKK (Project Work). Aplikasi ini menyatukan tiga alur dalam satu sistem:
 
 | Alur | Deskripsi |
 |---|---|
@@ -408,6 +408,10 @@ Aplikasi demo berjalan di [bagikopiordersystem.onrender.com](https://bagikopiord
 ```bash
 npm ci && npm run build && composer install --no-dev --optimize-autoloader
 ```
+
+Render berakhirkan HTTPS pada reverse proxy. Laravel harus mempercayai header `X-Forwarded-Proto`
+agar URL form dan cookie sesi tetap menggunakan HTTPS. Pastikan `APP_KEY` production stabil antar
+deploy; jangan membuat key baru setiap container start.
 
 Setelah push ke `main`, Render harus dideploy ulang secara manual (buka dashboard Render → instance → **Manual Deploy**) karena kondisi sebelumnya masih menampilkan perilaku lama (login page untuk pelanggan QR, foto produk 404).
 

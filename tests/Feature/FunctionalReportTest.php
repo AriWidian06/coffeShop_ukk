@@ -100,6 +100,20 @@ class FunctionalReportTest extends TestCase
         $this->assertGuest('karyawan');
     }
 
+    public function test_login_form_uses_https_behind_reverse_proxy(): void
+    {
+        $response = $this->withServerVariables([
+            'HTTPS' => 'off',
+            'HTTP_X_FORWARDED_PROTO' => 'https',
+        ])->get('/login');
+
+        $response->assertOk();
+        $this->assertMatchesRegularExpression(
+            '/<form[^>]+action="https:\/\/[^"]+\/login"/',
+            $response->getContent()
+        );
+    }
+
     public function test_tc_auth_03_logout_invalidates_session(): void
     {
         $user = $this->makeKaryawan('kasir', 'farhan', 'Farhan');
