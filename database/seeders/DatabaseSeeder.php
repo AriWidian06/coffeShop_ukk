@@ -22,14 +22,16 @@ class DatabaseSeeder extends Seeder
         $admin = Karyawan::firstOrNew(['username' => 'admin']);
 
         if (! $admin->exists) {
+            $adminPassword = $this->adminPassword();
+
             $admin->fill([
                 'nama_karyawan' => 'Administrator',
                 'jabatan' => 'Administrator',
                 'role' => 'admin',
-                'password' => Hash::make($this->adminPassword()),
+                'password' => Hash::make($adminPassword),
             ])->save();
 
-            $this->command?->info('Akun admin dibuat. Password awal: ' . $this->adminPassword());
+            $this->command?->info('Akun admin dibuat. Password awal: ' . $adminPassword);
         }
 
         // Data dasar agar admin bisa langsung menambah produk setelah deploy.
