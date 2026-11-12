@@ -1,3 +1,9 @@
+@php
+    $mejaId = $meja_id ?? session('meja_id') ?? request()->cookie('qr_meja_id');
+    $mejaNomor = $meja_nomor ?? session('meja_nomor') ?? request()->cookie('qr_meja_nomor');
+    $homeUrl = $mejaId ? route('welcome', ['meja_id' => $mejaId]) : route('welcome');
+@endphp
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -17,11 +23,20 @@
         <div>
             <h1 class="text-xl font-black text-slate-900">Akses Ditolak</h1>
             <p class="text-xs text-slate-500 mt-1">
-                Anda tidak memiliki izin untuk mengakses halaman ini.
+                Halaman dashboard hanya untuk admin, kasir, dan manager Bagi Kopi.
+                Pelanggan yang memesan dari QR meja tidak memiliki akses ke halaman ini.
             </p>
         </div>
+
+        @if($mejaId)
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-50 border border-primary-200 text-xs font-bold text-primary-700">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary-600"></span>
+                Meja #{{ $mejaNomor ?? $mejaId }} &mdash; pesanan dari QR
+            </div>
+        @endif
+
         <div class="pt-2">
-            <a href="{{ url('/') }}" class="inline-block w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-2.5 rounded-xl text-xs transition-all shadow">
+            <a href="{{ $homeUrl }}" class="inline-block w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-2.5 rounded-xl text-xs transition-all shadow">
                 Kembali ke Beranda
             </a>
         </div>

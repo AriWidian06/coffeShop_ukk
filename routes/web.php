@@ -20,6 +20,7 @@ use App\Models\KategoriProduk;
 use App\Models\Produk;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +33,20 @@ Route::get('/', function (Request $request) {
     $mejas = Meja::where('status_aktif', true)->orderBy('nomor_meja')->get();
     $mejaId = $request->query('meja_id');
     $mejaAktif = $mejaId ? $mejas->firstWhere('id', $mejaId) : null;
+
+    // Ingat meja dari QR agar pelanggan yang mencoba membuka dashboard
+    // tetap bisa dikembalikan ke link QR meja yang sama.
+    if ($mejaAktif) {
+        $request->session()->put([
+            'meja_id' => $mejaAktif->id,
+            'meja_nomor' => $mejaAktif->nomor_meja,
+        ]);
+
+        // Cookie cadangan agar link QR tetap dikenali meskipun sesi
+        // pelanggan sudah kedaluwarsa.
+        Cookie::queue('qr_meja_id', $mejaAktif->id, 60 * 24 * 7);
+        Cookie::queue('qr_meja_nomor', $mejaAktif->nomor_meja, 60 * 24 * 7);
+    }
 
     // Meja yang sudah punya pesanan aktif (belum selesai) -> tidak bisa dipilih pelanggan
     $mejaTerisi = Transaksi::whereIn('status_pesanan', ['pending', 'ready', 'prosesed'])

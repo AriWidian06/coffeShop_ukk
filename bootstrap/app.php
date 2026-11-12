@@ -22,8 +22,28 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
-            if ($e instanceof \Illuminate\Auth\AuthenticationException
-                || $e instanceof \Illuminate\Validation\ValidationException) {
+            // Pelanggan yang datang dari QR meja tidak diarahkan ke halaman
+            // login staf. Tampilkan halaman "Akses Ditolak" dan sediakan
+            // tautan kembali ke QR meja yang sedang dipakai.
+            if ($e instanceof \Illuminate\Auth\AuthenticationException) {
+                $mejaId = ($request->hasSession() ? $request->session()->get('meja_id') : null)
+                    ?? $request->cookie('qr_meja_id');
+
+                if ($mejaId) {
+                    $mejaNomor = ($request->hasSession() ? $request->session()->get('meja_nomor') : null)
+                        ?? $request->cookie('qr_meja_nomor');
+
+                    return response()->view('errors.403', [
+                        'status' => 403,
+                        'meja_id' => $mejaId,
+                        'meja_nomor' => $mejaNomor,
+                    ], 403);
+                }
+
+                return null;
+            }
+
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
                 return null;
             }
 

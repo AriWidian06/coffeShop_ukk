@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Karyawan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 
 class AuthController extends Controller
 {
@@ -15,8 +16,26 @@ class AuthController extends Controller
      */
     private const STAFF_ROLES = ['admin', 'kasir', 'manager'];
 
-    public function showLoginForm()
+    public function showLoginForm(Request $request)
     {
+        // Staf yang perlu masuk dari browser yang sama dengan sesi QR meja
+        // dapat membuka /login?staff=1 untuk membersihkan sesi pelanggan.
+        if ($request->boolean('staff')) {
+            $request->session()->forget(['meja_id', 'meja_nomor']);
+            Cookie::queue(Cookie::forget('qr_meja_id'));
+            Cookie::queue(Cookie::forget('qr_meja_nomor'));
+
+            return redirect()->route('login');
+        }
+
+        $qrMejaId = $request->session()->get('meja_id')
+            ?? $request->cookie('qr_meja_id');
+
+        // Pelanggan yang datang dari QR meja tidak diarahkan ke form login.
+        if (! Auth::guard('karyawan')->check() && $qrMejaId) {
+            return response()->view('errors.403', ['status' => 403], 403);
+        }
+
         return view('auth.login');
     }
 
@@ -43,6 +62,9 @@ class AuthController extends Controller
             }
 
             $request->session()->regenerate();
+            Cookie::queue(Cookie::forget('qr_meja_id'));
+            Cookie::queue(Cookie::forget('qr_meja_nomor'));
+
             return redirect()->intended('/dashboard');
         }
 

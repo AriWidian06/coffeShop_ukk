@@ -241,10 +241,25 @@ class SecurityFixTest extends TestCase
         $this->get('/?meja_id='.$meja->id)->assertOk();
         $this->assertGuest('karyawan');
 
-        // Semua pintu masuk dashboard staf harus menolak tamu.
+        // Semua pintu masuk dashboard staf harus menampilkan "Akses Ditolak",
+        // bukan mengalihkan pelanggan ke halaman login.
         foreach (['/dashboard', '/transaksis', '/produks', '/laporan/export', '/mejas'] as $path) {
-            $this->get($path)->assertRedirect('/login');
+            $response = $this->get($path);
+
+            $response->assertForbidden();
+            $response->assertSee('Akses Ditolak');
+            $response->assertSee('meja_id='.$meja->id, false);
         }
+
+        // Halaman login juga tidak boleh tampil untuk sesi pelanggan QR.
+        $this->get('/login')
+            ->assertForbidden()
+            ->assertSee('Akses Ditolak')
+            ->assertSee('meja_id='.$meja->id, false);
+
+        // Staf tetap bisa membersihkan sesi pelanggan lalu login.
+        $this->get('/login?staff=1')->assertRedirect('/login');
+        $this->get('/login')->assertOk();
 
         $this->assertGuest('karyawan');
     }
