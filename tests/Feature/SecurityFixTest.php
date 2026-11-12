@@ -228,6 +228,27 @@ class SecurityFixTest extends TestCase
         );
     }
 
+    /**
+     * Pelanggan yang membuka halaman dari QR meja tetap tamu dan tidak boleh
+     * masuk ke dashboard admin, kasir, maupun manager.
+     */
+    public function test_pelanggan_scan_qr_meja_tidak_bisa_akses_dashboard_staf(): void
+    {
+        $meja = $this->meja(7);
+        $this->produk();
+
+        // Simulasi scan QR meja: URL berisi meja_id, tanpa login staf.
+        $this->get('/?meja_id='.$meja->id)->assertOk();
+        $this->assertGuest('karyawan');
+
+        // Semua pintu masuk dashboard staf harus menolak tamu.
+        foreach (['/dashboard', '/transaksis', '/produks', '/laporan/export', '/mejas'] as $path) {
+            $this->get($path)->assertRedirect('/login');
+        }
+
+        $this->assertGuest('karyawan');
+    }
+
     /** Seeder tidak boleh menimpa password admin yang sudah ada. */
     public function test_seeder_tidak_menimpa_password_admin_yang_ada(): void
     {
