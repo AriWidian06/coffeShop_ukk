@@ -268,7 +268,7 @@ vendor/bin/phpunit --configuration=phpunit.sprint3.xml
 │   └── seeders/                   # DatabaseSeeder, AdminUserSeeder, MasterDataSeeder
 ├── pemodelan/                     # ERD, use case, activity, flowchart, user flow per peran
 ├── S3-04: ISSUE TRACKING & RESOLVED BUGS LOG/   # Papan issue tracker Sprint 3 (18 tiket, 18 CLOSED)
-├── S4-01: RELEASE CANDIDATE v1.0.0-rc/          # Release notes kandidat rilis v1.0.0-rc
+├── S4-01: FINAL BUG FIXING & GIT TAG RELEASE CANDIDATE/   # Release notes + closure log v1.0.0-rc
 ├── public/                        # Entry point web + hasil build Vite
 ├── resources/
 │   ├── css/app.css                # Tailwind + utility responsif
