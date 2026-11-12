@@ -4,9 +4,9 @@
 
 | Item | Keterangan |
 |---|---|
-| Aplikasi | CiwideyStay (Web - Laravel) |
-| Domain publik | `https://ciwideystay.smkbudibakti.sch.id` |
-| Server | cPanel / VPS Ubuntu / Platform PaaS |
+| Aplikasi | Bagi Kopi / Perkoci Eatery (Coffee Shop Order System) — Web Laravel |
+| Domain publik | `https://bagikopiordersystem.onrender.com` |
+| Server | Render (Platform PaaS) |
 | Offline fallback | Laptop Siswa 2 — `http://192.168.43.100:8000` |
 | Jaringan offline | Hotspot / WiFi HP bersama |
 
@@ -61,8 +61,8 @@ http://192.168.43.100:8000
 flowchart TD
     subgraph Skenario_Online ["Skenario Utama (Online Cloud Staging)"]
         direction TB
-        ClientNet["Browser Penguji / Laptop Asesor"] -->|Akses Domain Publik| CloudVPS["Cloud Hosting / VPS Ubuntu\nhttps://ciwideystay.smkbudibakti.sch.id"]
-        CloudVPS --> NginxProd["Nginx Reverse Proxy & SSL"]
+        ClientNet["Browser Penguji / Laptop Asesor"] -->|Akses Domain Publik| CloudVPS["Render (Platform PaaS)\nhttps://bagikopiordersystem.onrender.com"]
+        CloudVPS --> NginxProd["Render HTTPS & Reverse Proxy"]
         NginxProd --> AppProd["Laravel Production Engine\n(APP_DEBUG=false)"]
         AppProd --> DBProd[(MySQL Server Database)]
     end
@@ -88,8 +88,8 @@ flowchart TD
 
 | Kriteria | Target | Status |
 |---|---|---|
-| Aplikasi web dapat diakses via domain/URL publik | `https://ciwideystay.smkbudibakti.sch.id` aktif | ☐ |
-| Waktu respons halaman | ≤ 1,5 detik | ☐ |
+| Aplikasi web dapat diakses via domain/URL publik | `https://bagikopiordersystem.onrender.com` aktif | ✅ HTTP 200 |
+| Waktu respons halaman | ≤ 1,5 detik | ⚠️ Terukur 1,53–1,79 detik |
 | `APP_ENV` / `APP_DEBUG` produksi | `production` / `false` | ☐ |
 | Migrasi & seeding produksi | Berhasil tanpa error | ☐ |
 | Cache config, route, view | Berhasil dibuat | ☐ |
@@ -100,8 +100,8 @@ flowchart TD
 
 | Bukti | Diisi dengan |
 |---|---|
-| URL publik | `https://ciwideystay.smkbudibakti.sch.id` |
+| URL publik | `https://bagikopiordersystem.onrender.com` — HTTP 200 |
 | Screenshot halaman produksi | _(lampirkan)_ |
-| Hasil pengukuran respons | _(lampirkan, target ≤ 1,5 detik)_ |
+| Hasil pengukuran respons | 1,53 detik dan 1,79 detik (curl, 12 November 2026) — target ≤ 1,5 detik belum tercapai |
 | Screenshot akses offline | `http://192.168.43.100:8000` _(lampirkan)_ |
 | Waktu switch online → offline | _(catat, target ≤ 2 menit)_ |
