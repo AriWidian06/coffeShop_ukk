@@ -75,7 +75,7 @@
 Verifikasi ulang pada 12 November 2026 (Release Candidate):
 
 - `php artisan test` → **37 passed (117 assertions)**.
-- `php artisan test --configuration=phpunit.sprint3.xml` → **29 passed (174 assertions)**.
+- `vendor/bin/phpunit --configuration=phpunit.sprint3.xml` → **29 passed (175 assertions)**.
 - Kedua suite dijalankan pada `db_perkoci_test` yang **dibuat kosong dari nol** (simulasi runner GitHub Actions) → hijau, sesuai kriteria RC-05.
 - `tests/Feature/ReleaseCandidateTest.php` (7 test baru) dibuktikan **gagal** pada kode sebelum perbaikan (6 dari 7 test gagal) dan **lulus** sesudahnya.
 - Bukti manual RC-01: stok produk 10 → 8 (pesanan dibuat) → 10 (QRIS dibatalkan) → **10** (transaksi dihapus, tidak terbalik lagi).

@@ -28,7 +28,7 @@ Tidak ada perubahan fungsional di luar lima perbaikan tersebut.
 | RC-02 | MAJOR | Pesanan berstatus `cancelled` kini tampil sebagai **"Dibatalkan"** di halaman status pelanggan, bukan "Menunggu Konfirmasi". | `app/Http/Controllers/Api/TransaksiController.php`, `resources/views/welcome.blade.php` |
 | RC-03 | MAJOR | Transaksi `cancelled` (belum dibayar) tidak lagi dihitung sebagai pendapatan pada laporan, export PDF, dan dashboard manager/admin. | `app/Http/Controllers/LaporanController.php`, `app/Http/Controllers/DashboardController.php`, `routes/web.php` |
 | RC-04 | MINOR | Badge status `cancelled` tampil sebagai "Dibatalkan" (bukan string Inggris mentah) di daftar transaksi, detail transaksi, dan dashboard kasir. | `resources/views/transaksis/index.blade.php`, `resources/views/transaksis/show.blade.php`, `resources/views/dashboard/kasir.blade.php` |
-| RC-05 | MAJOR | GitHub Actions kembali hijau: `RefreshDatabase` diaktifkan pada `tests/Feature/ExampleTest.php`, matrix CI disederhanakan ke PHP 8.3, dan `composer.lock` disinkronkan. | `tests/Feature/ExampleTest.php`, `.github/workflows/tests.yml`, `composer.lock` |
+| RC-05 | MAJOR | GitHub Actions kembali hijau: `RefreshDatabase` diaktifkan, Vite dinonaktifkan di base `TestCase`, matrix CI disederhanakan ke PHP 8.3, `composer.lock` disinkronkan, dan suite Sprint 3 dibuat deterministik (kunci Midtrans dummy + mock QRIS) serta dijalankan lewat `vendor/bin/phpunit`. | `tests/Feature/ExampleTest.php`, `tests/TestCase.php`, `phpunit.xml`, `phpunit.sprint3.xml`, `tests/Sprint3/Sprint3FunctionalTest.php`, `app/Http/Controllers/Api/TransaksiController.php`, `.github/workflows/tests.yml`, `composer.lock` |
 
 ### Cleanup Kode Sumber
 
@@ -45,10 +45,10 @@ Tidak ada perubahan fungsional di luar lima perbaikan tersebut.
 | Suite | Perintah | Hasil |
 |---|---|---|
 | Feature & Unit | `php artisan test` | **37 passed (117 assertions)** |
-| Sprint 3 | `php artisan test --configuration=phpunit.sprint3.xml` | **29 passed (174 assertions)** |
+| Sprint 3 | `vendor/bin/phpunit --configuration=phpunit.sprint3.xml` | **29 passed (175 assertions)** |
 | Regression RC | `php artisan test --filter=ReleaseCandidateTest` | **7 passed (27 assertions)** |
 
-Kedua suite dijalankan pada database `db_perkoci_test` yang **dibuat kosong dari nol** untuk menyimulasikan runner GitHub Actions (sebelum perbaikan, suite utama gagal pada `tests/Feature/ExampleTest.php` karena tabel `mejas` belum tersedia).
+Kedua suite dijalankan pada database `db_perkoci_test` yang **dibuat kosong dari nol**, memakai `.env` hasil salinan `.env.example` + `APP_KEY` baru, dan **tanpa `public/build`** — replikasi persis langkah runner GitHub Actions. Sebelum perbaikan, suite utama gagal karena tabel `mejas` belum tersedia; setelah `RefreshDatabase` diaktifkan, masalah berikutnya adalah `ViteManifestNotFoundException` (job backend tidak membangun aset) yang ditutup dengan `withoutVite()` pada base `TestCase`.
 
 Tujuh test pada `tests/Feature/ReleaseCandidateTest.php` dibuktikan **gagal pada kode sebelum perbaikan** (6 dari 7 test gagal) dan **lulus sesudahnya** — menandakan test tersebut benar-benar menangkap regresi, bukan sekadar assertion yang selalu benar.
 

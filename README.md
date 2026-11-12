@@ -231,8 +231,12 @@ php artisan test
 # Suite Sprint 3 (15 skenario fungsional + skenario negatif) — memakai db_perkoci_test
 # Database db_perkoci_test harus sudah dibuat:
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS db_perkoci_test;"
-php artisan test --configuration=phpunit.sprint3.xml
+vendor/bin/phpunit --configuration=phpunit.sprint3.xml
 ```
+
+> Suite Sprint 3 dijalankan lewat `vendor/bin/phpunit`, bukan `php artisan test --configuration=...`.
+> Perintah `php artisan test` (Collision) selalu menambahkan `--configuration` sendiri sehingga
+> opsinya menjadi duplikat dan PHPUnit keluar dengan kode 1 meski semua test lulus.
 
 | Suite | File | Cakupan |
 |---|---|---|
@@ -399,7 +403,7 @@ Folder `pemodelan/` berisi dokumentasi analisis dan perancangan:
 
 1. Fork repository ini.
 2. Buat branch fitur: `git checkout -b feature/nama-fitur`.
-3. Jalankan pengujian sebelum push: `php artisan test` dan `php artisan test --configuration=phpunit.sprint3.xml`.
+3. Jalankan pengujian sebelum push: `php artisan test` dan `vendor/bin/phpunit --configuration=phpunit.sprint3.xml`.
 4. Format kode dengan Pint bila diperlukan: `vendor/bin/pint`.
 5. Buka Pull Request dengan deskripsi perubahan yang jelas.
 
