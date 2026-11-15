@@ -3,7 +3,7 @@
         'name' => 'coffeeshop/coffee-shop-order-system',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '24fad18a867829c82deb3e546bae55ec32596260',
+        'reference' => '4c37d92251951e48ee7bbb0b6a760867e6e04f59',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -31,7 +31,7 @@
         'coffeeshop/coffee-shop-order-system' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '24fad18a867829c82deb3e546bae55ec32596260',
+            'reference' => '4c37d92251951e48ee7bbb0b6a760867e6e04f59',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -468,6 +468,15 @@
             'install_path' => __DIR__ . '/../laravel/sail',
             'aliases' => array(),
             'dev_requirement' => true,
+        ),
+        'laravel/sanctum' => array(
+            'pretty_version' => 'v4.4.0',
+            'version' => '4.4.0.0',
+            'reference' => 'a28ea5d4c2b123420562d6a3a233414f84b70774',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../laravel/sanctum',
+            'aliases' => array(),
+            'dev_requirement' => false,
         ),
         'laravel/serializable-closure' => array(
             'pretty_version' => 'v2.0.16',

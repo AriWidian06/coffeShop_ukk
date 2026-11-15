@@ -44,7 +44,7 @@ Proses pemesanan di kedai kopi masih sering mengandalkan pencatatan manual: pela
 
 * **Frontend:** Blade Templating, Tailwind CSS 4, Vite 7, JavaScript (Alpine/vanilla), desain responsif untuk mobile & desktop.
 * **Backend:** PHP 8.2+ dengan Laravel 12 (MVC), Service Layer untuk pembayaran, Policy & Gate untuk otorisasi.
-* **Database:** MySQL 8 / MariaDB 10.11, 21 migrasi, relasi transaksi ternormalisasi, dan penyimpanan binary gambar produk sebagai fallback deployment.
+* **Database:** MySQL 8 / MariaDB 10.11, 22 migrasi, relasi transaksi ternormalisasi, dan penyimpanan binary gambar produk sebagai fallback deployment.
 * **Payment Gateway:** Midtrans Snap (QRIS) dengan verifikasi **signature hash** pada webhook.
 * **Reporting:** Dompdf 3.x untuk ekspor laporan penjualan PDF.
 * **Security:** Bcrypt password hashing, CSRF protection, rate limiting login, Role Middleware (RBAC), `TransaksiPolicy` anti-IDOR, dan validasi input server-side.
@@ -64,6 +64,8 @@ Proses pemesanan di kedai kopi masih sering mengandalkan pencatatan manual: pela
                           │ Webhook + signature    │
                           └────────────────────────┘
 ```
+
+> 📘 **Dokumentasi API:** Spesifikasi OpenAPI 3.0 dan Postman Collection tersedia di [`docs/04-api/`](docs/04-api/README.md).
 
 ---
 
@@ -196,6 +198,8 @@ Alur pembayaran: pelanggan/kasir memilih QRIS → `PaymentService` membuat Snap 
 
 <div align="center">
 
-Dibangun dengan ☕ dan Laravel untuk UKK Rekayasa Perangkat Lunak / PPLG.
+Dibangun dengan Kopi dan Laravel untuk UKK Rekayasa Perangkat Lunak / PPLG.
+
+© 2026 **Spark Industri** — Pengembang Aplikasi. Dilisensikan di bawah MIT.
 
 </div>

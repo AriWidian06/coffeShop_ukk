@@ -57,5 +57,12 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(5)
                 ->by(strtolower((string) $request->input('username')) . '|' . ($request->ip() ?: 'unknown'));
         });
+
+        // Endpoint staf boleh lebih sering karena dashboard/POS melakukan polling.
+        RateLimiter::for('api.staff', function (Request $request) {
+            return Limit::perMinute(120)->by(
+                (string) (auth('sanctum')->id() ?: $request->ip() ?: 'unknown')
+            );
+        });
     }
 }

@@ -1,9 +1,18 @@
 <?php
 
+use App\Http\Middleware\EnsureApiRole;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -21,9 +30,60 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             '/midtrans/notification',
         ]);
+
+        $middleware->alias([
+            'api.role' => EnsureApiRole::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
+        // Bentuk error API v1 dibuat konsisten: selalu ada success=false & message.
+        $exceptions->render(function (ValidationException $e, Request $request) {
+            if ($request->is('api/v1/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data yang diberikan tidak valid.',
+                    'errors' => $e->errors(),
+                ], 422);
+            }
+        });
+
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            if ($request->is('api/v1/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthenticated. Sertakan Bearer token yang valid.',
+                ], 401);
+            }
+        });
+
+        $exceptions->render(function (AuthorizationException $e, Request $request) {
+            if ($request->is('api/v1/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Akses ditolak: Anda tidak memiliki wewenang untuk aksi ini.',
+                ], 403);
+            }
+        });
+
+        $exceptions->render(function (ModelNotFoundException|NotFoundHttpException $e, Request $request) {
+            if ($request->is('api/v1/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak ditemukan.',
+                ], 404);
+            }
+        });
+
+        $exceptions->render(function (ThrottleRequestsException $e, Request $request) {
+            if ($request->is('api/v1/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terlalu banyak permintaan. Silakan coba lagi nanti.',
+                ], 429)->withHeaders($e->getHeaders());
+            }
+        });
+
+        $exceptions->render(function (Throwable $e, Request $request) {
             if ($request->expectsJson()) {
                 return null;
             }
@@ -31,7 +91,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // Pelanggan yang datang dari QR meja tidak diarahkan ke halaman
             // login staf. Tampilkan halaman "Akses Ditolak" dan sediakan
             // tautan kembali ke QR meja yang sedang dipakai.
-            if ($e instanceof \Illuminate\Auth\AuthenticationException) {
+            if ($e instanceof AuthenticationException) {
                 $mejaId = ($request->hasSession() ? $request->session()->get('meja_id') : null)
                     ?? $request->cookie('qr_meja_id');
 
@@ -49,7 +109,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
-            if ($e instanceof \Illuminate\Validation\ValidationException) {
+            if ($e instanceof ValidationException) {
                 return null;
             }
 
@@ -57,12 +117,12 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
-            $status = $e instanceof \Symfony\Component\HttpKernel\Exception\HttpException
+            $status = $e instanceof HttpException
                 ? $e->getStatusCode()
                 : 500;
 
-            $view = \Illuminate\Support\Facades\View::exists('errors.' . $status)
-                ? 'errors.' . $status
+            $view = View::exists('errors.'.$status)
+                ? 'errors.'.$status
                 : 'errors.generic';
 
             return response()->view($view, [
