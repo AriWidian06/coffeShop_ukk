@@ -172,7 +172,14 @@ class LaporanController extends Controller
 
         $canvas = $dompdf->getCanvas();
         $pageFont = $dompdf->getFontMetrics()->getFont('DejaVu Sans', 'normal');
-        $canvas->page_text(730, 575, 'Halaman {PAGE_NUM} dari {PAGE_COUNT}', $pageFont, 7, [0.45, 0.45, 0.45]);
+        $canvas->page_text(
+            $canvas->get_width() - 92,
+            $canvas->get_height() - 20,
+            'Halaman {PAGE_NUM} dari {PAGE_COUNT}',
+            $pageFont,
+            6.5,
+            [0.39, 0.45, 0.55]
+        );
 
         $filename = 'Laporan_BagiKopi_' . $fileTag . '.pdf';
 
