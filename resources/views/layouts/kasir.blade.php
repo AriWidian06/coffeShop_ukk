@@ -28,11 +28,15 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
-                    <div class="w-9 h-9 rounded-xl bg-primary-600 text-white flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 1v3M10 1v3M14 1v3" />
-                        </svg>
+                    <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm overflow-hidden border border-slate-200 shrink-0">
+                        <img src="{{ asset('images/logo.jpeg') }}" alt="Logo Bagi Kopi" class="w-full h-full object-cover"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="w-9 h-9 rounded-xl bg-primary-600 items-center justify-center" style="display: none;">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 1v3M10 1v3M14 1v3" />
+                            </svg>
+                        </div>
                     </div>
                     <div class="min-w-0">
                         <p class="text-sm font-bold text-slate-900 leading-tight truncate">Bagi Kopi</p>
@@ -53,11 +57,15 @@
             <!-- Logo & Outlet Info -->
             <div class="h-16 flex items-center justify-between gap-2 px-5 sm:px-6 border-b border-slate-200 shrink-0">
                 <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-9 h-9 rounded-xl bg-primary-600 text-white flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 1v3M10 1v3M14 1v3" />
-                        </svg>
+                    <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm overflow-hidden border border-slate-200 shrink-0">
+                        <img src="{{ asset('images/logo.jpeg') }}" alt="Logo Bagi Kopi" class="w-full h-full object-cover"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="w-9 h-9 rounded-xl bg-primary-600 items-center justify-center" style="display: none;">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 1v3M10 1v3M14 1v3" />
+                            </svg>
+                        </div>
                     </div>
                     <div class="min-w-0">
                         <h1 class="font-bold text-slate-900 text-sm leading-tight truncate">Bagi Kopi</h1>

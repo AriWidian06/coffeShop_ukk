@@ -24,9 +24,9 @@
 
             <!-- Logo -->
             <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center overflow-hidden">
-                    <!-- GANTI LOGO DI SINI: Upload file logo ke public/images/logo-bagi-kopi.jpg -->
-                    <img src="{{ asset('images/logo-bagi-kopi.jpg') }}" alt="Bagi Kopi Logo" class="w-full h-full object-cover p-1" onerror="this.style.display='none'; this.parentElement.innerHTML='<svg class=\'w-6 h-6 text-white\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z\' /><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M6 1v3M10 1v3M14 1v3\' /></svg>'">
+                <div class="w-11 h-11 rounded-xl bg-white flex items-center justify-center overflow-hidden shadow-sm">
+                    <img src="{{ asset('images/logo.jpeg') }}" alt="Bagi Kopi Logo" class="w-full h-full object-cover p-1"
+                         onerror="this.style.display='none'; this.parentElement.innerHTML='<svg class=\'w-6 h-6 text-primary-600\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z\' /><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M6 1v3M10 1v3M14 1v3\' /></svg>';">
                 </div>
                 <div>
                     <h2 class="font-bold text-lg leading-tight">BAGI KOPI</h2>
