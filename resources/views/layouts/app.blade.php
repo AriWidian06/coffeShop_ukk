@@ -206,5 +206,7 @@
             });
         })();
     </script>
+
+    @include('partials.toast')
 </body>
 </html>

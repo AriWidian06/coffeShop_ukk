@@ -3,7 +3,7 @@
         'name' => 'coffeeshop/coffee-shop-order-system',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '4c37d92251951e48ee7bbb0b6a760867e6e04f59',
+        'reference' => '4c10a68d1a5a282a15f4ae0f1ca4fa5cc7d4986f',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -31,7 +31,7 @@
         'coffeeshop/coffee-shop-order-system' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '4c37d92251951e48ee7bbb0b6a760867e6e04f59',
+            'reference' => '4c10a68d1a5a282a15f4ae0f1ca4fa5cc7d4986f',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

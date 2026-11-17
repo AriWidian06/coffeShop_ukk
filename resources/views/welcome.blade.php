@@ -9,12 +9,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="antialiased text-slate-800 bg-slate-50 pb-24">
+<body class="antialiased text-slate-800 bg-slate-50 pb-24 lg:pb-0">
 
-    <!-- Mobile Header -->
+    <!-- Header -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
-        <div class="px-4 py-3 max-w-md mx-auto">
-            <div class="flex items-center justify-between mb-3">
+        <div class="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap items-center justify-between gap-3">
                 <div class="flex items-center gap-2.5">
                     <div class="w-10 h-10 rounded-2xl bg-primary-600 text-white flex items-center justify-center shadow-md shadow-primary-600/20 overflow-hidden shrink-0">
                         <img
@@ -32,6 +32,18 @@
                         <p id="header-subtitle" class="text-[10px] text-slate-500 font-bold tracking-wider">ARTISANAL BREW • CATALOG</p>
                     </div>
                 </div>
+
+                <nav class="hidden items-center gap-1.5 lg:flex" aria-label="Navigasi pelanggan">
+                    <button onclick="switchTab('pesan')" id="nav-pesan-desktop"
+                            class="rounded-xl bg-primary-50 px-4 py-2 text-sm font-bold text-primary-700 transition">
+                        Pesan
+                    </button>
+                    <button onclick="switchTab('status')" id="nav-status-desktop"
+                            class="rounded-xl px-4 py-2 text-sm font-bold text-slate-500 transition hover:bg-slate-100 hover:text-slate-700">
+                        Status
+                    </button>
+                </nav>
+
                 <div class="flex items-center gap-2">
                     @if(isset($mejaAktif))
                         <div class="flex items-center gap-1.5 px-3 py-1.5 bg-primary-50 rounded-xl border border-primary-200">
@@ -39,6 +51,17 @@
                             <span class="text-xs font-bold text-primary-700">Meja #{{ $mejaAktif->nomor_meja }}</span>
                         </div>
                     @endif
+
+                    <button type="button" onclick="toggleCart()"
+                            class="hidden items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:border-primary-200 hover:bg-slate-50 lg:flex">
+                        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        <span>Keranjang</span>
+                        <span id="desktop-cart-total" class="text-primary-700">Rp 0</span>
+                        <span id="desktop-cart-badge" class="hidden h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-extrabold text-white">0</span>
+                    </button>
+
                     <button class="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -48,7 +71,7 @@
             </div>
 
             <!-- Search (Hanya tampil di tab Pesan) -->
-            <div id="search-container" class="relative">
+            <div id="search-container" class="relative mt-3 lg:max-w-2xl">
                 <input type="text" id="menu-search-mobile" onkeyup="filterMenu()"
                     placeholder="Cari kopi, pastry, atau manual brew..."
                     class="w-full pl-10 pr-10 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all">
@@ -65,7 +88,7 @@
     </header>
 
     <!-- Main Content Area -->
-    <main class="max-w-md mx-auto px-4 py-5 space-y-5">
+    <main class="mx-auto max-w-7xl px-4 py-5 space-y-5 sm:px-6 lg:px-8 lg:py-8 lg:space-y-8">
 
         <!-- ================= TAB PESAN (KATALOG MENU) ================= -->
         <div id="tab-pesan" class="space-y-5">
@@ -94,7 +117,7 @@
 
             <!-- Category Pills -->
             <div>
-                <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-1">
+                <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-1 lg:flex-wrap lg:overflow-visible">
                     <button onclick="setCategory('semua', this)" class="category-btn active px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all bg-primary-600 text-white shadow-md shadow-primary-600/20">
                         Semua
                     </button>
@@ -117,7 +140,7 @@
             </div>
 
             <!-- Menu List -->
-            <div id="menu-grid" class="space-y-3">
+            <div id="menu-grid" class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 @forelse($produks as $produk)
                     @php
                         $categorySlug = \Illuminate\Support\Str::slug($produk->kategoriProduk->nama_kategori ?? 'lainnya', '-');
@@ -142,7 +165,7 @@
                         }
                     @endphp
 
-                    <article class="menu-card product-card bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-3"
+                    <article class="menu-card product-card h-full bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-3"
                         data-category="{{ $categorySlug }}" data-name="{{ $dataName }}"
                         data-product-id="{{ $produk->id }}" data-product-name="{{ $produk->nama_produk }}"
                         data-product-description="{{ $produk->deskripsi ?? '' }}"
@@ -226,7 +249,7 @@
     </main>
 
     <!-- FLOATING CART BOTTOM BAR -->
-    <div id="floating-cart-bar" class="fixed bottom-16 left-4 right-4 max-w-md mx-auto z-40 hidden transition-all duration-300 transform translate-y-2 opacity-0">
+    <div id="floating-cart-bar" class="fixed bottom-16 left-4 right-4 max-w-md mx-auto z-40 hidden transition-all duration-300 transform translate-y-2 opacity-0 lg:hidden">
         <div onclick="toggleCart()" class="bg-primary-600 hover:bg-primary-700 text-white rounded-2xl p-3.5 shadow-xl shadow-primary-600/30 flex items-center justify-between cursor-pointer transition-all active:scale-95">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center relative">
@@ -250,7 +273,7 @@
     </div>
 
     <!-- Mobile Bottom Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-2 z-50 safe-area-pb max-w-md mx-auto">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-2 z-50 safe-area-pb max-w-md mx-auto lg:hidden">
         <div class="flex items-center justify-around">
             <button onclick="switchTab('pesan')" id="nav-pesan" class="flex flex-col items-center gap-1 py-1 px-3 text-primary-600 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,6 +312,9 @@
         .safe-area-pb { padding-bottom: env(safe-area-inset-bottom); }
         @keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .animate-slide-up { animation: slide-up 0.3s ease-out; }
+        @media (min-width: 640px) {
+            .animate-slide-up { animation: none; }
+        }
         .temp-btn.active, .milk-btn.active, .sugar-btn.active { @apply border-primary-600 bg-primary-50 text-primary-700; }
         .temp-btn:not(.active), .milk-btn:not(.active), .sugar-btn:not(.active) { @apply border-slate-200 text-slate-600; }
         .order-type-btn.active { @apply border-primary-600 bg-primary-50 text-primary-700 shadow-sm; }
@@ -571,33 +597,36 @@
 
             const navPesan = document.getElementById('nav-pesan');
             const navStatus = document.getElementById('nav-status');
+            const navPesanDesktop = document.getElementById('nav-pesan-desktop');
+            const navStatusDesktop = document.getElementById('nav-status-desktop');
+            const desktopNavActive = 'rounded-xl bg-primary-50 px-4 py-2 text-sm font-bold text-primary-700 transition';
+            const desktopNavInactive = 'rounded-xl px-4 py-2 text-sm font-bold text-slate-500 transition hover:bg-slate-100 hover:text-slate-700';
 
-            if (tabName === 'status') {
-                tabPesan.classList.add('hidden');
-                tabStatus.classList.remove('hidden');
-                searchContainer.classList.add('hidden');
-                headerTitle.textContent = 'Bagi Kopi';
-                headerSubtitle.textContent = 'ARTISANAL BREW • ORDER STATUS';
+            const isStatus = tabName === 'status';
 
-                navStatus.classList.remove('text-slate-400');
-                navStatus.classList.add('text-primary-600');
-                navPesan.classList.remove('text-primary-600');
-                navPesan.classList.add('text-slate-400');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+            tabPesan.classList.toggle('hidden', isStatus);
+            tabStatus.classList.toggle('hidden', !isStatus);
+            searchContainer.classList.toggle('hidden', isStatus);
+
+            headerTitle.textContent = 'Bagi Kopi';
+            headerSubtitle.textContent = isStatus
+                ? 'ARTISANAL BREW • ORDER STATUS'
+                : 'ARTISANAL BREW • CATALOG';
+
+            navPesan.classList.toggle('text-primary-600', !isStatus);
+            navPesan.classList.toggle('text-slate-400', isStatus);
+            navStatus.classList.toggle('text-primary-600', isStatus);
+            navStatus.classList.toggle('text-slate-400', !isStatus);
+
+            if (navPesanDesktop) navPesanDesktop.className = isStatus ? desktopNavInactive : desktopNavActive;
+            if (navStatusDesktop) navStatusDesktop.className = isStatus ? desktopNavActive : desktopNavInactive;
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (isStatus) {
                 startMyOrderPolling();
                 refreshMyOrder(true);
             } else {
-                tabStatus.classList.add('hidden');
-                tabPesan.classList.remove('hidden');
-                searchContainer.classList.remove('hidden');
-                headerTitle.textContent = 'Bagi Kopi';
-                headerSubtitle.textContent = 'ARTISANAL BREW • CATALOG';
-
-                navPesan.classList.remove('text-slate-400');
-                navPesan.classList.add('text-primary-600');
-                navStatus.classList.remove('text-primary-600');
-                navStatus.classList.add('text-slate-400');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
                 stopMyOrderPolling();
             }
         }
@@ -952,9 +981,13 @@
             const floatingBadge = document.getElementById('floating-cart-badge');
             const floatingTitle = document.getElementById('floating-cart-title');
             const floatingTotal = document.getElementById('floating-cart-total');
+            const desktopBadge = document.getElementById('desktop-cart-badge');
+            const desktopTotal = document.getElementById('desktop-cart-total');
 
             const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
             const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+            if (desktopTotal) desktopTotal.textContent = formatRupiah(subtotal);
 
             if (totalQty > 0) {
                 bottomBadge.textContent = totalQty;
@@ -965,6 +998,12 @@
                 floatingTitle.textContent = `${totalQty} MENU DIPILIH`;
                 floatingTotal.textContent = formatRupiah(subtotal);
 
+                if (desktopBadge) {
+                    desktopBadge.textContent = totalQty;
+                    desktopBadge.classList.remove('hidden');
+                    desktopBadge.classList.add('flex');
+                }
+
                 floatingBar.classList.remove('hidden');
                 setTimeout(() => {
                     floatingBar.classList.remove('translate-y-2', 'opacity-0');
@@ -972,6 +1011,11 @@
             } else {
                 bottomBadge.classList.add('hidden');
                 bottomBadge.classList.remove('flex');
+
+                if (desktopBadge) {
+                    desktopBadge.classList.add('hidden');
+                    desktopBadge.classList.remove('flex');
+                }
 
                 floatingBar.classList.add('translate-y-2', 'opacity-0');
                 setTimeout(() => {
@@ -1207,6 +1251,7 @@
                 toggleCart();
                 document.getElementById('receipt-modal').classList.remove('hidden');
                 document.getElementById('receipt-modal').classList.add('flex');
+                document.body.style.overflow = 'hidden';
             } catch (requestError) {
                 alert(requestError.message);
             } finally {
@@ -1255,6 +1300,7 @@
             stopQrisPolling();
             document.getElementById('receipt-modal').classList.add('hidden');
             document.getElementById('receipt-modal').classList.remove('flex');
+            document.body.style.overflow = '';
             document.getElementById('order-notes').value = '';
             cart = [];
             nextCartLineId = 1;
@@ -1306,6 +1352,21 @@
         updateHeaderCart();
         setOrderType('dine-in');
         updatePaymentMethodUI();
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key !== 'Escape') return;
+
+            const cartPage = document.getElementById('cart-page');
+            if (cartPage && !cartPage.classList.contains('hidden')) {
+                toggleCart();
+                return;
+            }
+
+            const customModal = document.getElementById('mobile-customization-modal');
+            if (customModal && !customModal.classList.contains('hidden')) {
+                closeMobileCustomization();
+            }
+        });
 
         document.addEventListener('visibilitychange', function () {
             if (!document.hidden && activeTab === 'status') {

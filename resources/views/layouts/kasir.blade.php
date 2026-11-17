@@ -187,6 +187,9 @@
             });
         })();
     </script>
+
+    @include('partials.toast')
+
     @yield('scripts')
 </body>
 

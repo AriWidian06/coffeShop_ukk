@@ -25,12 +25,6 @@
 
     <main class="p-4 sm:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6">
 
-        @if (session('success'))
-            <div class="rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 text-sm font-medium">
-                {{ session('success') }}
-            </div>
-        @endif
-
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-sm min-w-[900px]">
