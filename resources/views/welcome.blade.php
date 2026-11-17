@@ -70,7 +70,7 @@
                 </div>
             </div>
 
-            <!-- Search (Hanya tampil di tab Pesan) -->
+            <!-- Search  -->
             <div id="search-container" class="relative mt-3 lg:max-w-2xl">
                 <input type="text" id="menu-search-mobile" onkeyup="filterMenu()"
                     placeholder="Cari kopi, pastry, atau manual brew..."
@@ -192,15 +192,21 @@
                                 </div>
                                 <div class="flex items-center justify-between mt-2">
                                     <span class="font-extrabold text-primary-600 text-sm">Rp {{ $hargaFormatted }}</span>
+
+                                    <!-- ini bagian nampilin ketersediaan product &   -->
                                     @if($produk->stock > 0)
+                                    <span class="text-[10px] font-bold px-2 py-1 rounded-lg">Tersedia</span>
                                         <button type="button" onclick="quickAddToCart({{ $produk->id }}, '{{ addslashes($produk->nama_produk) }}', {{ $produk->harga_jual }}, {{ $produk->stock }})"
                                             class="w-8 h-8 rounded-xl bg-primary-600 text-white flex items-center justify-center hover:bg-primary-700 active:scale-95 shadow-md shadow-primary-600/20 transition">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                             </svg>
                                         </button>
-                                    @else
+                        
+                                    @elseif($produk->stock <= 0)
                                         <span class="text-[10px] font-bold px-2 py-1 bg-red-50 text-red-600 rounded-lg">Habis</span>
+                                    @else
+                                    <!--selesai-->
                                     @endif
                                 </div>
                             </div>
@@ -243,7 +249,7 @@
             </div>
         </div>
 
-        <!-- ================= TAB STATUS PESANAN ================= -->
+        
         @include('user.status')
 
     </main>

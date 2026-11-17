@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('harga_beli', 10, 2);
             $table->enum('tipe', ['jual', 'bahan baku']);
             $table->string('satuan')->default('pcs');
-            $table->integer('stock')->default(0);
+            $table->integer('stock')->default(0);  // saya ngambil dari stok buat validasinya
             $table->boolean('status_aktif')->default(true);
             $table->timestamps();
         });

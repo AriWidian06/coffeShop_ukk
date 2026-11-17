@@ -124,13 +124,14 @@
                                             </svg>
                                         </div>
                                     @endif
+                                    <!--ni bagian  toggle ketersediaan stock-->
                                     <div class="p-3">
                                         <div class="flex items-center justify-between mb-1">
                                             <span class="text-[10px] font-bold text-primary-600 uppercase tracking-wider">{{ $produk->kategoriProduk->nama_kategori ?? 'Menu' }}</span>
-                                            @if($produk->stock < 5)
-                                                <span class="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">Stok: {{ $produk->stock }}</span>
+                                            @if($produk->stock < 5) 
+                                                <span class="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">Habis</span>
                                             @else
-                                                <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Stok: {{ $produk->stock }}</span>
+                                                <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Tersedia: {{ $produk->stock }}</span>
                                             @endif
                                         </div>
                                         <h2 class="font-bold text-slate-900 text-sm mb-1 line-clamp-2 min-h-[2.5rem]">{{ $produk->nama_produk }}</h2>
@@ -145,8 +146,10 @@
                                                 data-price="{{ (float) $produk->harga_jual }}"
                                                 data-stock="{{ $produk->stock }}"
                                                 aria-label="Tambah {{ $produk->nama_produk }}"
-                                                @disabled($produk->stock < 1)
-                                            >
+                                                @disabled($produk->stock < 1) >    <!--ini agar pada saat stock nya kurang dari satu gak bisa di teken-->
+
+                                        <!--selesai-->
+                                            
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                                 </svg>
@@ -186,11 +189,11 @@
                             <div class="pos-type-selector">
                                 <label class="pos-type-option">
                                     <input type="radio" name="tipe_pesanan" value="dine-in" checked>
-                                    <span>🍽️ Makan di Tempat</span>
+                                    <span>Makan di Tempat</span>
                                 </label>
                                 <label class="pos-type-option">
                                     <input type="radio" name="tipe_pesanan" value="take-away">
-                                    <span>🥡 Bawa Pulang</span>
+                                    <span>Bawa Pulang</span>
                                 </label>
                             </div>
                         </div>
