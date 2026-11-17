@@ -189,7 +189,7 @@ Alur pembayaran: pelanggan/kasir memilih QRIS → `PaymentService` membuat Snap 
 | Nama | Peran | NISN |
 |---|---|---|
 | **Putra Ari Widian** | Backend Architect & Database Administrator | `[0018505224/242510318]` |
-| **Muh.Rapa aditya** | Frontend Specialist & UI/UX Designer | `[0084566332]` |
+| **Muh.Rapa aditya** | Frontend Specialist & UI/UX Designer | `[0084566332/25261101]` |
 
 **Pembimbing UKK:** `[Nurdiansyah Permana,S.T.]`<br>
 **SMK `[Budi Bakti Ciwidey]`** — 2026
@@ -202,6 +202,6 @@ Alur pembayaran: pelanggan/kasir memilih QRIS → `PaymentService` membuat Snap 
 
 Dibangun dengan Kopi dan Laravel untuk UKK Rekayasa Perangkat Lunak / PPLG.
 
-© 2026 **Spark Industri** — Pengembang Aplikasi. Dilisensikan di bawah MIT.
+© 2026 **Spark Industri** — Pengembang Aplikasi..
 
 </div>

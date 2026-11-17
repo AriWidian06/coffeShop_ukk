@@ -26,7 +26,7 @@
             <div class="flex items-center gap-3">
                 <div class="w-11 h-11 rounded-xl bg-white flex items-center justify-center overflow-hidden shadow-sm">
                     <img src="{{ asset('images/logo.jpeg') }}" alt="Bagi Kopi Logo" class="w-full h-full object-cover p-1"
-                         onerror="this.style.display='none'; this.parentElement.innerHTML='<svg class=\'w-6 h-6 text-primary-600\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z\' /><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M6 1v3M10 1v3M14 1v3\' /></svg>';">
+                        onerror="this.style.display='none'; this.parentElement.innerHTML='<svg class=\'w-6 h-6 text-primary-600\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z\' /><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M6 1v3M10 1v3M14 1v3\' /></svg>';">
                 </div>
                 <div>
                     <h2 class="font-bold text-lg leading-tight">BAGI KOPI</h2>
@@ -38,15 +38,15 @@
             <div class="my-8 lg:my-0">
                 <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-xs font-semibold mb-6">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    KONSOL ROASTERY V2.4
+                    KONSOL ROASTERY V1.0
                 </div>
 
                 <h1 class="font-bold text-2xl sm:text-3xl lg:text-4xl leading-tight mb-4">
-                    Presisi Artisan dalam<br>Setiap Takaran & Batch
+                    System Pengelolaan<br> internal roastery & supply
                 </h1>
 
                 <p class="text-blue-100 text-sm leading-relaxed max-w-md">
-                    Akses terpadu pengelolaan inventaris green beans, jadwal profiling sangrai cupping harian, hingga distribusi multi-outlet se-Nusantara.
+                    Sistem manajemen internal untuk mengelola proses produksi, pemesanan, dan penjualan kopi di Karsa Roastery & Supply. Didesain untuk efisiensi operasional dan pengalaman pengguna yang optimal.
                 </p>
             </div>
 
@@ -56,9 +56,9 @@
                     <svg class="w-5 h-5 text-blue-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
-                    <span class="text-sm font-semibold">Sistem Manajemen Internal</span>
+                    <span class="text-sm font-semibold">Sistem Internal</span>
                 </div>
-                <span class="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2.5 py-1 rounded-md">v2.4</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2.5 py-1 rounded-md">v1.0</span>
             </div>
         </div>
 
@@ -76,7 +76,7 @@
             <!-- Heading -->
             <h2 class="font-bold text-2xl sm:text-3xl lg:text-4xl text-slate-900 mb-2">Selamat Datang Kembali</h2>
             <p class="text-slate-500 text-sm mb-8">
-                Gunakan kredensial resmi manajemen internal Karsa Roastery untuk melanjutkan.
+                Gunakan kredensial resmi manajemen internal untuk melanjutkan.
             </p>
 
             <!-- Error Alert -->
@@ -88,7 +88,7 @@
                         </svg>
                     </div>
                     <div class="flex-1">
-                        <p class="font-bold text-red-900 text-sm">Otentikasi Tidak Berhasil</p>
+                        <p class="font-bold text-red-900 text-sm">Login gagal</p>
                         <p class="text-xs text-red-700 mt-0.5">
                             {{ $errors->first() }}
                         </p>

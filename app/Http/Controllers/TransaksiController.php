@@ -18,6 +18,7 @@ class TransaksiController extends Controller
         $filters = $request->validate([
             'q' => 'nullable|string|max:40',
             'status' => 'nullable|in:pending,ready,prosesed,completed',
+            'metode_pembayaran' => 'nullable|in:cash,QRIS'
         ]);
 
         $query = Transaksi::with(['meja', 'karyawan', 'pembayaran', 'detail_transaksis.produk'])
@@ -44,6 +45,12 @@ class TransaksiController extends Controller
 
         if (!empty($filters['status'])) {
             $query->where('status_pesanan', $filters['status']);
+        }
+
+        if (!empty($filters['metode_pembayaran'])) {
+            $query->whereHas('pembayaran', function ($query) use ($filters) {
+                $query->where('metode_pembayaran', $filters['metode_pembayaran']);
+            });
         }
 
         $transaksis = $query->paginate(10)->withQueryString();

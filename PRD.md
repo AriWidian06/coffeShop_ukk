@@ -13,7 +13,7 @@
 | **Institusi** | SMK Budi Bakti Ciwidey, Kabupaten Bandung, Jawa Barat |
 | **Repositori** | `github.com/AriWidian06/coffeShop_ukk` |
 | **Demo** | `bagikopiordersystem.onrender.com` |
-| **Dokumen terkait** | [`README.md`](../README.md), [`DESIGN.md`](./DESIGN.md), [`pemodelan/`](../pemodelan/), [`docs/presentation/`](./presentation/) |
+| **Dokumen terkait** | [`README.md`](../README.md), [`DESIGN.md`](./DESIGN.md)|
 
 > **Cara membaca dokumen ini.** PRD ini menjelaskan **apa** yang dibangun dan **mengapa**, bukan bagaimana implementasinya. Keputusan teknis, skema database, API, dan diagram alur ada di [`DESIGN.md`](./DESIGN.md). Semua requirement di sini diverifikasi terhadap kode di repositori, bukan terhadap diagram perencanaan yang lebih lama.
 
@@ -90,7 +90,7 @@ BagiKopi **tidak** bertujuan menjadi:
 - platform multi-outlet;
 - integrasi printer thermal dan kitchen display system;
 - program loyalitas/pelanggan terdaftar;
-- payment gateway produksi pada rilis UKK ini.
+- M_Banking / E-Wallet payment
 
 ### 3.3 Metrik keberhasilan rilis
 
@@ -448,7 +448,7 @@ Rilis dinyatakan siap ketika:
 
 ```bash
 # Siapkan database uji terpisah
-mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS db_perkoci_test;"
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS db_CoffeeShop_test;"
 
 # Suite utama
 php artisan test
@@ -457,7 +457,7 @@ php artisan test
 vendor/bin/phpunit --configuration=phpunit.sprint3.xml
 ```
 
-> Suite memakai `RefreshDatabase` dan database `db_perkoci_test`. Jangan mengarahkan suite ke `db_perkoci`.
+> Suite memakai `RefreshDatabase` dan database `db_CoffeeShop_test`. Jangan mengarahkan suite ke `db_CoffeeShop`.
 
 ---
 
