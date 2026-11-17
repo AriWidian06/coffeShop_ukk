@@ -12,13 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
-/**
- * Data demo lengkap: admin, kategori, supplier, menu + kustomisasi,
- * bahan baku, meja, dan kode promo.
- *
- * Idempoten (firstOrCreate/firstOrNew) sehingga aman dijalankan berulang
- * dan tidak menimpa data yang sudah ada.
- */
+
 class DemoDataSeeder extends Seeder
 {
     public function run(): void

@@ -53,9 +53,10 @@ class TransaksiController extends Controller
             });
         }
 
-        $transaksis = $query->paginate(10)->withQueryString();
+        $totalNominalTerfilter = (clone $query)->sum('total_harga');
+        $transaksis = $query->paginate(15)->withQueryString();
 
-        return view('transaksis.index', compact('transaksis'));
+        return view('transaksis.index', compact('transaksis', 'totalNominalTerfilter'));
     }
 
     public function create(Request $request)

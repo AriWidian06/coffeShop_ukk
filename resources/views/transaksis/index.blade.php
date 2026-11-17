@@ -83,7 +83,7 @@
                     </svg>
                     Tampilkan
                 </button>
-                @if (request()->filled('q') || request()->filled('status'))
+                @if (request()->filled('q') || request()->filled('status') || request()->filled('metode_pembayaran'))
                     <a href="{{ route('transaksis.index') }}" class="flex-1 lg:flex-none px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center">
                         Reset
                     </a>
@@ -104,10 +104,11 @@
                 <div class="min-w-0">
                     <h2 class="text-sm font-bold text-slate-900 leading-tight">Daftar Transaksi</h2>
                     <p class="text-xs text-slate-500">Menampilkan <span class="font-bold text-slate-900">{{ isset($transaksis) ? $transaksis->total() : 0 }}</span> transaksi</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Total nominal terfilter: <span class="font-bold text-slate-900">Rp {{ number_format((float) ($totalNominalTerfilter ?? 0), 0, ',', '.') }}</span></p>
                 </div>
             </div>
 
-            @if (request()->filled('q') || request()->filled('status'))
+            @if (request()->filled('q') || request()->filled('status') || request()->filled('metode_pembayaran'))
                 <div class="flex flex-wrap items-center gap-1.5 text-[10px] font-bold">
                     <span class="text-slate-400 uppercase tracking-wider">Filter aktif:</span>
                     @if (request()->filled('q'))
@@ -119,6 +120,12 @@
                         <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-primary-50 border border-primary-100 text-primary-700">
                             <span class="w-1.5 h-1.5 rounded-full bg-primary-500"></span>
                             {{ $statusLabels[request('status')] ?? request('status') }}
+                        </span>
+                    @endif
+                    @if (request()->filled('metode_pembayaran'))
+                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-700">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            {{ request('metode_pembayaran') === 'cash' ? 'Tunai' : request('metode_pembayaran') }}
                         </span>
                     @endif
                 </div>

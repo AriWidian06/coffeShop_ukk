@@ -30,7 +30,7 @@
                 </div>
                 <div>
                     <h2 class="font-bold text-lg leading-tight">BAGI KOPI</h2>
-                    <p class="text-[10px] font-semibold uppercase tracking-widest text-blue-100">Karsa Roastery & Supply</p>
+                    <p class="text-[10px] font-semibold uppercase tracking-widest text-blue-100">Roastery & Supply</p>
                 </div>
             </div>
 
@@ -204,7 +204,7 @@
                     </svg>
                     <span>Dilindungi enkripsi SSL 256-bit</span>
                 </div>
-                <span class="font-mono">Sistem Manajemen Internal Karsa Roastery v2.4</span>
+                <span class="font-mono">Sistem Manajemen Internal Bagi Kopi V1.0</span>
             </div>
         </div>
     </div>
