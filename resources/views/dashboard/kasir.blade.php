@@ -128,7 +128,7 @@
                                     <div class="p-3">
                                         <div class="flex items-center justify-between mb-1">
                                             <span class="text-[10px] font-bold text-primary-600 uppercase tracking-wider">{{ $produk->kategoriProduk->nama_kategori ?? 'Menu' }}</span>
-                                            @if($produk->stock < 5) 
+                                            @if($produk->stock < 1) 
                                                 <span class="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">Habis</span>
                                             @else
                                                 <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Tersedia: {{ $produk->stock }}</span>
