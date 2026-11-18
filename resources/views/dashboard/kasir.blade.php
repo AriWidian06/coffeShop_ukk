@@ -34,32 +34,45 @@
     };
 @endphp
 
-<div class="min-h-screen lg:h-screen flex flex-col bg-slate-50 lg:overflow-hidden">
+<div class="kasir-pos min-h-screen lg:h-screen flex flex-col bg-slate-50 lg:overflow-hidden">
 
     {{-- ═══════════════════════════════════════════════════════════════
         TOP BAR — Terminal title, shift info, kasir, time, tab buttons
         ═══════════════════════════════════════════════════════════════ --}}
-    <header class="bg-white border-b border-slate-200 flex-shrink-0 z-20">
-        <div class="px-3 sm:px-5 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-2 sm:gap-3 min-w-0">
-                <h1 class="text-lg sm:text-xl font-bold text-slate-900 whitespace-nowrap">Terminal POS</h1>
-                <span class="inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[10px] sm:text-xs font-bold whitespace-nowrap">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
-                    Station #01
-                </span>
+    <header class="kasir-topbar bg-white/85 backdrop-blur-xl border-b border-slate-200/80 flex-shrink-0 z-20">
+        <div class="px-3 sm:px-5 py-3 flex flex-wrap items-center justify-between gap-2.5">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="hidden sm:flex relative w-11 h-11 rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 text-white items-center justify-center shadow-lg shadow-primary-600/20 overflow-hidden shrink-0">
+                    <span class="absolute -right-3 -top-4 w-12 h-12 rounded-full bg-white/25 blur-xl"></span>
+                    <svg class="relative w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 1v3M10 1v3M14 1v3" />
+                    </svg>
+                </div>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-lg sm:text-xl font-extrabold text-slate-900 whitespace-nowrap tracking-tight">Terminal POS</h1>
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[9px] sm:text-[10px] font-extrabold whitespace-nowrap">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            LIVE
+                        </span>
+                    </div>
+                    <p class="text-[10px] sm:text-xs text-slate-500 mt-0.5 truncate">Shift {{ $shift }} · Siap menerima pesanan</p>
+                </div>
             </div>
             <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
                 <div class="kasir-badge hidden xl:inline-flex">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    Shift {{ $shift }}
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    {{ $shift }}
                 </div>
-                <div class="kasir-badge hidden sm:inline-flex max-w-[160px]">
-                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                <div class="kasir-badge hidden sm:inline-flex max-w-[170px]">
+                    <span class="w-5 h-5 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-[9px] font-extrabold shrink-0">{{ substr(auth('karyawan')->user()->nama_karyawan, 0, 1) }}</span>
                     <span class="truncate">{{ auth('karyawan')->user()->nama_karyawan }}</span>
                 </div>
-                <div class="kasir-badge" id="live-clock">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <span id="clock-text">{{ now('Asia/Jakarta')->format('H:i:s') }}</span> WIB
+                <div class="kasir-badge inline-flex" id="live-clock">
+                    <svg class="w-3.5 h-3.5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span id="clock-text" class="tabular-nums">{{ now('Asia/Jakarta')->format('H:i:s') }}</span>
+                    <span class="text-slate-400 font-medium">WIB</span>
                 </div>
             </div>
         </div>
@@ -75,23 +88,37 @@
         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ --}}
         <div id="tab-kasir" class="flex flex-col lg:h-full lg:min-h-0">
             {{-- Search & Category Filter Bar --}}
-            <div class="bg-white border-b border-slate-200 px-3 sm:px-5 py-3 flex-shrink-0">
-                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                    <div class="flex-1 relative">
-                        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                        <input id="pos-search" type="search" placeholder="Cari nama menu atau kategori..." class="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                    </div>
-                    <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-0.5">
-                        <button class="pos-category-tab active" data-category="all">
-                            Semua Menu <span class="ml-1 bg-white/20 px-1.5 py-0.5 rounded-full text-[10px]">{{ $produks->count() }}</span>
-                        </button>
-                        @foreach($kategoriProduks as $kategori)
-                            <button class="pos-category-tab inactive" data-category="{{ strtolower($kategori->nama_kategori) }}">
-                                {{ $kategori->nama_kategori }}
+            <div class="px-3 sm:px-5 pt-4 pb-1 flex-shrink-0">
+                <div class="pos-toolbar rounded-2xl border border-slate-200/80 bg-white shadow-[0_10px_35px_-25px_rgba(15,23,42,.45)] p-2.5 sm:p-3">
+                    <div class="flex flex-col gap-2.5 xl:flex-row xl:items-center">
+                        <div class="flex items-center gap-3 xl:w-52 shrink-0">
+                            <div class="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 12h16M4 18h10" />
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-extrabold text-slate-900 leading-tight">Katalog Menu</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">{{ $produks->count() }} menu aktif</p>
+                            </div>
+                        </div>
+                        <div class="relative flex-1 min-w-0">
+                            <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            <input id="pos-search" type="search" placeholder="Cari nama menu atau kategori..." aria-label="Cari menu"
+                                class="w-full pl-10 pr-4 py-2.5 bg-slate-50/80 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-400 focus:bg-white transition-all">
+                        </div>
+                        <div class="flex items-center gap-1.5 overflow-x-auto hide-scrollbar pb-0.5 xl:max-w-[55%]">
+                            <button class="pos-category-tab active" data-category="all">
+                                Semua Menu <span class="ml-1 bg-white/20 px-1.5 py-0.5 rounded-full text-[10px]">{{ $produks->count() }}</span>
                             </button>
-                        @endforeach
+                            @foreach($kategoriProduks as $kategori)
+                                <button class="pos-category-tab inactive" data-category="{{ strtolower($kategori->nama_kategori) }}">
+                                    {{ $kategori->nama_kategori }}
+                                </button>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             </div>
@@ -112,33 +139,53 @@
                             <p class="text-sm text-slate-500">Aktifkan produk bertipe jual untuk menerima pesanan.</p>
                         </div>
                     @else
-                        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4" data-pos-products>
+                        <div class="mb-4 flex items-end justify-between gap-3">
+                            <div>
+                                <p class="text-[10px] font-extrabold uppercase tracking-[0.16em] text-primary-600">Menu Tersedia</p>
+                                <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight mt-0.5">Pilih menu untuk pesanan</h2>
+                                <p class="text-[11px] text-slate-500 mt-1">Klik tombol + pada kartu untuk menambahkan ke keranjang.</p>
+                            </div>
+                            <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-slate-200 text-[11px] font-bold text-slate-600 shrink-0">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                {{ $produks->count() }} item
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4" data-pos-products>
                             @foreach ($produks as $produk)
-                                <article class="pos-product-card" data-pos-product data-search="{{ strtolower($produk->nama_produk . ' ' . ($produk->kategoriProduk->nama_kategori ?? '')) }}" data-category="{{ strtolower($produk->kategoriProduk->nama_kategori ?? '') }}">
-                                    @if($produk->gambar_url)
-                                        <img src="{{ $produk->gambar_url }}" alt="{{ $produk->nama_produk }}" class="pos-product-card-img">
-                                    @else
-                                        <div class="w-full h-32 bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center border-b border-slate-100">
-                                            <svg class="w-12 h-12 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
-                                            </svg>
-                                        </div>
-                                    @endif
-                                    <!--ni bagian  toggle ketersediaan stock-->
-                                    <div class="p-3">
-                                        <div class="flex items-center justify-between mb-1">
-                                            <span class="text-[10px] font-bold text-primary-600 uppercase tracking-wider">{{ $produk->kategoriProduk->nama_kategori ?? 'Menu' }}</span>
-                                            @if($produk->stock < 1) 
-                                                <span class="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">Habis</span>
-                                            @else
-                                                <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Tersedia: {{ $produk->stock }}</span>
-                                            @endif
-                                        </div>
-                                        <h2 class="font-bold text-slate-900 text-sm mb-1 line-clamp-2 min-h-[2.5rem]">{{ $produk->nama_produk }}</h2>
-                                        <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
-                                            <span class="font-bold text-primary-600 text-sm">Rp {{ number_format($produk->harga_jual, 0, ',', '.') }}</span>
+                                <article @class([
+                                    'pos-product-card group',
+                                    'is-sold-out' => $produk->stock < 1,
+                                ]) data-pos-product data-search="{{ strtolower($produk->nama_produk . ' ' . ($produk->kategoriProduk->nama_kategori ?? '')) }}" data-category="{{ strtolower($produk->kategoriProduk->nama_kategori ?? '') }}">
+                                    <div class="pos-product-media relative">
+                                        @if($produk->gambar_url)
+                                            <img src="{{ $produk->gambar_url }}" alt="{{ $produk->nama_produk }}" class="pos-product-card-img" loading="lazy">
+                                        @else
+                                            <div class="w-full h-full bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center">
+                                                <svg class="w-12 h-12 text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
+                                                </svg>
+                                            </div>
+                                        @endif
+                                        <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-950/45 to-transparent pointer-events-none"></div>
+                                        <span class="absolute left-2.5 top-2.5 px-2 py-1 rounded-lg bg-white/90 backdrop-blur text-[9px] font-extrabold text-primary-700 uppercase tracking-wider shadow-sm">
+                                            {{ $produk->kategoriProduk->nama_kategori ?? 'Menu' }}
+                                        </span>
+                                        @if($produk->stock < 1)
+                                            <span class="absolute right-2.5 top-2.5 px-2 py-1 rounded-lg bg-red-500 text-white text-[9px] font-extrabold uppercase tracking-wider shadow-sm">Habis</span>
+                                        @else
+                                            <span class="absolute right-2.5 top-2.5 px-2 py-1 rounded-lg bg-slate-900/65 backdrop-blur text-white text-[9px] font-bold shadow-sm">Sisa {{ $produk->stock }}</span>
+                                        @endif
+                                    </div>
+                                    <div class="p-3.5">
+                                        <h2 class="font-extrabold text-slate-900 text-sm leading-snug line-clamp-2 min-h-[2.5rem]">{{ $produk->nama_produk }}</h2>
+                                        <p class="text-[10px] text-slate-500 line-clamp-1 mt-1">{{ $produk->deskripsi ?: 'Menu pilihan Bagi Kopi' }}</p>
+                                        <div class="flex items-end justify-between gap-2 mt-3 pt-3 border-t border-slate-100">
+                                            <div>
+                                                <span class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider">Harga</span>
+                                                <span class="font-extrabold text-slate-900 text-[15px] tracking-tight">Rp {{ number_format($produk->harga_jual, 0, ',', '.') }}</span>
+                                            </div>
                                             <button
-                                                class="pos-add-btn w-7 h-7 rounded-lg bg-primary-600 text-white flex items-center justify-center hover:bg-primary-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                                class="pos-add-btn"
                                                 type="button"
                                                 data-add-product
                                                 data-id="{{ $produk->id }}"
@@ -146,12 +193,9 @@
                                                 data-price="{{ (float) $produk->harga_jual }}"
                                                 data-stock="{{ $produk->stock }}"
                                                 aria-label="Tambah {{ $produk->nama_produk }}"
-                                                @disabled($produk->stock < 1) >    <!--ini agar pada saat stock nya kurang dari satu gak bisa di teken-->
-
-                                        <!--selesai-->
-                                            
+                                                @disabled($produk->stock < 1)>
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 4v16m8-8H4" />
                                                 </svg>
                                             </button>
                                         </div>
@@ -159,57 +203,77 @@
                                 </article>
                             @endforeach
                         </div>
-                        <p class="pos-no-results hidden text-center py-12 text-slate-500" data-pos-no-results>Menu tidak ditemukan. Coba kata pencarian lain.</p>
+                        <p class="pos-no-results text-center py-12 text-slate-500" data-pos-no-results hidden>Menu tidak ditemukan. Coba kata pencarian lain.</p>
                     @endif
                 </section>
 
                 {{-- Order Panel / Cart (sticky right) --}}
-                <aside class="pos-order-panel w-full lg:w-[380px] flex-shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200 flex flex-col bg-white" id="pos-order" aria-labelledby="pos-order-title">
-                    <div class="p-4 border-b border-slate-200 flex items-center justify-between flex-shrink-0">
-                        <div>
-                            <h2 id="pos-order-title" class="font-bold text-slate-900">Pesanan Baru</h2>
-                            <p class="text-xs text-slate-500 mt-0.5">Periksa item sebelum disimpan</p>
+                <aside class="pos-order-panel w-full lg:w-[390px] flex-shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200/80 flex flex-col bg-white" id="pos-order" aria-labelledby="pos-order-title">
+                    <div class="pos-cart-header p-4 sm:p-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between flex-shrink-0 relative overflow-hidden">
+                        <div class="absolute -right-8 -top-10 w-32 h-32 rounded-full bg-primary-100/60 blur-2xl pointer-events-none"></div>
+                        <div class="relative flex items-center gap-3 min-w-0">
+                            <div class="w-10 h-10 rounded-2xl bg-white border border-primary-100 text-primary-600 flex items-center justify-center shrink-0 shadow-sm">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <h2 id="pos-order-title" class="font-extrabold text-slate-900 tracking-tight">Pesanan Baru</h2>
+                                <p class="text-[10px] text-slate-500 mt-0.5">Periksa item sebelum disimpan</p>
+                            </div>
                         </div>
-                        <span class="px-2.5 py-1 bg-primary-100 text-primary-700 rounded-lg text-xs font-bold" data-cart-count>0 item</span>
+                        <span class="relative px-2.5 py-1 bg-primary-100 border border-primary-200 text-primary-700 rounded-lg text-[11px] font-extrabold" data-cart-count>0 item</span>
                     </div>
 
-                    <p class="pos-cart-empty text-center py-12 text-slate-500 text-sm" data-cart-empty>
-                        Keranjang kosong.<br>Tambahkan menu dari katalog.
-                    </p>
-                    <div class="pos-cart-lines flex-1 overflow-y-auto p-4" data-cart-lines aria-live="polite"></div>
+                    <div class="pos-panel-scroll">
+                    <div class="pos-cart-empty text-center px-6 py-10 text-slate-500 text-sm" data-cart-empty>
+                        <div class="w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        </div>
+                        <p class="font-bold text-slate-700">Keranjang masih kosong</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Tambahkan menu dari katalog untuk memulai pesanan.</p>
+                    </div>
+                    <div class="pos-cart-lines flex-1 overflow-y-auto p-3 sm:p-4 space-y-2" data-cart-lines aria-live="polite"></div>
 
-                    <form class="pos-order-form p-4 border-t border-slate-200 flex-shrink-0" id="pos-form" method="post" action="{{ route('transaksis.store') }}">
+                    <form class="pos-order-form p-4 border-t border-slate-200/80 flex-shrink-0 bg-white" id="pos-form" method="post" action="{{ route('transaksis.store') }}">
                         @csrf
                          <input type="hidden" name="metode_pembayaran" value="cash">
                         <div data-cart-inputs></div>
 
                         {{-- Tipe Pesanan --}}
                         <div class="mb-4">
-                            <label class="block text-xs font-bold text-slate-700 mb-2">Tipe Pesanan</label>
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="block text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">Tipe Pesanan</label>
+                                <span class="text-[9px] font-bold text-slate-400">Wajib dipilih</span>
+                            </div>
                             <div class="pos-type-selector">
                                 <label class="pos-type-option">
                                     <input type="radio" name="tipe_pesanan" value="dine-in" checked>
-                                    <span>Makan di Tempat</span>
+                                    <span>
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M5 10v7m14-7v7M7 21v-4m10 4v-4M8 3v4m4-4v4m4-4v4" /></svg>
+                                        Makan di Tempat
+                                    </span>
                                 </label>
                                 <label class="pos-type-option">
                                     <input type="radio" name="tipe_pesanan" value="take-away">
-                                    <span>Bawa Pulang</span>
+                                    <span>
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                                        Bawa Pulang
+                                    </span>
                                 </label>
                             </div>
                         </div>
 
                         {{-- Pilih Meja --}}
                         <div class="mb-4">
-                            <label class="block text-xs font-bold text-slate-700 mb-2">
+                            <label class="block text-[11px] font-extrabold text-slate-700 uppercase tracking-wider mb-2">
                                 Pilih Meja <span class="text-red-500">*</span>
                             </label>
-                            <select name="meja_id" data-table-select required class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <select name="meja_id" data-table-select required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-400 focus:bg-white transition-all">
                                 <option value="">-- Pilih Meja --</option>
                                 @foreach ($mejas as $meja)
                                     <option value="{{ $meja->id }}">Meja {{ $meja->nomor_meja }} · {{ $meja->kapasitas }} kursi</option>
                                 @endforeach
                             </select>
-                            <p class="pos-field-hint text-xs text-slate-500 mt-1.5" data-takeaway-hint hidden>Pesanan bawa pulang tidak memerlukan meja.</p>
+                            <p class="pos-field-hint text-[11px] text-slate-500 mt-1.5" data-takeaway-hint hidden>Pesanan bawa pulang tidak memerlukan meja.</p>
                             @if ($mejas->isEmpty())
                                 <span class="text-xs text-red-600 mt-1.5 block">Tidak ada meja aktif. Aktifkan meja untuk melanjutkan pesanan.</span>
                             @endif
@@ -217,33 +281,40 @@
 
                         {{-- Catatan --}}
                         <div class="mb-4">
-                            <label class="block text-xs font-bold text-slate-700 mb-2">Catatan Pesanan (Opsional)</label>
-                            <textarea name="catatan" rows="2" placeholder="Contoh: Jangan terlalu manis..." class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"></textarea>
+                            <label class="block text-[11px] font-extrabold text-slate-700 uppercase tracking-wider mb-2">Catatan Pesanan <span class="text-slate-400 font-semibold normal-case">(Opsional)</span></label>
+                            <textarea name="catatan" rows="2" placeholder="Contoh: Jangan terlalu manis..." class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-400 focus:bg-white transition-all resize-none"></textarea>
                         </div>
 
                         {{-- Ringkasan Total --}}
-                        <div class="space-y-2 pt-3 border-t border-slate-200">
-                            <div class="flex justify-between text-sm">
-                                <span class="text-slate-600">Subtotal</span>
+                        <div class="space-y-2.5 pt-3 border-t border-slate-200">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-500 font-medium">Subtotal</span>
                                 <strong class="text-slate-900" data-cart-subtotal>Rp 0</strong>
                             </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-slate-600">Pajak & Layanan (10%)</span>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-500 font-medium">Pajak &amp; Layanan (10%)</span>
                                 <strong class="text-slate-900" data-cart-tax>Rp 0</strong>
                             </div>
-                            <div class="flex justify-between items-center pt-3 border-t border-slate-200">
-                                <span class="font-bold text-slate-900">Total Bayar</span>
-                                <strong class="text-xl font-bold text-primary-600" data-cart-total>Rp 0</strong>
+                            <div class="mt-3 rounded-2xl bg-white border border-slate-200 p-4 flex items-center justify-between gap-3 shadow-sm">
+                                <div>
+                                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-[0.16em]">Total Bayar</span>
+                                    <strong class="block text-xl sm:text-2xl font-extrabold text-primary-700 tracking-tight mt-0.5" data-cart-total>Rp 0</strong>
+                                </div>
+                                <div class="w-10 h-10 rounded-xl bg-primary-50 border border-primary-100 flex items-center justify-center shrink-0">
+                                    <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                </div>
                             </div>
                         </div>
 
-                        <button class="pos-checkout w-full mt-4 px-4 py-3 bg-primary-600 text-white rounded-xl font-bold text-sm hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2" type="submit" data-checkout disabled>
+                        <button class="pos-checkout w-full mt-4 px-4 py-3.5 bg-primary-600 text-white rounded-xl font-extrabold text-sm hover:bg-primary-700 transition-all shadow-lg shadow-primary-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2" type="submit" data-checkout disabled>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
                             Simpan Pesanan
                         </button>
+                        <p class="text-center text-[10px] text-slate-400 mt-2">Pesanan akan masuk ke antrean pesanan aktif.</p>
                     </form>
+                    </div>
                 </aside>
             </div>
         </div>
@@ -253,13 +324,18 @@
         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ --}}
         <div id="tab-meja" class="lg:h-full lg:overflow-hidden hidden flex flex-col">
             {{-- Top summary bar for Denah --}}
-            <div class="bg-white border-b border-slate-200 px-3 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
-                <div class="flex flex-wrap items-center gap-2 sm:gap-4 min-w-0">
-                    <h2 class="font-bold text-slate-900 text-base flex items-center gap-2">
-                        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                        Terminal Denah Meja
-                    </h2>
-                    <div class="flex items-center gap-1.5 text-xs bg-slate-100 p-1 rounded-xl overflow-x-auto hide-scrollbar max-w-full">
+            <div class="bg-white border-b border-slate-200 px-3 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4 flex-shrink-0">
+                <div class="flex flex-wrap items-center gap-3 sm:gap-5 min-w-0">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-10 h-10 rounded-2xl bg-primary-50 border border-primary-100 text-primary-600 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                        </div>
+                        <div class="min-w-0">
+                            <h2 class="font-extrabold text-slate-900 text-base sm:text-lg leading-tight tracking-tight">Denah Meja</h2>
+                            <p class="text-[11px] text-slate-500 mt-0.5">Pantau ketersediaan dan kelola pesanan per meja.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 text-xs bg-slate-100 border border-slate-200/70 p-1 rounded-xl overflow-x-auto hide-scrollbar max-w-full">
                         <button type="button" class="table-filter-pill active" data-filter="all" onclick="filterTables('all')">
                             Semua (<span id="count-all-tables">{{ $mejas->count() }}</span>)
                         </button>
@@ -271,14 +347,14 @@
                         </button>
                     </div>
                 </div>
-                <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-semibold">
-                    <span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                <div class="flex flex-wrap items-center gap-2 text-[11px] font-semibold">
+                    <span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-200">
                         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        Tersedia (Siap Pakai)
+                        Tersedia
                     </span>
-                    <span class="inline-flex items-center gap-1.5 text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
+                    <span class="inline-flex items-center gap-1.5 text-amber-700 bg-amber-50 px-2.5 py-1.5 rounded-lg border border-amber-200">
                         <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                        Terisi (Ada Pesanan)
+                        Terisi
                     </span>
                 </div>
             </div>
@@ -303,45 +379,65 @@
                                     $order = $activeOrders[$meja->id] ?? null;
                                     $isOccupied = !is_null($order);
                                 @endphp
-                                <div class="terminal-table-card relative p-4 rounded-2xl border-2 transition-all duration-200 text-center cursor-pointer select-none {{ $isOccupied ? 'border-amber-200 bg-amber-50/70 hover:border-amber-400' : 'border-slate-200 bg-white hover:border-primary-400 hover:shadow-md' }} shadow-sm"
+                                <div class="terminal-table-card relative overflow-hidden p-4 rounded-2xl border transition-all duration-200 text-left cursor-pointer select-none {{ $isOccupied ? 'border-amber-200 bg-gradient-to-b from-amber-50/80 to-white hover:border-amber-300' : 'border-slate-200 bg-white hover:border-primary-300' }} shadow-sm"
                                     id="table-node-{{ $meja->id }}"
                                     onclick="inspectTable({{ $meja->id }})"
                                     data-meja-id="{{ $meja->id }}"
                                     data-status="{{ $isOccupied ? 'terisi' : 'kosong' }}">
-                                    
-                                    <div class="flex items-center justify-between text-xs mb-1">
-                                        <span class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Meja</span>
-                                        <span class="text-[10px] text-slate-500 font-semibold">{{ $meja->kapasitas }} Kursi</span>
+
+                                    <span class="absolute inset-x-0 top-0 h-1 {{ $isOccupied ? 'bg-amber-400' : 'bg-emerald-400' }}"></span>
+
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                                            Meja
+                                        </span>
+                                        <span class="text-[10px] text-slate-500 font-semibold bg-white/80 border border-slate-200 rounded-md px-1.5 py-0.5">{{ $meja->kapasitas }} Kursi</span>
                                     </div>
 
-                                    <div class="text-3xl font-black my-1 {{ $isOccupied ? 'text-amber-700' : 'text-slate-900' }}">
-                                        {{ str_pad($meja->nomor_meja, 2, '0', STR_PAD_LEFT) }}
-                                    </div>
-
-                                    @if($isOccupied)
-                                        <div class="mt-2 space-y-1">
+                                    <div class="mt-3 flex items-end justify-between gap-2">
+                                        <div>
+                                            <div class="text-3xl font-black tracking-tight {{ $isOccupied ? 'text-amber-700' : 'text-slate-900' }}">
+                                                {{ str_pad($meja->nomor_meja, 2, '0', STR_PAD_LEFT) }}
+                                            </div>
+                                            <div class="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mt-0.5">Nomor Meja</div>
+                                        </div>
+                                        @if($isOccupied)
                                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                                                 Terisi
                                             </span>
-                                            @if($order)
-                                                <div class="text-xs font-bold text-slate-900 mt-1">
-                                                    Rp {{ number_format($order->total_harga, 0, ',', '.') }}
-                                                </div>
-                                                <div class="text-[10px] text-slate-500">
-                                                    {{ $order->detail_transaksis->count() }} item · #{{ $order->id }}
-                                                </div>
-                                            @endif
-                                        </div>
-                                    @else
-                                        <div class="mt-2">
+                                        @else
                                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                                 Tersedia
                                             </span>
-                                            <div class="text-[10px] text-slate-400 mt-1">Klik untuk kelola</div>
-                                        </div>
-                                    @endif
+                                        @endif
+                                    </div>
+
+                                    <div class="mt-3 pt-3 border-t border-dashed {{ $isOccupied ? 'border-amber-200' : 'border-slate-200' }}">
+                                        @if($isOccupied)
+                                            @if($order)
+                                                <div class="flex items-center justify-between gap-2">
+                                                    <div class="text-xs font-bold text-slate-900">
+                                                        Rp {{ number_format($order->total_harga, 0, ',', '.') }}
+                                                    </div>
+                                                    <div class="text-[10px] text-slate-500">
+                                                        {{ $order->detail_transaksis->count() }} item
+                                                    </div>
+                                                </div>
+                                                <div class="mt-1.5 flex items-center justify-between">
+                                                    <span class="text-[10px] text-slate-500 font-mono">#{{ $order->id }}</span>
+                                                    <span class="text-[10px] font-bold text-primary-600">Lihat detail →</span>
+                                                </div>
+                                            @endif
+                                        @else
+                                            <div class="flex items-center justify-between gap-2">
+                                                <span class="text-[10px] text-slate-500">Siap menerima pesanan</span>
+                                                <span class="text-[10px] font-bold text-primary-600">Kelola →</span>
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
@@ -349,34 +445,43 @@
                 </div>
 
                 {{-- RIGHT: Table Action Terminal Panel (Live Inspector & Kasir) --}}
-                <aside class="w-full lg:w-96 bg-white border-t lg:border-t-0 lg:border-l border-slate-200 flex flex-col flex-shrink-0 lg:h-full min-h-[280px] lg:min-h-0 overflow-hidden shadow-lg" id="table-inspector-panel">
+                <aside class="w-full lg:w-96 bg-white border-t lg:border-t-0 lg:border-l border-slate-200 flex flex-col flex-shrink-0 lg:h-full min-h-[280px] lg:min-h-0 overflow-hidden" id="table-inspector-panel">
                     {{-- Default empty placeholder --}}
-                    <div id="inspector-placeholder" class="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-400">
-                        <div class="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-3">
-                            <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                    <div id="inspector-placeholder" class="flex-1 flex flex-col items-center justify-center p-8 text-center">
+                        <div class="w-20 h-20 rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center mb-4">
+                            <svg class="w-9 h-9 text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                         </div>
-                        <h3 class="font-bold text-slate-800 text-sm mb-1">Pilih Meja pada Denah</h3>
-                        <p class="text-xs text-slate-500 max-w-xs">Klik salah satu kartu meja di samping untuk melihat rincian pesanan, proses pembayaran langsung, atau membuat pesanan baru.</p>
+                        <h3 class="font-bold text-slate-900 text-sm mb-1">Pilih Meja pada Denah</h3>
+                        <p class="text-xs text-slate-500 max-w-xs leading-relaxed">Klik salah satu kartu meja untuk melihat rincian pesanan, memproses pembayaran, atau membuat pesanan baru.</p>
+                        <div class="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-50 border border-primary-100 text-[10px] font-bold text-primary-700">
+                            <span class="w-1.5 h-1.5 rounded-full bg-primary-500"></span>
+                            Klik kartu meja untuk mulai
+                        </div>
                     </div>
 
                     {{-- Dynamic Inspector Content --}}
                     <div id="inspector-content" class="flex-1 flex flex-col h-full overflow-hidden hidden">
                         {{-- Inspector Header --}}
-                        <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <h3 class="font-bold text-slate-900 text-lg" id="inspect-title">Meja 01</h3>
-                                    <span id="inspect-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">Tersedia</span>
+                        <div class="p-4 border-b border-slate-200 flex items-center justify-between gap-3 bg-gradient-to-r from-primary-50/80 via-white to-white shrink-0">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <div class="w-9 h-9 rounded-xl bg-white border border-primary-100 text-primary-600 flex items-center justify-center shrink-0 shadow-sm">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                                 </div>
-                                <p class="text-xs text-slate-500 mt-0.5" id="inspect-subtitle">Kapasitas: 4 Orang</p>
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <h3 class="font-bold text-slate-900 text-lg leading-tight" id="inspect-title">Meja 01</h3>
+                                        <span id="inspect-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">Tersedia</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-0.5" id="inspect-subtitle">Kapasitas: 4 Orang</p>
+                                </div>
                             </div>
-                            <button type="button" onclick="closeInspector()" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-200 transition" title="Tutup">
+                            <button type="button" onclick="closeInspector()" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-200 transition shrink-0" title="Tutup">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
 
                         {{-- Inspector Body --}}
-                        <div class="flex-1 overflow-y-auto p-4 space-y-4" id="inspect-body">
+                        <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50" id="inspect-body">
                             {{-- Content injected by JavaScript --}}
                         </div>
                     </div>
@@ -393,11 +498,16 @@
         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ --}}
         <div id="tab-transaksi" class="lg:h-full flex flex-col lg:overflow-hidden bg-slate-50 hidden">
             {{-- Toolbar: Status Filters, Search, Sync, and Link to History --}}
-            <div class="px-3 sm:px-5 py-3 bg-white border-b border-slate-200 flex-shrink-0 flex flex-wrap items-center justify-between gap-3">
-                <div class="flex items-center gap-1.5 overflow-x-auto hide-scrollbar max-w-full pb-0.5">
+            <div class="px-3 sm:px-5 py-3 bg-white/95 backdrop-blur border-b border-slate-200 flex-shrink-0 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2 min-w-0 max-w-full">
+                    <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-primary-50 border border-primary-100 text-[10px] font-bold text-primary-700 shrink-0">
+                        <span class="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse"></span>
+                        LIVE
+                    </span>
+                    <div class="flex items-center gap-1.5 overflow-x-auto hide-scrollbar max-w-full pb-0.5">
                     <button type="button" onclick="filterActiveOrders('all')"
                         class="order-filter-pill active" data-filter="all">
-                        Semua Aktif <span id="count-all" class="ml-1.5 bg-slate-800 text-white px-2 py-0.5 rounded-full text-[10px] font-bold">{{ $pesananAktif->count() }}</span>
+                        Semua Aktif <span id="count-all" class="ml-1.5 bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-bold">{{ $pesananAktif->count() }}</span>
                     </button>
                     <button type="button" onclick="filterActiveOrders('pending')"
                         class="order-filter-pill inactive" data-filter="pending">
@@ -414,6 +524,7 @@
                         <span class="w-2 h-2 rounded-full bg-blue-500 inline-block mr-1"></span>
                         Siap <span id="count-ready" class="ml-1.5 bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-[10px] font-bold">{{ $pesananAktif->where('status_pesanan', 'ready')->count() }}</span>
                     </button>
+                    </div>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2">
@@ -456,18 +567,26 @@
                                 $order->detail_transaksis->pluck('produk.nama_produk')->implode(' ') . ' ' .
                                 ($order->catatan ?? '')
                             );
+                            $statusAccent = match ($status) {
+                                'pending' => 'bg-amber-400',
+                                'prosesed' => 'bg-purple-400',
+                                'ready' => 'bg-blue-400',
+                                default => 'bg-slate-300',
+                            };
                         @endphp
-                        <article class="active-order-card bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between overflow-hidden"
+                        <article class="active-order-card relative overflow-hidden bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
                             id="order-card-{{ $order->id }}"
                             data-order-id="{{ $order->id }}"
                             data-status="{{ $status }}"
                             data-search="{{ $searchKeywords }}">
 
+                            <span class="absolute inset-x-0 top-0 h-1 {{ $statusAccent }}"></span>
+
                             {{-- Card Header --}}
                             <div class="p-4 border-b border-slate-100">
-                                <div class="flex items-center justify-between gap-2 mb-2">
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="font-black text-slate-900 font-mono text-base">#{{ $order->id }}</span>
+                                <div class="flex items-center justify-between gap-2 mb-3">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <span class="inline-flex items-center justify-center min-w-9 h-9 px-2 rounded-xl bg-primary-50 border border-primary-100 text-primary-700 font-black font-mono text-sm">#{{ $order->id }}</span>
                                         @if ($order->sumber_pesanan === 'web')
                                             <span class="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-md text-[10px] font-bold">Web</span>
                                         @else
@@ -522,16 +641,16 @@
                                 @foreach ($order->detail_transaksis as $detail)
                                     <div class="pt-2 first:pt-0">
                                         <div class="flex items-start justify-between text-xs gap-2">
-                                            <div class="font-bold text-slate-900 leading-snug">
-                                                <span class="text-primary-600 font-extrabold mr-1">{{ $detail->QTY ?? $detail->qty }}x</span>
-                                                {{ $detail->produk->nama_produk ?? 'Menu Dihapus' }}
+                                            <div class="font-bold text-slate-900 leading-snug flex items-start gap-2 min-w-0">
+                                                <span class="inline-flex items-center justify-center min-w-6 h-6 px-1.5 rounded-lg bg-primary-50 border border-primary-100 text-primary-700 text-[10px] font-extrabold shrink-0">{{ $detail->QTY ?? $detail->qty }}x</span>
+                                                <span class="pt-0.5">{{ $detail->produk->nama_produk ?? 'Menu Dihapus' }}</span>
                                             </div>
-                                            <div class="font-semibold text-slate-700 whitespace-nowrap">
+                                            <div class="font-semibold text-slate-700 whitespace-nowrap pt-0.5">
                                                 Rp {{ number_format($detail->subtotal, 0, ',', '.') }}
                                             </div>
                                         </div>
                                         @if ($detail->customization)
-                                            <div class="mt-1">
+                                            <div class="mt-1.5 pl-8">
                                                 <span class="inline-block px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-semibold italic">
                                                     📝 {{ $detail->customization }}
                                                 </span>
@@ -548,14 +667,14 @@
                             </div>
 
                             {{-- Card Footer: Pricing & Action Buttons --}}
-                            <div class="p-4 bg-slate-50 border-t border-slate-100 space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <div>
+                            <div class="p-4 bg-slate-50/80 border-t border-slate-100 space-y-3">
+                                <div class="flex items-center justify-between gap-3">
+                                    <div class="min-w-0">
                                         <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Total Tagihan</span>
-                                        <span class="text-base font-black text-slate-900">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span>
+                                        <span class="text-lg font-black text-slate-900 tracking-tight">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span>
                                     </div>
 
-                                    <div>
+                                    <div class="shrink-0">
                                         @if ($isPaid)
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
@@ -739,44 +858,6 @@
 </div>
 
 {{-- ═══════════════════════════════════════════════════════════════════
-     INLINE STYLES for tab buttons (scoped)
-═══════════════════════════════════════════════════════════════════ --}}
-<style>
-    .pos-tab-btn {
-        @apply px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 whitespace-nowrap;
-        color: theme('colors.slate.500');
-        background: transparent;
-    }
-    .pos-tab-btn:hover {
-        color: theme('colors.slate.700');
-        background: theme('colors.white');
-    }
-    .pos-tab-btn.active {
-        background: theme('colors.white');
-        color: theme('colors.primary.700');
-        box-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
-    }
-    .table-filter-pill {
-        @apply px-3 py-1 rounded-lg font-bold text-xs transition-all cursor-pointer;
-    }
-    .table-filter-pill.active {
-        @apply bg-slate-900 text-white shadow-sm;
-    }
-    .table-filter-pill.inactive {
-        @apply text-slate-600 hover:text-slate-900;
-    }
-    .order-filter-pill {
-        @apply px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center whitespace-nowrap;
-    }
-    .order-filter-pill.active {
-        @apply bg-slate-900 text-white shadow-sm;
-    }
-    .order-filter-pill.inactive {
-        @apply bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200;
-    }
-</style>
-
-{{-- ═══════════════════════════════════════════════════════════════════
      JAVASCRIPT — Tab switching, Table Terminal Inspector, POS cart logic
 ═══════════════════════════════════════════════════════════════════ --}}
 <script>
@@ -791,8 +872,8 @@
     let currentInspectedOrderId = null;
     let currentTableFilter = 'all';
     const TABLE_CARD_CLASS = {
-        terisi: 'terminal-table-card relative p-4 rounded-2xl border-2 transition-all duration-200 text-center cursor-pointer select-none border-amber-200 bg-amber-50/70 hover:border-amber-400 shadow-sm',
-        kosong: 'terminal-table-card relative p-4 rounded-2xl border-2 transition-all duration-200 text-center cursor-pointer select-none border-slate-200 bg-white hover:border-primary-400 hover:shadow-md shadow-sm',
+        terisi: 'terminal-table-card relative overflow-hidden p-4 rounded-2xl border transition-all duration-200 text-left cursor-pointer select-none border-amber-200 bg-gradient-to-b from-amber-50/80 to-white hover:border-amber-300 shadow-sm',
+        kosong: 'terminal-table-card relative overflow-hidden p-4 rounded-2xl border transition-all duration-200 text-left cursor-pointer select-none border-slate-200 bg-white hover:border-primary-300 shadow-sm',
     };
     const csrfToken = '{{ csrf_token() }}';
     const routeStorePembayaran = '{{ route('pembayarans.store') }}';
@@ -894,35 +975,49 @@
 
         const nomor = String(meja.nomor_meja).padStart(2, '0');
         const header = `
-            <div class="flex items-center justify-between text-xs mb-1">
-                <span class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Meja</span>
-                <span class="text-[10px] text-slate-500 font-semibold">${meja.kapasitas} Kursi</span>
+            <span class="absolute inset-x-0 top-0 h-1 ${isOccupied ? 'bg-amber-400' : 'bg-emerald-400'}"></span>
+            <div class="flex items-center justify-between gap-2">
+                <span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                    Meja
+                </span>
+                <span class="text-[10px] text-slate-500 font-semibold bg-white/80 border border-slate-200 rounded-md px-1.5 py-0.5">${meja.kapasitas} Kursi</span>
             </div>
-            <div class="text-3xl font-black my-1 ${isOccupied ? 'text-amber-700' : 'text-slate-900'}">${nomor}</div>`;
+            <div class="mt-3 flex items-end justify-between gap-2">
+                <div>
+                    <div class="text-3xl font-black tracking-tight ${isOccupied ? 'text-amber-700' : 'text-slate-900'}">${nomor}</div>
+                    <div class="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mt-0.5">Nomor Meja</div>
+                </div>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${isOccupied ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}">
+                    <span class="w-1.5 h-1.5 rounded-full ${isOccupied ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}"></span>
+                    ${isOccupied ? 'Terisi' : 'Tersedia'}
+                </span>
+            </div>`;
 
         if (isOccupied) {
             const itemCount = order.detail_transaksis ? order.detail_transaksis.length : 0;
             card.innerHTML = header + `
-                <div class="mt-2 space-y-1">
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                        Terisi
-                    </span>
-                    <div class="text-xs font-bold text-slate-900 mt-1">
-                        Rp ${formatNumber(order.total_harga)}
+                <div class="mt-3 pt-3 border-t border-dashed border-amber-200">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="text-xs font-bold text-slate-900">
+                            Rp ${formatNumber(order.total_harga)}
+                        </div>
+                        <div class="text-[10px] text-slate-500">
+                            ${itemCount} item
+                        </div>
                     </div>
-                    <div class="text-[10px] text-slate-500">
-                        ${itemCount} item · #${order.id}
+                    <div class="mt-1.5 flex items-center justify-between">
+                        <span class="text-[10px] text-slate-500 font-mono">#${order.id}</span>
+                        <span class="text-[10px] font-bold text-primary-600">Lihat detail →</span>
                     </div>
                 </div>`;
         } else {
             card.innerHTML = header + `
-                <div class="mt-2">
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        Tersedia
-                    </span>
-                    <div class="text-[10px] text-slate-400 mt-1">Klik untuk kelola</div>
+                <div class="mt-3 pt-3 border-t border-dashed border-slate-200">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-[10px] text-slate-500">Siap menerima pesanan</span>
+                        <span class="text-[10px] font-bold text-primary-600">Kelola →</span>
+                    </div>
                 </div>`;
         }
     }
@@ -1066,7 +1161,7 @@
                             <option value="ready" ${order.status_pesanan === 'ready' ? 'selected' : ''}>Siap</option>
                             <option value="completed" ${order.status_pesanan === 'completed' ? 'selected' : ''}>Selesai</option>
                         </select>
-                        <button type="submit" class="px-3 py-1.5 bg-slate-800 text-white rounded-lg text-xs font-bold hover:bg-slate-900 transition cursor-pointer">
+                        <button type="submit" class="px-3 py-1.5 bg-primary-600 text-white rounded-lg text-xs font-bold hover:bg-primary-700 transition cursor-pointer">
                             Update
                         </button>
                     </form>
@@ -1573,6 +1668,11 @@
         grid.innerHTML = orders.map(order => {
             const isPaid = !!order.pembayaran;
             const status = order.status_pesanan;
+            const statusAccent = {
+                pending: 'bg-amber-400',
+                prosesed: 'bg-purple-400',
+                ready: 'bg-blue-400',
+            }[status] || 'bg-slate-300';
             const tableLabel = order.meja ? `Meja ${order.meja.nomor_meja}` : 'Take Away';
             const sourceBadge = order.sumber_pesanan === 'web'
                 ? '<span class="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-md text-[10px] font-bold">Web</span>'
@@ -1621,16 +1721,16 @@
                     return `
                         <div class="pt-2 first:pt-0">
                             <div class="flex items-start justify-between text-xs gap-2">
-                                <div class="font-bold text-slate-900 leading-snug">
-                                    <span class="text-primary-600 font-extrabold mr-1">${d.QTY || d.qty}x</span>
-                                    ${prodName}
+                                <div class="font-bold text-slate-900 leading-snug flex items-start gap-2 min-w-0">
+                                    <span class="inline-flex items-center justify-center min-w-6 h-6 px-1.5 rounded-lg bg-primary-50 border border-primary-100 text-primary-700 text-[10px] font-extrabold shrink-0">${d.QTY || d.qty}x</span>
+                                    <span class="pt-0.5">${prodName}</span>
                                 </div>
-                                <div class="font-semibold text-slate-700 whitespace-nowrap">
+                                <div class="font-semibold text-slate-700 whitespace-nowrap pt-0.5">
                                     Rp ${formatNumber(d.subtotal)}
                                 </div>
                             </div>
                             ${d.customization ? `
-                                <div class="mt-1">
+                                <div class="mt-1.5 pl-8">
                                     <span class="inline-block px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-semibold italic">
                                         📝 ${d.customization}
                                     </span>
@@ -1706,16 +1806,18 @@
             const searchKeywords = `#${order.id} ${tableLabel.toLowerCase()} ${(order.sumber_pesanan || '')} ${searchItems} ${(order.catatan || '')}`.toLowerCase();
 
             return `
-                <article class="active-order-card bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between overflow-hidden"
+                <article class="active-order-card relative overflow-hidden bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
                     id="order-card-${order.id}"
                     data-order-id="${order.id}"
                     data-status="${status}"
                     data-search="${searchKeywords}">
 
+                    <span class="absolute inset-x-0 top-0 h-1 ${statusAccent}"></span>
+
                     <div class="p-4 border-b border-slate-100">
-                        <div class="flex items-center justify-between gap-2 mb-2">
-                            <div class="flex items-center gap-1.5">
-                                <span class="font-black text-slate-900 font-mono text-base">#${order.id}</span>
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="inline-flex items-center justify-center min-w-9 h-9 px-2 rounded-xl bg-primary-50 border border-primary-100 text-primary-700 font-black font-mono text-sm">#${order.id}</span>
                                 ${sourceBadge}
                             </div>
                             <div class="status-badge-container">
@@ -1738,13 +1840,13 @@
                         ${notesHtml}
                     </div>
 
-                    <div class="p-4 bg-slate-50 border-t border-slate-100 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <div>
+                    <div class="p-4 bg-slate-50/80 border-t border-slate-100 space-y-3">
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="min-w-0">
                                 <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Total Tagihan</span>
-                                <span class="text-base font-black text-slate-900">Rp ${formatNumber(order.total_harga)}</span>
+                                <span class="text-lg font-black text-slate-900 tracking-tight">Rp ${formatNumber(order.total_harga)}</span>
                             </div>
-                            <div>
+                            <div class="shrink-0">
                                 ${paidBadge}
                             </div>
                         </div>
@@ -1859,7 +1961,7 @@
                 detail.append(name, price);
 
                  const customizationLabel = document.createElement('div');
-                 customizationLabel.className = 'mt-2 pt-2 border-t border-slate-200';
+                 customizationLabel.className = 'pos-cart-customization mt-2 pt-2 border-t border-slate-200/80';
                  const customTitle = document.createElement('div');
                  customTitle.className = 'text-[10px] font-bold text-slate-500 uppercase mb-1.5';
                  customTitle.textContent = 'Kustomisasi';
@@ -1944,13 +2046,16 @@
 
                 const remove = document.createElement('button');
                 remove.type = 'button';
-                remove.className = 'text-xs text-red-600 hover:text-red-700 font-semibold ml-2';
+                remove.className = 'pos-cart-remove';
                 remove.dataset.cartAction = 'remove';
                 remove.dataset.id = product.id;
-                remove.textContent = 'Hapus';
+                remove.textContent = 'Hapus item';
 
                 line.append(detail, controls);
-                cartLines.append(line, customizationLabel, remove);
+                const lineWrapper = document.createElement('div');
+                lineWrapper.className = 'pos-cart-line';
+                lineWrapper.append(line, customizationLabel, remove);
+                cartLines.append(lineWrapper);
 
                 const productId = document.createElement('input');
                 productId.type = 'hidden';
