@@ -94,6 +94,7 @@ class TransaksiController extends Controller
             'items.*.produk_id' => 'required|exists:produks,id',
             'items.*.qty' => 'required|integer|min:1',
             'items.*.customization' => 'nullable|string|max:250',
+            'catatan' => 'nullable|string|max:500',
         ]);
 
         return DB::transaction(function () use ($request) {
@@ -161,6 +162,8 @@ class TransaksiController extends Controller
             $transaksi = Transaksi::create([
                 'meja_id' => $request->meja_id,
                 'karyawan_id' => auth('karyawan')->id(),
+                'sumber_pesanan' => 'kasir',
+                'catatan' => $request->input('catatan'),
                 'tipe_pesanan' => $request->tipe_pesanan,
                 'total_harga' => $totalHarga,
                 'status_pesanan' => 'pending',

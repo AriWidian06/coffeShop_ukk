@@ -1,4 +1,4 @@
-*.log
+/*.log
 .DS_Store
 .env
 .env.backup
@@ -14,6 +14,7 @@
 /.zed
 /auth.json
 /node_modules
+/public/build
 /public/hot
 /public/storage
 /storage/*.key
@@ -23,10 +24,6 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 /storage/logs/*.log
-/node_modules
 /pemodelan
 .github
 /docs
-/node_modules
-/public/build
-/public/hot
