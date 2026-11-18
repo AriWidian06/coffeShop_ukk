@@ -174,7 +174,7 @@
                                 $stockStatus = $produk->stock == 0 ? 'habis' : ($produk->stock < 10 ? 'menipis' : 'tersedia');
                                 $stockLabel = $stockStatus == 'habis' ? 'Habis' : ($stockStatus == 'menipis' ? 'Menipis' : 'Tersedia');
                                 $stockColor = $stockStatus == 'habis' ? 'red' : ($stockStatus == 'menipis' ? 'amber' : 'emerald');
-                                $margin = $produk->harga_beli > 0 ? round((($produk->harga_jual - $produk->harga_beli) / $produk->harga_jual) * 100) : 0;
+                                $margin = $produk->harga_jual > 0 ? round((($produk->harga_jual - $produk->harga_beli) / $produk->harga_jual) * 100) : 0;
                             @endphp
                             <tr>
                                 <!-- Foto -->

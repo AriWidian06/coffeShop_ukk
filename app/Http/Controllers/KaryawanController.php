@@ -69,6 +69,17 @@ class KaryawanController extends Controller
 
     public function destroy(Karyawan $karyawan)
     {
+        if ((int) auth('karyawan')->id() === (int) $karyawan->id) {
+            return back()->with('error', 'Anda tidak dapat menghapus akun yang sedang digunakan.');
+        }
+
+        // FK transaksis.karyawan_id memakai cascade; hapus karyawan yang
+        // memiliki riwayat transaksi akan ikut menghapus laporan penjualan.
+        if ($karyawan->transaksis()->exists()) {
+            return back()->with('error', 'Karyawan ini memiliki riwayat transaksi dan tidak dapat dihapus.');
+        }
+
+        $karyawan->tokens()->delete();
         $karyawan->delete();
         return redirect()->route('karyawans.index')->with('success', 'Data karyawan berhasil dihapus.');
     }

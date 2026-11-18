@@ -87,6 +87,12 @@ class MejaController extends Controller
 
     public function destroy(Meja $meja)
     {
+        // FK transaksis.meja_id memakai cascade; hapus meja yang punya riwayat
+        // transaksi akan ikut menghapus laporan penjualan. Nonaktifkan saja.
+        if ($meja->transaksis()->exists()) {
+            return back()->with('error', 'Meja ini sudah memiliki riwayat transaksi dan tidak dapat dihapus. Nonaktifkan meja sebagai gantinya.');
+        }
+
         $meja->delete();
         return redirect()->route('mejas.index')->with('success', 'Meja berhasil dihapus.');
     }

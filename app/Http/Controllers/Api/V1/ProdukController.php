@@ -131,6 +131,12 @@ class ProdukController extends Controller
 
     public function destroy(Produk $produk): JsonResponse
     {
+        // FK detail_transaksis.produk_id memakai cascade; jangan hapus produk
+        // yang sudah terjual agar riwayat laporan tidak ikut hilang.
+        if ($produk->detailTransaksis()->exists()) {
+            return $this->fail('Produk sudah memiliki riwayat penjualan dan tidak dapat dihapus. Nonaktifkan produk sebagai gantinya.', 422);
+        }
+
         if ($produk->gambar) {
             Storage::disk('public')->delete($produk->gambar);
         }

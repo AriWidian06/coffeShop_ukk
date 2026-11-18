@@ -85,10 +85,15 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::match(['put', 'patch'], 'mejas/{meja}', [V1MejaController::class, 'update']);
             Route::delete('mejas/{meja}', [V1MejaController::class, 'destroy']);
 
-            Route::apiResource('suppliers', V1SupplierController::class);
-            Route::apiResource('karyawans', V1KaryawanController::class);
+            // Nama route API diberi prefiks agar tidak menimpa nama route web
+            // (mis. suppliers.index) yang dipakai form dan tautan admin.
+            Route::apiResource('suppliers', V1SupplierController::class)
+                ->names('api.v1.suppliers');
+            Route::apiResource('karyawans', V1KaryawanController::class)
+                ->names('api.v1.karyawans');
             Route::apiResource('promo-kodes', V1PromoKodeController::class)
-                ->parameters(['promo-kodes' => 'promoKode']);
+                ->parameters(['promo-kodes' => 'promoKode'])
+                ->names('api.v1.promo-kodes');
         });
     });
 });

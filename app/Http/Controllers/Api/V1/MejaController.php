@@ -111,8 +111,10 @@ class MejaController extends Controller
 
     public function destroy(Meja $meja): JsonResponse
     {
-        if ($this->occupiedTableIds() !== [] && in_array($meja->id, $this->occupiedTableIds(), true)) {
-            return $this->fail('Meja masih memiliki pesanan aktif dan tidak dapat dihapus.', 422);
+        // FK transaksis.meja_id memakai cascade; meja yang punya riwayat
+        // transaksi tidak boleh dihapus agar laporan penjualan tetap utuh.
+        if ($meja->transaksis()->exists()) {
+            return $this->fail('Meja sudah memiliki riwayat transaksi dan tidak dapat dihapus. Nonaktifkan meja sebagai gantinya.', 422);
         }
 
         $meja->delete();

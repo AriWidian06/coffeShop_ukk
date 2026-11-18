@@ -251,10 +251,18 @@ class ProdukController extends Controller
 
     public function destroy(Produk $produk)
     {
+        // FK detail_transaksis.produk_id memakai cascade; produk yang sudah
+        // pernah terjual tidak boleh dihapus agar riwayat laporan tetap utuh.
+        if ($produk->detailTransaksis()->exists()) {
+            return back()->with('error', 'Produk ini sudah memiliki riwayat penjualan dan tidak dapat dihapus. Nonaktifkan produk sebagai gantinya.');
+        }
+
         if ($produk->gambar) {
             Storage::disk('public')->delete($produk->gambar);
         }
 
+        $produk->gambarData()->delete();
+        $produk->opsis()->delete();
         $produk->delete();
 
         return redirect()->route('produks.index')->with('success', 'Produk berhasil dihapus.');

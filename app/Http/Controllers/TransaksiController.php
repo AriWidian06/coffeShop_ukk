@@ -17,7 +17,7 @@ class TransaksiController extends Controller
     {
         $filters = $request->validate([
             'q' => 'nullable|string|max:40',
-            'status' => 'nullable|in:pending,ready,prosesed,completed',
+            'status' => 'nullable|in:pending,ready,prosesed,completed,cancelled',
             'metode_pembayaran' => 'nullable|in:cash,QRIS'
         ]);
 
