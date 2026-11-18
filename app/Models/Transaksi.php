@@ -20,6 +20,8 @@ class Transaksi extends Model
         'promo_kode_id',
         'diskon',
         'session_id',
+        'metode_pembayaran',
+        'sudah_dibalik',
     ];
 
     protected $casts = [
@@ -98,6 +100,7 @@ class Transaksi extends Model
             'released_at' => now(),
         ]);
     }
+
 
     /**
      * Kembalikan stok produk & lepaskan kuota promo dalam satu kali saja.

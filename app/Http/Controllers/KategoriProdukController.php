@@ -47,6 +47,12 @@ class KategoriProdukController extends Controller
 
     public function destroy(KategoriProduk $kategoriProduk)
     {
+        // FK produks.kategori_produk_id memakai cascade; jangan sampai
+        // menghapus produk (dan detail transaksinya) secara tidak sengaja.
+        if ($kategoriProduk->produks()->exists()) {
+            return back()->with('error', 'Kategori masih digunakan oleh produk. Pindahkan atau hapus produk terlebih dahulu.');
+        }
+
         $kategoriProduk->delete();
         return redirect()->route('kategori-produks.index')->with('success', 'Kategori produk berhasil dihapus.');
     }

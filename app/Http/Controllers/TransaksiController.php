@@ -17,7 +17,8 @@ class TransaksiController extends Controller
     {
         $filters = $request->validate([
             'q' => 'nullable|string|max:40',
-            'status' => 'nullable|in:pending,ready,prosesed,completed',
+            'status' => 'nullable|in:pending,ready,prosesed,completed,cancelled',
+            'metode_pembayaran' => 'nullable|in:cash,QRIS'
         ]);
 
         $query = Transaksi::with(['meja', 'karyawan', 'pembayaran', 'detail_transaksis.produk'])
@@ -46,9 +47,16 @@ class TransaksiController extends Controller
             $query->where('status_pesanan', $filters['status']);
         }
 
-        $transaksis = $query->paginate(10)->withQueryString();
+        if (!empty($filters['metode_pembayaran'])) {
+            $query->whereHas('pembayaran', function ($query) use ($filters) {
+                $query->where('metode_pembayaran', $filters['metode_pembayaran']);
+            });
+        }
 
-        return view('transaksis.index', compact('transaksis'));
+        $totalNominalTerfilter = (clone $query)->sum('total_harga');
+        $transaksis = $query->paginate(15)->withQueryString();
+
+        return view('transaksis.index', compact('transaksis', 'totalNominalTerfilter'));
     }
 
     public function create(Request $request)
@@ -86,6 +94,7 @@ class TransaksiController extends Controller
             'items.*.produk_id' => 'required|exists:produks,id',
             'items.*.qty' => 'required|integer|min:1',
             'items.*.customization' => 'nullable|string|max:250',
+            'catatan' => 'nullable|string|max:500',
         ]);
 
         return DB::transaction(function () use ($request) {
@@ -153,6 +162,8 @@ class TransaksiController extends Controller
             $transaksi = Transaksi::create([
                 'meja_id' => $request->meja_id,
                 'karyawan_id' => auth('karyawan')->id(),
+                'sumber_pesanan' => 'kasir',
+                'catatan' => $request->input('catatan'),
                 'tipe_pesanan' => $request->tipe_pesanan,
                 'total_harga' => $totalHarga,
                 'status_pesanan' => 'pending',

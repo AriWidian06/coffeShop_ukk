@@ -95,8 +95,14 @@ class KaryawanController extends Controller
 
     public function destroy(Request $request, Karyawan $karyawan): JsonResponse
     {
-        if ($request->user()?->id === $karyawan->id) {
+        if ((int) $request->user()?->id === (int) $karyawan->id) {
             return $this->fail('Anda tidak dapat menghapus akun yang sedang digunakan.', 422);
+        }
+
+        // FK transaksis.karyawan_id memakai cascade; hapus karyawan yang
+        // memiliki riwayat transaksi akan ikut menghapus laporan penjualan.
+        if ($karyawan->transaksis()->exists()) {
+            return $this->fail('Karyawan ini memiliki riwayat transaksi dan tidak dapat dihapus.', 422);
         }
 
         $karyawan->tokens()->delete();

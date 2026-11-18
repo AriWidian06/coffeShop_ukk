@@ -46,13 +46,17 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (Auth::guard('karyawan')->attempt($credentials)) {
-            $user = Auth::guard('karyawan')->user();
+        $guard = Auth::guard('karyawan');
+        // Sesuai label pada form login: "Ingat sesi saya selama 14 hari".
+        $guard->setRememberDuration(14 * 24 * 60);
+
+        if ($guard->attempt($credentials, $request->boolean('remember'))) {
+            $user = $guard->user();
 
             // Tolak akun yang bukan staf (mis. akun pelanggan) agar tidak
             // pernah mendapat sesi dashboard admin/kasir/manager.
             if (! in_array(strtolower(trim((string) $user->role)), self::STAFF_ROLES, true)) {
-                Auth::guard('karyawan')->logout();
+                $guard->logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
 

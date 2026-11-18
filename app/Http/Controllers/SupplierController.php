@@ -51,6 +51,12 @@ class SupplierController extends Controller
 
     public function destroy(Supplier $supplier)
     {
+        // FK produks.supplier_id memakai cascade; hapus supplier yang masih
+        // dipakai akan ikut menghapus produk dan riwayat detail transaksi.
+        if ($supplier->produks()->exists()) {
+            return back()->with('error', 'Supplier masih digunakan oleh produk. Pindahkan atau hapus produk terlebih dahulu.');
+        }
+
         $supplier->delete();
         return redirect()->route('suppliers.index')->with('success', 'Supplier berhasil dihapus.');
     }
