@@ -55,7 +55,7 @@ Route::get('/', function (Request $request) {
         ->distinct()
         ->pluck('meja_id');
 
-    $kategoriProduks = KategoriProduk::orderBy('nama_kategori')->get();
+    $kategoriProduks = KategoriProduk::untukKatalog()->orderBy('nama_kategori')->get();
 
     $produks = Produk::with(['kategoriProduk', 'opsis'])
         ->where('tipe', 'jual')

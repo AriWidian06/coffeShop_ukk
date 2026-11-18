@@ -111,7 +111,7 @@ php artisan key:generate
 # 5. Jalankan migrasi dan data awal
 php artisan migrate --seed
 
-# 6. (Opsional) Muat data demo lengkap: menu, meja, supplier, promo
+# 6. (Opsional) Muat data demo lengkap: 30 menu kafe, meja, supplier, promo
 php artisan db:seed --class=DemoDataSeeder
 
 # 7. Hubungkan storage symlink untuk upload gambar produk & struk
@@ -166,6 +166,8 @@ Gunakan kredensial berikut untuk menguji hak akses multi-role. Aplikasi ini meng
 >
 > **Cara membuat akun Manager/Kasir:** login sebagai Admin → menu **Karyawan** → tambah karyawan → pilih role `manager` atau `kasir`.
 > **Ganti password default sebelum dipakai di lingkungan produksi.**
+>
+> **Katalog menu:** `CafeMenuSeeder` memasang 30 menu kafe dan dijalankan otomatis melalui `DatabaseSeeder`. Menu lama yang sudah dipakai transaksi akan dinonaktifkan (tidak dihapus) agar riwayat pesanan tetap utuh; menu lama tanpa riwayat transaksi akan dihapus.
 
 ### Konfigurasi Pembayaran QRIS (Midtrans)
 

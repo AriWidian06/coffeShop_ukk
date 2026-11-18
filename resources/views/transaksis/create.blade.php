@@ -9,7 +9,7 @@
         $activeLayout = 'layouts.app';
     }
 
-    $kategoriProduks = \App\Models\KategoriProduk::orderBy('nama_kategori')->get();
+    $kategoriProduks = \App\Models\KategoriProduk::untukKatalog()->orderBy('nama_kategori')->get();
 @endphp
 
 @extends($activeLayout)

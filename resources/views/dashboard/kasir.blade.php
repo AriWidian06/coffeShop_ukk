@@ -3,7 +3,7 @@
 @section('content')
 @php
     // Query produk & kategori inline (tidak mengubah route)
-    $kategoriProduks = \App\Models\KategoriProduk::orderBy('nama_kategori')->get();
+    $kategoriProduks = \App\Models\KategoriProduk::untukKatalog()->orderBy('nama_kategori')->get();
     $produks = \App\Models\Produk::with(['kategoriProduk', 'opsis'])
         ->where('tipe', 'jual')
         ->where('status_aktif', true)

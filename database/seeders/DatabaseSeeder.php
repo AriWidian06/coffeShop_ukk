@@ -34,20 +34,8 @@ class DatabaseSeeder extends Seeder
             $this->command?->info('Akun admin dibuat. Password awal: ' . $adminPassword);
         }
 
-        // Data dasar agar admin bisa langsung menambah produk setelah deploy.
-        \App\Models\Supplier::firstOrCreate(
-            ['nama_supplier' => 'Supplier Utama'],
-            [
-                'alamat' => 'Perkoci Eatery',
-                'no_telp' => '-',
-            ]
-        );
-
-        foreach (['Kopi Susu', 'Pastry', 'Topping'] as $namaKategori) {
-            \App\Models\KategoriProduk::firstOrCreate([
-                'nama_kategori' => $namaKategori,
-            ]);
-        }
+        // Katalog menu kafe (30 makanan/minuman) sekaligus membersihkan menu lama.
+        $this->call(CafeMenuSeeder::class);
     }
 
     /**

@@ -6,7 +6,6 @@ use App\Models\Karyawan;
 use App\Models\KategoriProduk;
 use App\Models\Supplier;
 use App\Models\Produk;
-use App\Models\ProdukOpsi;
 use App\Models\Meja;
 use App\Models\PromoKode;
 use Carbon\Carbon;
@@ -27,7 +26,7 @@ class DemoDataSeeder extends Seeder
         $this->buatAdmin();
         $kategori = $this->buatKategori();
         $supplier = $this->buatSupplier();
-        $this->buatMenu($kategori, $supplier);
+        $this->call(CafeMenuSeeder::class);
         $this->buatBahanBaku($kategori, $supplier);
         $this->buatMeja();
         $this->buatPromo();
@@ -71,53 +70,6 @@ class DemoDataSeeder extends Seeder
                 ['alamat' => 'Bandung', 'no_telp' => '08222000222']
             ),
         ];
-    }
-
-    private function buatMenu(array $kategori, array $supplier): void
-    {
-        $kopiSusu = Produk::firstOrCreate(
-            ['nama_produk' => 'Kopi Susu Gula Aren'],
-            [
-                'supplier_id' => $supplier['kopi']->id,
-                'kategori_produk_id' => $kategori['kopi']->id,
-                'deskripsi' => 'Kopi susu dengan gula aren asli.',
-                'harga_jual' => 18000,
-                'harga_beli' => 9000,
-                'tipe' => 'jual',
-                'satuan' => 'cup',
-                'stock' => 50,
-                'status_aktif' => true,
-                'is_customizable' => true,
-            ]
-        );
-        $this->buatOpsi($kopiSusu, [
-            ['kategori' => 'Gula', 'tipe' => 'single', 'is_required' => 1, 'nama_opsi' => 'Less Sugar', 'harga_tambahan' => 0],
-            ['kategori' => 'Gula', 'tipe' => 'single', 'is_required' => 1, 'nama_opsi' => 'Extra Sugar', 'harga_tambahan' => 2000],
-            ['kategori' => 'Ukuran', 'tipe' => 'single', 'is_required' => 1, 'nama_opsi' => 'Regular', 'harga_tambahan' => 0],
-            ['kategori' => 'Ukuran', 'tipe' => 'single', 'is_required' => 1, 'nama_opsi' => 'Large', 'harga_tambahan' => 5000],
-        ]);
-
-        $croissant = Produk::firstOrCreate(
-            ['nama_produk' => 'Croissant Butter'],
-            [
-                'supplier_id' => $supplier['pastry']->id,
-                'kategori_produk_id' => $kategori['pastry']->id,
-                'deskripsi' => 'Croissant mentega renyah.',
-                'harga_jual' => 20000,
-                'harga_beli' => 10000,
-                'tipe' => 'jual',
-                'satuan' => 'pcs',
-                'stock' => 30,
-                'status_aktif' => true,
-                'is_customizable' => true,
-            ]
-        );
-        $this->buatOpsi($croissant, [
-            ['kategori' => 'Suhu', 'tipe' => 'single', 'is_required' => 1, 'nama_opsi' => 'Panas', 'harga_tambahan' => 0],
-            ['kategori' => 'Suhu', 'tipe' => 'single', 'is_required' => 1, 'nama_opsi' => 'Dingin', 'harga_tambahan' => 0],
-            ['kategori' => 'Topping', 'tipe' => 'multiple', 'is_required' => 0, 'nama_opsi' => 'Extra Cheese', 'harga_tambahan' => 5000],
-            ['kategori' => 'Topping', 'tipe' => 'multiple', 'is_required' => 0, 'nama_opsi' => 'Chocolate Drizzle', 'harga_tambahan' => 6000],
-        ]);
     }
 
     private function buatBahanBaku(array $kategori, array $supplier): void
@@ -192,24 +144,5 @@ class DemoDataSeeder extends Seeder
                 'is_aktif' => true,
             ]
         );
-    }
-
-    /** @param array<int, array{kategori: string, tipe: string, is_required: int, nama_opsi: string, harga_tambahan: int}> $daftar */
-    private function buatOpsi(Produk $produk, array $daftar): void
-    {
-        foreach ($daftar as $opsi) {
-            ProdukOpsi::firstOrCreate(
-                [
-                    'produk_id' => $produk->id,
-                    'kategori' => $opsi['kategori'],
-                    'nama_opsi' => $opsi['nama_opsi'],
-                ],
-                [
-                    'tipe' => $opsi['tipe'],
-                    'is_required' => $opsi['is_required'],
-                    'harga_tambahan' => $opsi['harga_tambahan'],
-                ]
-            );
-        }
     }
 }
