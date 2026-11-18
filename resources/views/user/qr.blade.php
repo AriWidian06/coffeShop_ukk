@@ -168,10 +168,11 @@
         <!-- Bottom Action -->
         <footer class="shrink-0 border-t border-slate-200 bg-white px-4 py-3 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-lg space-y-2">
-                <button onclick="closeReceipt()" class="w-full py-4 rounded-2xl bg-primary-600 text-white font-bold text-sm hover:bg-primary-700 transition-all shadow-lg shadow-primary-600/30 flex items-center justify-center gap-2">
+                <button id="paid-btn" onclick="closeReceipt()" disabled class="w-full py-4 rounded-2xl bg-slate-300 text-slate-500 font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-not-allowed">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                     <span>Saya Sudah Membayar</span>
                 </button>
+                <p id="paid-hint" class="text-[10px] text-center text-amber-600 font-medium">Menunggu konfirmasi pembayaran...</p>
                 <p class="text-[10px] text-center text-slate-400 font-medium">Transaksi dilindungi enkripsi SSL 256-bit standar Bank Indonesia</p>
             </div>
         </footer>

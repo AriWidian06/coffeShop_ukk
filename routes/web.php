@@ -361,15 +361,97 @@ Route::middleware('auth:karyawan')->group(function () {
         ]);
     })->middleware('can:view-sales-report')->name('dashboard.manager-sales-chart');
 
-    Route::get('/dashboard/sales-chart', function () {
-        $data = DashboardSalesChart::forDay(Carbon::now('Asia/Jakarta'));
-        $peakHour = $data['peak_hour'];
+    Route::get('/dashboard/sales-chart', function (Request $request) {
+        $tz = 'Asia/Jakarta';
+        $now = Carbon::now($tz);
+        $periode = $request->query('periode', 'hari');
+        if (! in_array($periode, ['hari', 'minggu', 'bulan', 'tahun'], true)) {
+            $periode = 'hari';
+        }
+
+        $tanggal = $request->query('tanggal');
+        $selectedDate = $now;
+        if (is_string($tanggal) && preg_match('/^\\d{4}-\\d{2}-\\d{2}$/', $tanggal)) {
+            $parsed = Carbon::createFromFormat('!Y-m-d', $tanggal, $tz);
+            if ($parsed && $parsed->format('Y-m-d') === $tanggal) {
+                $selectedDate = $parsed;
+            }
+        }
+
+        $labels = [];
+        $sales = [];
+        $volume = [];
+        $peakIndex = null;
+
+        if ($periode === 'hari') {
+            $data = DashboardSalesChart::forDay($selectedDate);
+            $labels = array_map(fn ($h) => str_pad((string) $h, 2, '0', STR_PAD_LEFT), range(0, 23));
+            $sales = array_values($data['sales']);
+            $volume = array_values($data['volume']);
+            $peakIndex = $data['peak_hour'];
+        } else {
+            // Fetch raw transactions in range and aggregate in PHP (timezone-correct).
+            if ($periode === 'minggu') {
+                $start = $selectedDate->copy()->startOfWeek(Carbon::MONDAY)->startOfDay();
+                $end = $selectedDate->copy()->endOfWeek(Carbon::SUNDAY)->endOfDay();
+                $bucketLabels = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+                $n = 7;
+                $keyFn = fn ($dt) => ($dt->dayOfWeek + 6) % 7;
+            } elseif ($periode === 'bulan') {
+                $start = $selectedDate->copy()->startOfYear()->startOfDay();
+                $end = $selectedDate->copy()->endOfYear()->endOfDay();
+                $bucketLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+                $n = 12;
+                $keyFn = fn ($dt) => $dt->month - 1;
+            } else { // tahun
+                $startYear = $selectedDate->year - 4;
+                $endYear = $selectedDate->year;
+                $start = Carbon::create($startYear, 1, 1, 0, 0, 0, $tz)->startOfDay();
+                $end = Carbon::create($endYear, 12, 31, 23, 59, 59, $tz)->endOfDay();
+                $bucketLabels = array_map('strval', range($startYear, $endYear));
+                $n = count($bucketLabels);
+                $yearIndex = array_flip($bucketLabels);
+                $keyFn = fn ($dt) => $yearIndex[(string) $dt->year] ?? null;
+            }
+
+            $sales = array_fill(0, $n, 0.0);
+            $volume = array_fill(0, $n, 0);
+            $labels = $bucketLabels;
+
+            $rows = Transaksi::query()
+                ->whereBetween('waktu_transaksi', [$start->copy()->utc(), $end->copy()->utc()])
+                ->where('status_pesanan', '!=', 'cancelled')
+                ->get(['waktu_transaksi', 'total_harga']);
+
+            foreach ($rows as $row) {
+                $dt = Carbon::parse($row->waktu_transaksi, 'UTC')->setTimezone($tz);
+                $idx = $keyFn($dt);
+                if ($idx === null || $idx < 0 || $idx >= $n) continue;
+                $sales[$idx] += (float) $row->total_harga;
+                $volume[$idx] += 1;
+            }
+
+            $peakIndex = count($sales) ? (int) array_search(max($sales), $sales, true) : null;
+            if (max($sales) <= 0) $peakIndex = null;
+        }
+
+        $peakLabel = 'Belum ada data';
+        if ($peakIndex !== null && isset($labels[$peakIndex])) {
+            if ($periode === 'hari') {
+                $peakLabel = sprintf('%s:00 - %s:00 WIB', str_pad((string) $labels[$peakIndex], 2, '0', STR_PAD_LEFT), str_pad((string) (($labels[$peakIndex] + 1) % 24), 2, '0', STR_PAD_LEFT));
+            } else {
+                $peakLabel = (string) $labels[$peakIndex];
+            }
+        }
 
         return response()->json([
-            ...$data,
-            'peak_hour_label' => $peakHour !== null
-                ? sprintf('%02d:00 - %02d:00 WIB', $peakHour, ($peakHour + 1) % 24)
-                : 'Belum ada data',
+            'sales' => array_values($sales),
+            'volume' => array_values($volume),
+            'labels' => array_values($labels),
+            'peak_hour' => $peakIndex,
+            'peak_hour_label' => $peakLabel,
+            'updated_at' => Carbon::now($tz)->format('H:i:s'),
+            'periode' => $periode,
         ]);
     })->middleware('can:access-admin-panel')->name('dashboard.sales-chart');
 

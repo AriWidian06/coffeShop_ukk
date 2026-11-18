@@ -222,7 +222,16 @@ class TransaksiController extends Controller
         $transaksi = null;
 
         if ($sessionId !== '') {
-            $transaksi = (clone $query)->where('session_id', $sessionId)->first();
+            // Utamakan pesanan yang masih aktif agar status tetap tampil meski
+            // ada pesanan lain dengan session yang sama yang sudah selesai.
+            $transaksi = (clone $query)
+                ->where('session_id', $sessionId)
+                ->whereIn('status_pesanan', ['pending', 'prosesed', 'ready'])
+                ->first();
+
+            if (! $transaksi) {
+                $transaksi = (clone $query)->where('session_id', $sessionId)->first();
+            }
         }
 
         if (! $transaksi && $mejaId) {
