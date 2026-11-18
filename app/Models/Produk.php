@@ -41,6 +41,10 @@ class Produk extends Model
      */
     public function getGambarUrlAttribute(): ?string
     {
+        if ($this->gambar && is_file(public_path($this->gambar))) {
+            return asset($this->gambar);
+        }
+
         if ($this->gambar && Storage::disk('public')->exists($this->gambar)) {
             return asset('storage/'.$this->gambar);
         }

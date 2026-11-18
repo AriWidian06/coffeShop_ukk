@@ -8,6 +8,7 @@ use App\Models\ProdukOpsi;
 use App\Models\Supplier;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * Katalog menu kafe: 30 makanan dan minuman.
@@ -43,12 +44,15 @@ class CafeMenuSeeder extends Seeder
 
         [$diarsipkan, $dihapus] = DB::transaction(function () use ($daftarMenu, $namaMenuBaru, $katalogPernahAda, $kategori, $supplier) {
             foreach ($daftarMenu as $menu) {
+                $gambar = 'images/menu/'.Str::slug($menu['nama']).'.jpg';
+
                 $produk = Produk::firstOrCreate(
                     ['nama_produk' => $menu['nama']],
                     [
                         'supplier_id' => $supplier->id,
                         'kategori_produk_id' => $kategori[$menu['kategori']]->id,
                         'deskripsi' => $menu['deskripsi'],
+                        'gambar' => is_file(public_path($gambar)) ? $gambar : null,
                         'harga_jual' => $menu['harga_jual'],
                         'harga_beli' => $menu['harga_beli'],
                         'tipe' => 'jual',
@@ -58,6 +62,12 @@ class CafeMenuSeeder extends Seeder
                         'is_customizable' => $menu['customizable'],
                     ]
                 );
+
+                // Jangan timpa gambar unggahan admin. Hanya isi jika produk
+                // lama belum punya gambar dan file katalog tersedia.
+                if (blank($produk->gambar) && is_file(public_path($gambar))) {
+                    $produk->update(['gambar' => $gambar]);
+                }
 
                 if ($menu['opsi'] !== []) {
                     $this->buatOpsi($produk, $menu['opsi']);
