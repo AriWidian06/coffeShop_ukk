@@ -27,3 +27,6 @@ Thumbs.db
 /pemodelan
 .github
 /docs
+/node_modules
+/public/build
+/public/hot
