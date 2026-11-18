@@ -31,7 +31,7 @@ Route::middleware('throttle:api')->group(function () {
 | API Staf v1 (Sanctum token)
 |--------------------------------------------------------------------------
 */
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::post('auth/login', [V1AuthController::class, 'login'])->middleware('throttle:login');
 
     Route::middleware(['auth:sanctum', 'throttle:api.staff'])->group(function () {
