@@ -39,11 +39,10 @@
     {{-- ═══════════════════════════════════════════════════════════════
         TOP BAR — Terminal title, shift info, kasir, time, tab buttons
         ═══════════════════════════════════════════════════════════════ --}}
-    <header class="kasir-topbar bg-white/85 backdrop-blur-xl border-b border-slate-200/80 flex-shrink-0 z-20">
+    <header class="kasir-topbar bg-white border-b border-slate-200/80 flex-shrink-0 z-20">
         <div class="px-3 sm:px-5 py-3 flex flex-wrap items-center justify-between gap-2.5">
             <div class="flex items-center gap-3 min-w-0">
-                <div class="hidden sm:flex relative w-11 h-11 rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 text-white items-center justify-center shadow-lg shadow-primary-600/20 overflow-hidden shrink-0">
-                    <span class="absolute -right-3 -top-4 w-12 h-12 rounded-full bg-white/25 blur-xl"></span>
+                <div class="hidden sm:flex relative w-11 h-11 rounded-2xl bg-primary-600 text-white items-center justify-center shrink-0">
                     <svg class="relative w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 1v3M10 1v3M14 1v3" />
@@ -160,13 +159,13 @@
                                         @if($produk->gambar_url)
                                             <img src="{{ $produk->gambar_url }}" alt="{{ $produk->nama_produk }}" class="pos-product-card-img" loading="lazy">
                                         @else
-                                            <div class="w-full h-full bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center">
+                                            <div class="w-full h-full bg-primary-50 flex items-center justify-center">
                                                 <svg class="w-12 h-12 text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
                                                 </svg>
                                             </div>
                                         @endif
-                                        <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-950/45 to-transparent pointer-events-none"></div>
+                                        <div class="absolute inset-x-0 bottom-0 h-12 bg-slate-900/20 pointer-events-none"></div>
                                         <span class="absolute left-2.5 top-2.5 px-2 py-1 rounded-lg bg-white/90 backdrop-blur text-[9px] font-extrabold text-primary-700 uppercase tracking-wider shadow-sm">
                                             {{ $produk->kategoriProduk->nama_kategori ?? 'Menu' }}
                                         </span>
@@ -379,7 +378,7 @@
                                     $order = $activeOrders[$meja->id] ?? null;
                                     $isOccupied = !is_null($order);
                                 @endphp
-                                <div class="terminal-table-card relative overflow-hidden p-4 rounded-2xl border transition-all duration-200 text-left cursor-pointer select-none {{ $isOccupied ? 'border-amber-200 bg-gradient-to-b from-amber-50/80 to-white hover:border-amber-300' : 'border-slate-200 bg-white hover:border-primary-300' }} shadow-sm"
+                                <div class="terminal-table-card relative overflow-hidden p-4 rounded-2xl border transition-all duration-200 text-left cursor-pointer select-none {{ $isOccupied ? 'border-amber-200 bg-amber-50 hover:border-amber-300' : 'border-slate-200 bg-white hover:border-primary-300' }} shadow-sm"
                                     id="table-node-{{ $meja->id }}"
                                     onclick="inspectTable({{ $meja->id }})"
                                     data-meja-id="{{ $meja->id }}"
@@ -462,7 +461,7 @@
                     {{-- Dynamic Inspector Content --}}
                     <div id="inspector-content" class="flex-1 flex flex-col h-full overflow-hidden hidden">
                         {{-- Inspector Header --}}
-                        <div class="p-4 border-b border-slate-200 flex items-center justify-between gap-3 bg-gradient-to-r from-primary-50/80 via-white to-white shrink-0">
+                        <div class="p-4 border-b border-slate-200 flex items-center justify-between gap-3 bg-primary-50/60 shrink-0">
                             <div class="flex items-center gap-2.5 min-w-0">
                                 <div class="w-9 h-9 rounded-xl bg-white border border-primary-100 text-primary-600 flex items-center justify-center shrink-0 shadow-sm">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
@@ -498,7 +497,7 @@
         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ --}}
         <div id="tab-transaksi" class="lg:h-full flex flex-col lg:overflow-hidden bg-slate-50 hidden">
             {{-- Toolbar: Status Filters, Search, Sync, and Link to History --}}
-            <div class="px-3 sm:px-5 py-3 bg-white/95 backdrop-blur border-b border-slate-200 flex-shrink-0 flex flex-wrap items-center justify-between gap-3">
+            <div class="px-3 sm:px-5 py-3 bg-white border-b border-slate-200 flex-shrink-0 flex flex-wrap items-center justify-between gap-3">
                 <div class="flex items-center gap-2 min-w-0 max-w-full">
                     <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-primary-50 border border-primary-100 text-[10px] font-bold text-primary-700 shrink-0">
                         <span class="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse"></span>
@@ -872,7 +871,7 @@
     let currentInspectedOrderId = null;
     let currentTableFilter = 'all';
     const TABLE_CARD_CLASS = {
-        terisi: 'terminal-table-card relative overflow-hidden p-4 rounded-2xl border transition-all duration-200 text-left cursor-pointer select-none border-amber-200 bg-gradient-to-b from-amber-50/80 to-white hover:border-amber-300 shadow-sm',
+        terisi: 'terminal-table-card relative overflow-hidden p-4 rounded-2xl border transition-all duration-200 text-left cursor-pointer select-none border-amber-200 bg-amber-50 hover:border-amber-300 shadow-sm',
         kosong: 'terminal-table-card relative overflow-hidden p-4 rounded-2xl border transition-all duration-200 text-left cursor-pointer select-none border-slate-200 bg-white hover:border-primary-300 shadow-sm',
     };
     const csrfToken = '{{ csrf_token() }}';

@@ -61,12 +61,6 @@
                         <span id="desktop-cart-total" class="text-primary-700">Rp 0</span>
                         <span id="desktop-cart-badge" class="hidden h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-extrabold text-white">0</span>
                     </button>
-
-                    <button class="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                    </button>
                 </div>
             </div>
 
@@ -74,15 +68,10 @@
             <div id="search-container" class="relative mt-3 lg:max-w-2xl">
                 <input type="text" id="menu-search-mobile" onkeyup="filterMenu()"
                     placeholder="Cari kopi, pastry, atau manual brew..."
-                    class="w-full pl-10 pr-10 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all">
+                    class="w-full pl-10 pr-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all">
                 <svg class="w-5 h-5 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <button class="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                    </svg>
-                </button>
             </div>
         </div>
     </header>
@@ -961,7 +950,9 @@
             if (checkoutBtn) {
                 const orderText = qrisSelected ? 'Bayar Sekarang - QRIS Instan' : 'Bayar Sekarang - Tunai di Kasir';
                 const titleEl = checkoutBtn.querySelector('.text-sm');
+                const subtitleEl = checkoutBtn.querySelector('.text-xs');
                 if (titleEl) titleEl.textContent = orderText;
+                if (subtitleEl) subtitleEl.textContent = qrisSelected ? 'QRIS Instan' : 'Tunai di Kasir';
             }
         }
 
@@ -1229,24 +1220,59 @@
                     itemsList += `<div class="flex justify-between gap-3"><span>${item.qty}x ${escapeHtml(item.name)}${item.customization ? `<br><small class="text-slate-500">${escapeHtml(item.customization)}</small>` : ''}</span><span>${formatRupiah(item.price * item.qty)}</span></div>`;
                 });
                 document.getElementById('receipt-items-list').innerHTML = itemsList;
+                document.getElementById('receipt-cash-items').innerHTML = itemsList;
                 document.getElementById('receipt-grand-total').textContent = formatRupiah(order.total_harga);
+                document.getElementById('receipt-cash-total').textContent = formatRupiah(order.total_harga);
+                document.getElementById('receipt-cash-number').textContent = `#${order.id}`;
 
                 const qrisSection = document.getElementById('receipt-qris-section');
-                const qrisStatus = document.getElementById('receipt-qris-status');
+                const cashSection = document.getElementById('receipt-cash-section');
+                const timerBar = document.getElementById('receipt-timer-bar');
+                const guideSection = document.getElementById('receipt-guide-section');
+                const receiptTitle = document.getElementById('receipt-title');
+                const paidLabel = document.querySelector('#paid-btn span');
+
                 if (paymentMethod === 'QRIS' && order.qris && order.qris.qr_url) {
+                    receiptTitle.textContent = 'Pembayaran QRIS';
                     document.getElementById('receipt-qris-img').src = order.qris.qr_url;
                     qrisSection.classList.remove('hidden');
+                    cashSection.classList.add('hidden');
+                    timerBar.classList.remove('hidden');
+                    guideSection.classList.remove('hidden');
+                    if (paidLabel) paidLabel.textContent = 'Saya Sudah Membayar';
                     disablePaidButton();
+                    startReceiptTimer();
                     startQrisPolling(order.id, order.qris.order_id);
                 } else if (paymentMethod === 'QRIS') {
+                    receiptTitle.textContent = 'Pembayaran di Kasir';
                     document.getElementById('receipt-qris-img').src = '';
-                    qrisSection.classList.remove('hidden');
-                    qrisStatus.textContent = order.qris_error || 'QRIS otomatis tidak tersedia. Silakan bayar di kasir.';
-                    qrisStatus.className = 'text-[10px] font-bold text-red-700';
-                    disablePaidButton();
-                } else {
                     qrisSection.classList.add('hidden');
+                    cashSection.classList.remove('hidden');
+                    timerBar.classList.add('hidden');
+                    guideSection.classList.add('hidden');
+                    const cashNotice = document.getElementById('receipt-cash-notice');
+                    if (cashNotice) {
+                        cashNotice.textContent = order.qris_error || 'QRIS otomatis tidak tersedia. Silakan lakukan pembayaran di kasir.';
+                        cashNotice.classList.remove('hidden');
+                    }
+                    if (paidLabel) paidLabel.textContent = 'Mengerti';
                     enablePaidButton();
+                    const fallbackHint = document.getElementById('paid-hint');
+                    if (fallbackHint) fallbackHint.textContent = 'Pesanan dibuat. Silakan lakukan pembayaran di kasir.';
+                    stopReceiptTimer();
+                } else {
+                    receiptTitle.textContent = 'Pembayaran Tunai';
+                    qrisSection.classList.add('hidden');
+                    cashSection.classList.remove('hidden');
+                    timerBar.classList.add('hidden');
+                    guideSection.classList.add('hidden');
+                    const cashNotice = document.getElementById('receipt-cash-notice');
+                    if (cashNotice) cashNotice.classList.add('hidden');
+                    if (paidLabel) paidLabel.textContent = 'Mengerti';
+                    enablePaidButton();
+                    const cashHint = document.getElementById('paid-hint');
+                    if (cashHint) cashHint.textContent = 'Silakan bayar di kasir. Pesanan menunggu konfirmasi kasir.';
+                    stopReceiptTimer();
                 }
 
                 const notesDisplay = document.getElementById('receipt-notes-display');
@@ -1266,11 +1292,40 @@
             } finally {
                 checkout.disabled = false;
                 checkout.innerHTML = `<div><div class="text-sm">BAYAR SEKARANG</div><div class="text-xs opacity-90">QRIS Instan</div></div><div class="flex items-center gap-2"><span id="bottom-total" class="text-lg">Rp 0</span><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></div>`;
+                updatePaymentMethodUI();
                 renderCart();
             }
         }
 
         let qrisPollTimer = null;
+        let receiptTimer = null;
+        let receiptSecondsLeft = 15 * 60;
+
+        function updateReceiptTimerDisplay() {
+            const el = document.getElementById('receipt-timer');
+            if (!el) return;
+            const minutes = String(Math.floor(receiptSecondsLeft / 60)).padStart(2, '0');
+            const seconds = String(receiptSecondsLeft % 60).padStart(2, '0');
+            el.textContent = `${minutes}:${seconds}`;
+        }
+
+        function startReceiptTimer() {
+            stopReceiptTimer();
+            receiptSecondsLeft = 15 * 60;
+            updateReceiptTimerDisplay();
+            receiptTimer = setInterval(() => {
+                receiptSecondsLeft = Math.max(0, receiptSecondsLeft - 1);
+                updateReceiptTimerDisplay();
+                if (receiptSecondsLeft === 0) stopReceiptTimer();
+            }, 1000);
+        }
+
+        function stopReceiptTimer() {
+            if (receiptTimer) {
+                clearInterval(receiptTimer);
+                receiptTimer = null;
+            }
+        }
 
         function stopQrisPolling() {
             if (qrisPollTimer) {
@@ -1320,6 +1375,7 @@
                         statusEl.textContent = 'Pembayaran Lunas ✓';
                         statusEl.className = 'text-[10px] font-bold text-emerald-700';
                         stopQrisPolling();
+                        stopReceiptTimer();
                         enablePaidButton();
                     } else {
                         statusEl.textContent = 'Menunggu pembayaran...';
@@ -1330,6 +1386,7 @@
 
         function closeReceipt() {
             stopQrisPolling();
+            stopReceiptTimer();
             disablePaidButton();
             document.getElementById('receipt-modal').classList.add('hidden');
             document.getElementById('receipt-modal').classList.remove('flex');

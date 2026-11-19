@@ -47,6 +47,42 @@ class AppServiceProvider extends ServiceProvider
             return $user && in_array(strtolower($user->role), ['kasir', 'admin'], false);
         });
 
+        // Alur kas & pengeluaran.
+        Gate::define('input-pengeluaran', function ($user = null) {
+            $user = auth('karyawan')->user();
+            return $user && in_array(strtolower($user->role), ['kasir', 'admin'], false);
+        });
+
+        Gate::define('approve-pengeluaran', function ($user = null) {
+            $user = auth('karyawan')->user();
+            return $user && in_array(strtolower($user->role), ['manager', 'admin'], false);
+        });
+
+        Gate::define('lihat-kas', function ($user = null) {
+            $user = auth('karyawan')->user();
+            return $user && in_array(strtolower($user->role), ['kasir', 'manager', 'admin'], false);
+        });
+
+        Gate::define('kelola-kas', function ($user = null) {
+            $user = auth('karyawan')->user();
+            return $user && in_array(strtolower($user->role), ['manager', 'admin'], false);
+        });
+
+        Gate::define('tutup-kas', function ($user = null) {
+            $user = auth('karyawan')->user();
+            return $user && in_array(strtolower($user->role), ['kasir', 'manager', 'admin'], false);
+        });
+
+        Gate::define('verifikasi-kas', function ($user = null) {
+            $user = auth('karyawan')->user();
+            return $user && in_array(strtolower($user->role), ['manager', 'admin'], false);
+        });
+
+        Gate::define('lihat-laporan-kas', function ($user = null) {
+            $user = auth('karyawan')->user();
+            return $user && in_array(strtolower($user->role), ['manager', 'admin'], false);
+        });
+
         // Pembatas laju untuk endpoint publik agar tidak bisa disalahgunakan
         // (mis. menguras stok lewat spam pesanan atau mencoba brute force login).
         RateLimiter::for('api', function (Request $request) {

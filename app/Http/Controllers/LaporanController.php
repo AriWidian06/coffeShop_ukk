@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\KasAccount;
+use App\Models\KasMovement;
+use App\Models\Pengeluaran;
 use App\Models\Transaksi;
+use App\Services\KasService;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -128,6 +132,36 @@ class LaporanController extends Controller
         $maxHourlySales = max(1.0, ...$hourlySales);
         $totalPembayaran = (float) $paymentStats->sum('total');
 
+        // Arus kas & laba rugi untuk periode laporan yang sama.
+        $kasService = app(KasService::class);
+        $arusKas = KasAccount::where('aktif', true)->orderBy('id')->get()
+            ->map(function ($account) use ($kasService, $start, $end) {
+                $mutasi = KasMovement::where('kas_account_id', $account->id)
+                    ->whereBetween('tanggal', [$start->toDateString(), $end->toDateString()])
+                    ->get();
+
+                return (object) [
+                    'nama' => $account->nama,
+                    'saldo_awal' => $kasService->saldoPada($account, $start->copy()->subDay()->endOfDay()),
+                    'masuk' => (float) $mutasi->sum('debit'),
+                    'keluar' => (float) $mutasi->sum('kredit'),
+                    'saldo_akhir' => $kasService->saldoPada($account, $end),
+                ];
+            });
+
+        $hpp = (float) $transaksis->flatMap->detail_transaksis->sum(
+            fn ($detail) => (int) $detail->QTY * (float) ($detail->produk->harga_beli ?? 0)
+        );
+        $labaKotor = round($totalPendapatan - $hpp, 2);
+
+        $pengeluarans = Pengeluaran::approved()
+            ->whereBetween('tanggal', [$start->toDateString(), $end->toDateString()])
+            ->get();
+        $pengeluaranPerKategori = $pengeluarans->groupBy('kategori')
+            ->map(fn ($group) => (float) $group->sum('jumlah'));
+        $totalPengeluaran = (float) $pengeluarans->sum('jumlah');
+        $labaBersih = round($labaKotor - $totalPengeluaran, 2);
+
         $logoPath = public_path('images/logo.jpeg');
         $logoData = is_file($logoPath) ? base64_encode(file_get_contents($logoPath)) : null;
 
@@ -150,6 +184,12 @@ class LaporanController extends Controller
             'maxHourlySales' => $maxHourlySales,
             'totalPembayaran' => $totalPembayaran,
             'topProducts' => $topProducts,
+            'arusKas' => $arusKas,
+            'hpp' => $hpp,
+            'labaKotor' => $labaKotor,
+            'labaBersih' => $labaBersih,
+            'totalPengeluaran' => $totalPengeluaran,
+            'pengeluaranPerKategori' => $pengeluaranPerKategori,
             'periodeLabel' => $periodeLabel,
             'start' => $start,
             'end' => $end,

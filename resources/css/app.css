@@ -1065,3 +1065,170 @@ body.manager-drawer-open {
         transform: none;
     }
 }
+
+/* ============================================================
+   Kasir UI — blue/white console, anti-slop polish
+   Scoped to body.kasir-ui so admin and manager views stay intact.
+   ============================================================ */
+
+body.kasir-ui {
+    background: #f6f9ff;
+    color: #0f172a;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Solid surfaces instead of frosted glass */
+body.kasir-ui [class*="bg-white/85"],
+body.kasir-ui [class*="bg-white/95"],
+body.kasir-ui [class*="bg-white/90"] {
+    background-color: #ffffff !important;
+}
+
+/* Cool neutral palette */
+body.kasir-ui .bg-slate-50,
+body.kasir-ui .bg-slate-100 {
+    background-color: #eff6ff;
+}
+
+body.kasir-ui .border-slate-200,
+body.kasir-ui .border-slate-100 {
+    border-color: #dbeafe;
+}
+
+body.kasir-ui .text-slate-900 {
+    color: #0b2447;
+}
+
+body.kasir-ui .text-slate-700 {
+    color: #334e68;
+}
+
+body.kasir-ui .text-slate-500,
+body.kasir-ui .text-slate-400 {
+    color: #64748b;
+}
+
+/* Decorative gradients and blurs are removed; semantic colors stay */
+body.kasir-ui [class*="blur-3xl"],
+body.kasir-ui [class*="blur-xl"] {
+    display: none !important;
+}
+
+body.kasir-ui [class*="bg-gradient-to-br"],
+body.kasir-ui [class*="bg-gradient-to-r"],
+body.kasir-ui [class*="bg-gradient-to-t"],
+body.kasir-ui [class*="bg-gradient-to-b"] {
+    background-image: none !important;
+}
+
+body.kasir-ui .kasir-topbar [class*="from-primary-600"] {
+    background-color: #2563eb;
+}
+
+body.kasir-ui .pos-product-media [class*="from-primary-50"] {
+    background-color: #eff6ff;
+}
+
+body.kasir-ui .terminal-table-card[class*="border-amber-200"] {
+    background-color: #fffbeb;
+}
+
+body.kasir-ui .animate-pulse {
+    animation: none !important;
+}
+
+body.kasir-ui [class*="backdrop-blur"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Flatter, consistent elevation */
+body.kasir-ui .kasir-topbar {
+    background: #ffffff;
+    box-shadow: 0 1px 0 #dbeafe;
+}
+
+body.kasir-ui .kasir-pos .pos-toolbar {
+    border-color: #dbeafe;
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(15, 36, 71, 0.04);
+}
+
+body.kasir-ui .kasir-pos .pos-toolbar:focus-within {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+body.kasir-ui .kasir-pos .pos-product-card {
+    border-color: #dbeafe;
+    box-shadow: 0 1px 2px rgba(15, 36, 71, 0.04);
+}
+
+body.kasir-ui .kasir-pos .pos-product-card:hover {
+    border-color: #93c5fd;
+    box-shadow: 0 6px 16px -10px rgba(37, 99, 235, 0.35);
+    transform: translateY(-2px);
+}
+
+body.kasir-ui .kasir-pos .pos-add-btn,
+body.kasir-ui .shadow-primary-600\/20,
+body.kasir-ui .shadow-primary-600\/30 {
+    box-shadow: none;
+}
+
+body.kasir-ui .kasir-pos .pos-add-btn:hover:not(:disabled) {
+    box-shadow: 0 4px 10px -6px rgba(37, 99, 235, 0.45);
+}
+
+body.kasir-ui .kasir-pos .pos-cart-line {
+    border-color: #dbeafe;
+    background: #f8fbff;
+}
+
+body.kasir-ui .kasir-pos .pos-order-form {
+    background: #ffffff;
+    border-top: 1px solid #dbeafe;
+}
+
+body.kasir-ui .kasir-pos .terminal-table-card:hover,
+body.kasir-ui .kasir-pos .active-order-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px -14px rgba(37, 99, 235, 0.35);
+}
+
+/* Sidebar and shared cards */
+body.kasir-ui .kasir-sidebar {
+    background: #ffffff;
+    border-right-color: #dbeafe;
+}
+
+body.kasir-ui .kasir-sidebar .sidebar-link.active {
+    box-shadow: 0 6px 14px -10px rgba(37, 99, 235, 0.7);
+}
+
+body.kasir-ui .stat-card,
+body.kasir-ui .chart-container,
+body.kasir-ui .product-card-kasir,
+body.kasir-ui .order-panel {
+    border-color: #dbeafe;
+    box-shadow: 0 1px 2px rgba(15, 36, 71, 0.04);
+}
+
+body.kasir-ui a,
+body.kasir-ui button {
+    transition-duration: 150ms;
+}
+
+body.kasir-ui :is(a, button, input, select, textarea):focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.kasir-ui * {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}

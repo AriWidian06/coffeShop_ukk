@@ -238,18 +238,24 @@ class PaymentService
 
     protected function markAsPaid(Transaksi $transaksi)
     {
-        $transaksi->update(['status_pesanan' => 'completed']);
+        DB::transaction(function () use ($transaksi) {
+            $transaksi->update(['status_pesanan' => 'completed']);
 
-        Pembayaran::updateOrCreate(
-            ['transaksi_id' => $transaksi->id],
-            [
-                'jumlah_bayar' => $transaksi->total_harga,
-                'metode_pembayaran' => 'QRIS',
-                'status_pembayaran' => 'paid',
-                'kembalian' => 0,
-                'waktu_pembayaran' => now(),
-            ]
-        );
+            $pembayaran = Pembayaran::updateOrCreate(
+                ['transaksi_id' => $transaksi->id],
+                [
+                    'jumlah_bayar' => $transaksi->total_harga,
+                    'metode_pembayaran' => 'QRIS',
+                    'status_pembayaran' => 'paid',
+                    'kembalian' => 0,
+                    'waktu_pembayaran' => now(),
+                ]
+            );
+
+            // QRIS yang lunas otomatis menambah saldo Bank / QRIS.
+            // KasService menjaga idempotensi bila notifikasi Midtrans datang dua kali.
+            app(KasService::class)->catatPenjualan($pembayaran->load('transaksi'));
+        });
     }
 
     /**

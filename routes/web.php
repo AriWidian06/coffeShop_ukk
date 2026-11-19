@@ -3,21 +3,26 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KaryawanController;
+use App\Http\Controllers\KasController;
 use App\Http\Controllers\KategoriProdukController;
 use App\Http\Controllers\PromoKodeController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\MejaController;
 use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\PengeluaranController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TransaksiController;
+use App\Models\KasAccount;
+use App\Models\Pengeluaran;
 use App\Models\DetailTransaksi;
 use App\Models\Meja;
 use App\Models\Pembayaran;
 use App\Models\Transaksi;
 use App\Models\KategoriProduk; 
 use App\Models\Produk;
+use App\Services\KasService;
 use App\Support\DashboardSalesChart;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -186,6 +191,21 @@ Route::middleware('auth:karyawan')->group(function () {
                 ->groupBy('metode_pembayaran')
                 ->get();
 
+            // Ringkasan arus kas & laba rugi pada periode terpilih.
+            $kasService = app(KasService::class);
+            $totalSaldoKas = (float) KasAccount::where('aktif', true)->get()
+                ->sum(fn ($account) => $kasService->saldo($account));
+            $pengeluaranPeriode = (float) Pengeluaran::approved()
+                ->whereBetween('tanggal', [$start->toDateString(), $end->toDateString()])
+                ->sum('jumlah');
+            $hppPeriode = (float) (DetailTransaksi::join('produks', 'detail_transaksis.produk_id', '=', 'produks.id')
+                ->whereHas('transaksi', fn ($q) => $q->whereBetween('waktu_transaksi', [$startUtc, $endUtc])->where('status_pesanan', '!=', 'cancelled'))
+                ->selectRaw('SUM(detail_transaksis.QTY * produks.harga_beli) as total')
+                ->value('total') ?? 0);
+            $labaKotorPeriode = round($totalPendapatanPeriode - $hppPeriode, 2);
+            $labaBersihPeriode = round($labaKotorPeriode - $pengeluaranPeriode, 2);
+            $pengeluaranPending = (float) Pengeluaran::pending()->sum('jumlah');
+
             $shift = match (true) {
                 $nowWib->hour >= 6 && $nowWib->hour < 14 => 'Pagi (06:00 - 14:00)',
                 $nowWib->hour >= 14 && $nowWib->hour < 22 => 'Siang/Sore (14:00 - 22:00)',
@@ -198,6 +218,7 @@ Route::middleware('auth:karyawan')->group(function () {
                 'averageTransactionValue', 'pendapatanGrowth', 'pendapatanSebelumnya',
                 'salesByHour', 'volumeByHour', 'peakHour', 'peakHourLabel', 'chartUpdatedAt',
                 'produkTerlaris', 'paymentStats',
+                'totalSaldoKas', 'pengeluaranPeriode', 'labaKotorPeriode', 'labaBersihPeriode', 'pengeluaranPending',
                 'periode', 'periodeLabel', 'selectedDate', 'prevReference', 'nextReference', 'shift', 'nowWib',
                 'start', 'end'
             ));
@@ -301,7 +322,26 @@ Route::middleware('auth:karyawan')->group(function () {
                 ->limit(4)
                 ->get();
 
+            // Arus kas & laba rugi bulan berjalan.
+            $monthStartUtc = $nowWib->copy()->startOfMonth()->utc();
+            $monthEndUtc = $nowWib->copy()->endOfMonth()->utc();
+            $totalPenjualanBulan = (float) Transaksi::whereBetween('waktu_transaksi', [$monthStartUtc, $monthEndUtc])
+                ->where('status_pesanan', '!=', 'cancelled')->sum('total_harga');
+            $hppBulan = (float) (DetailTransaksi::join('produks', 'detail_transaksis.produk_id', '=', 'produks.id')
+                ->whereHas('transaksi', fn ($q) => $q->whereBetween('waktu_transaksi', [$monthStartUtc, $monthEndUtc])->where('status_pesanan', '!=', 'cancelled'))
+                ->selectRaw('SUM(detail_transaksis.QTY * produks.harga_beli) as total')
+                ->value('total') ?? 0);
+            $pengeluaranBulan = (float) Pengeluaran::approved()
+                ->whereBetween('tanggal', [$nowWib->copy()->startOfMonth()->toDateString(), $nowWib->copy()->endOfMonth()->toDateString()])
+                ->sum('jumlah');
+            $labaBersihBulan = round($totalPenjualanBulan - $hppBulan - $pengeluaranBulan, 2);
+            $kasServiceAdmin = app(KasService::class);
+            $totalSaldoKas = (float) KasAccount::where('aktif', true)->get()
+                ->sum(fn ($account) => $kasServiceAdmin->saldo($account));
+            $pengeluaranPending = (float) Pengeluaran::pending()->sum('jumlah');
+
             return view('dashboard.admin', compact(
+                'totalSaldoKas', 'totalPenjualanBulan', 'pengeluaranBulan', 'labaBersihBulan', 'pengeluaranPending',
                 'totalPenjualan',
                 'totalPesanan',
                 'totalMeja',
@@ -487,6 +527,54 @@ Route::middleware('auth:karyawan')->group(function () {
         // FITUR EKSPOR LAPORAN CSV BARU
         Route::get('/laporan/export', [LaporanController::class, 'export'])->name('laporan.export');
     });
+
+    // ==========================================
+    // Pengeluaran & Alur Kas
+    // ==========================================
+    Route::middleware('can:lihat-kas')->group(function () {
+        Route::get('/kas', [KasController::class, 'index'])->name('kas.index');
+        Route::get('/kas/mutasi', [KasController::class, 'mutasi'])->name('kas.mutasi');
+        Route::get('/pengeluarans', [PengeluaranController::class, 'index'])->name('pengeluarans.index');
+    });
+
+    Route::middleware('can:input-pengeluaran')->group(function () {
+        Route::get('/pengeluarans/create', [PengeluaranController::class, 'create'])->name('pengeluarans.create');
+        Route::post('/pengeluarans', [PengeluaranController::class, 'store'])->name('pengeluarans.store');
+        Route::get('/pengeluarans/{pengeluaran}/edit', [PengeluaranController::class, 'edit'])->name('pengeluarans.edit');
+        Route::put('/pengeluarans/{pengeluaran}', [PengeluaranController::class, 'update'])->name('pengeluarans.update');
+        Route::delete('/pengeluarans/{pengeluaran}', [PengeluaranController::class, 'destroy'])->name('pengeluarans.destroy');
+    });
+
+    Route::get('/pengeluarans/{pengeluaran}', [PengeluaranController::class, 'show'])
+        ->middleware('can:lihat-kas')
+        ->name('pengeluarans.show');
+
+    Route::middleware('can:approve-pengeluaran')->group(function () {
+        Route::post('/pengeluarans/{pengeluaran}/approve', [PengeluaranController::class, 'approve'])->name('pengeluarans.approve');
+        Route::post('/pengeluarans/{pengeluaran}/reject', [PengeluaranController::class, 'reject'])->name('pengeluarans.reject');
+    });
+
+    Route::middleware('can:kelola-kas')->group(function () {
+        Route::get('/kas/saldo-awal', [KasController::class, 'saldoAwal'])->name('kas.saldo-awal');
+        Route::post('/kas/saldo-awal', [KasController::class, 'simpanSaldoAwal'])->name('kas.saldo-awal.store');
+        Route::get('/kas/transfer', [KasController::class, 'transfer'])->name('kas.transfer');
+        Route::post('/kas/transfer', [KasController::class, 'simpanTransfer'])->name('kas.transfer.store');
+        Route::get('/kas/penyesuaian', [KasController::class, 'penyesuaian'])->name('kas.penyesuaian');
+        Route::post('/kas/penyesuaian', [KasController::class, 'simpanPenyesuaian'])->name('kas.penyesuaian.store');
+    });
+
+    Route::middleware('can:tutup-kas')->group(function () {
+        Route::get('/kas/tutup-hari', [KasController::class, 'tutupHari'])->name('kas.tutup-hari');
+        Route::post('/kas/tutup-hari', [KasController::class, 'simpanTutupHari'])->name('kas.tutup-hari.store');
+    });
+
+    Route::post('/kas/closing/{closing}/verifikasi', [KasController::class, 'verifikasi'])
+        ->middleware('can:verifikasi-kas')
+        ->name('kas.verifikasi');
+
+    Route::get('/laporan-kas', [KasController::class, 'laporan'])
+        ->middleware('can:lihat-laporan-kas')
+        ->name('kas.laporan');
 
     // Rute khusus Kasir untuk pembayaran QRIS
     Route::middleware(['auth:karyawan'])->prefix('kasir')->name('kasir.')->group(function () {

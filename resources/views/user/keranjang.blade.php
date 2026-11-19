@@ -159,7 +159,7 @@
                 <button onclick="processOrder()" id="checkout-btn" disabled class="w-full bg-primary-600 text-white rounded-xl py-4 px-6 flex items-center justify-between font-bold shadow-lg shadow-primary-600/25 active:scale-95 transition disabled:bg-slate-300 disabled:cursor-not-allowed lg:w-96">
                     <div>
                         <div class="text-sm">BAYAR SEKARANG</div>
-                        <div class="text-xs opacity-90">QRIS Instan</div>
+                        <div class="text-xs opacity-90" id="checkout-subtitle">QRIS Instan</div>
                     </div>
                     <div class="flex items-center gap-2">
                         <span id="bottom-total" class="text-lg">Rp 0</span>

@@ -129,18 +129,11 @@
                 
                 <!-- Right Side Controls -->
                 <div class="flex flex-wrap items-center gap-2 shrink-0">
-                    <select class="flex-1 sm:flex-none px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500 text-slate-600">
-                        <option>Semua Status Order</option>
-                        <option>Sedang Digunakan</option>
-                        <option>Standby</option>
-                        <option>Reserved</option>
+                    <select id="meja-status-filter" class="flex-1 sm:flex-none px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500 text-slate-600">
+                        <option value="all">Semua Status Meja</option>
+                        <option value="aktif">Aktif / Siap Pakai</option>
+                        <option value="nonaktif">Nonaktif / Servis</option>
                     </select>
-                    <button type="button" class="px-3 py-2 bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-200 transition flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                        Rotasi Token
-                    </button>
                 </div>
             </div>
         </div>
@@ -155,7 +148,7 @@
                     $qrUrl = route('welcome', ['meja_id' => $meja->id]);
                 @endphp
 
-                <div class="bg-white rounded-2xl border {{ $meja->status_aktif ? 'border-slate-200' : 'border-red-200' }} p-5 transition-all hover:shadow-md">
+                <div data-meja-status="{{ $meja->status_aktif ? 'aktif' : 'nonaktif' }}" class="meja-card bg-white rounded-2xl border {{ $meja->status_aktif ? 'border-slate-200' : 'border-red-200' }} p-5 transition-all hover:shadow-md">
                     <!-- Card Header -->
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
                         <div class="flex items-center gap-2">
@@ -305,26 +298,40 @@
                     Disarankan menggunakan laminasi doff tahan gores dan anti-glare agar kamera smartphone mudah memindai dalam segala kondisi pencahayaan kafe.
                 </p>
             </div>
-            <div class="flex flex-wrap items-center gap-2 shrink-0">
-                <button type="button" class="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-50 transition flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    Pratinjau Mockup Akrilik
-                </button>
-                <button type="button" class="btn-navbar-primary">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Unduh Kit Cetak (PDF Vektor)
-                </button>
-            </div>
         </div>
     </div>
 </div>
 
 <script>
+    const mejaStatusFilter = document.getElementById('meja-status-filter');
+    if (mejaStatusFilter) {
+        mejaStatusFilter.addEventListener('change', () => {
+            const value = mejaStatusFilter.value;
+            const cards = document.querySelectorAll('.meja-card');
+            let visible = 0;
+
+            cards.forEach(card => {
+                const show = value === 'all' || card.dataset.mejaStatus === value;
+                card.classList.toggle('hidden', !show);
+                if (show) visible++;
+            });
+
+            let empty = document.getElementById('meja-filter-empty');
+            if (!visible && cards.length) {
+                if (!empty) {
+                    empty = document.createElement('div');
+                    empty.id = 'meja-filter-empty';
+                    empty.className = 'col-span-full text-center py-12 bg-white rounded-2xl border border-dashed border-slate-300';
+                    empty.innerHTML = '<p class="font-bold text-slate-900 mb-1">Tidak ada meja dengan status ini</p><p class="text-sm text-slate-500">Coba pilih status lain.</p>';
+                    cards[0].parentElement.appendChild(empty);
+                }
+                empty.classList.remove('hidden');
+            } else if (empty) {
+                empty.classList.add('hidden');
+            }
+        });
+    }
+
     function copyMejaUrl(button) {
         const url = button?.dataset?.copyUrl || '';
         if (!url) return;

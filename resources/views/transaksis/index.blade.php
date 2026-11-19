@@ -8,8 +8,8 @@
 
     $statusLabels = [
         'pending' => 'Menunggu',
-        'ready' => 'Siap',
         'prosesed' => 'Diproses',
+        'ready' => 'Siap',
         'completed' => 'Selesai',
         'cancelled' => 'Dibatalkan',
     ];

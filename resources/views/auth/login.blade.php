@@ -137,9 +137,9 @@
                         <label for="password" class="text-sm font-bold text-slate-700">
                             Kata Sandi Akun
                         </label>
-                        <a href="#" class="text-xs font-semibold text-primary-600 hover:text-primary-700">
-                            Lupa Kata Sandi?
-                        </a>
+                        <span class="text-xs text-slate-500">
+                            Hubungi admin untuk reset
+                        </span>
                     </div>
                     <div class="input-icon-wrapper">
                         <svg class="input-icon w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

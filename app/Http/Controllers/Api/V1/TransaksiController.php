@@ -10,6 +10,7 @@ use App\Models\Produk;
 use App\Models\ProdukOpsi;
 use App\Models\PromoUsage;
 use App\Models\Transaksi;
+use App\Services\KasService;
 use App\Services\PaymentService;
 use App\Support\ApiPresenter;
 use Illuminate\Http\JsonResponse;
@@ -269,7 +270,7 @@ class TransaksiController extends Controller
         return $this->ok(null, 'Transaksi berhasil dihapus.');
     }
 
-    public function payment(Request $request, Transaksi $transaksi): JsonResponse
+    public function payment(Request $request, Transaksi $transaksi, KasService $kas): JsonResponse
     {
         if (! $request->user()->can('view', $transaksi)) {
             return $this->fail('Akses ditolak: Anda tidak berwenang membayar transaksi ini.', 403);
@@ -296,8 +297,8 @@ class TransaksiController extends Controller
             ? round((float) $validated['jumlah_bayar'] - (float) $transaksi->total_harga, 2)
             : 0;
 
-        DB::transaction(function () use ($transaksi, $validated, $kembalian) {
-            Pembayaran::create([
+        DB::transaction(function () use ($transaksi, $validated, $kembalian, $kas) {
+            $pembayaran = Pembayaran::create([
                 'transaksi_id' => $transaksi->id,
                 'jumlah_bayar' => $validated['jumlah_bayar'],
                 'metode_pembayaran' => $validated['metode_pembayaran'],
@@ -306,6 +307,7 @@ class TransaksiController extends Controller
                 'waktu_pembayaran' => now(),
             ]);
 
+            $kas->catatPenjualan($pembayaran->load('transaksi'));
             $transaksi->update(['status_pesanan' => 'completed']);
 
             PromoUsage::where('transaksi_id', $transaksi->id)

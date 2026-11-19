@@ -958,6 +958,56 @@
         </table>
     </div>
 
+    <div class="detail-head" style="page-break-inside: avoid;">
+        <table>
+            <tr>
+                <td>
+                    <div class="section-kicker">Buku Kas &amp; Laporan Keuangan</div>
+                    <div class="section-title">Arus Kas &amp; Laba Rugi</div>
+                    <div class="section-subtitle">Pengeluaran yang telah disetujui &bull; nilai dalam Rupiah</div>
+                </td>
+            </tr>
+        </table>
+        <table class="closing-table">
+            <tr>
+                <td width="49%" style="padding-right: 10px;">
+                    <table class="data-table">
+                        <thead><tr><th>Laba Rugi</th><th class="text-right">Nilai</th></tr></thead>
+                        <tbody>
+                            <tr><td>Pendapatan penjualan</td><td class="text-right">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</td></tr>
+                            <tr><td>Harga pokok penjualan (HPP)</td><td class="text-right">-Rp {{ number_format($hpp, 0, ',', '.') }}</td></tr>
+                            <tr><td><strong>Laba Kotor</strong></td><td class="text-right"><strong>Rp {{ number_format($labaKotor, 0, ',', '.') }}</strong></td></tr>
+                            @foreach (['bahan_baku' => 'Bahan Baku', 'operasional' => 'Operasional', 'gaji' => 'Gaji Karyawan', 'lainnya' => 'Lainnya'] as $key => $label)
+                                <tr><td>Pengeluaran {{ $label }}</td><td class="text-right">Rp {{ number_format($pengeluaranPerKategori->get($key, 0), 0, ',', '.') }}</td></tr>
+                            @endforeach
+                            <tr><td>Total Pengeluaran</td><td class="text-right">-Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</td></tr>
+                            <tr><td><strong>Laba Bersih</strong></td><td class="text-right"><strong>Rp {{ number_format($labaBersih, 0, ',', '.') }}</strong></td></tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td width="2%"></td>
+                <td width="49%" style="padding-left: 10px;">
+                    <table class="data-table">
+                        <thead><tr><th>Akun Kas</th><th class="text-right">Awal</th><th class="text-right">Masuk</th><th class="text-right">Keluar</th><th class="text-right">Akhir</th></tr></thead>
+                        <tbody>
+                            @forelse ($arusKas as $akun)
+                                <tr>
+                                    <td>{{ $akun->nama }}</td>
+                                    <td class="text-right">{{ number_format($akun->saldo_awal, 0, ',', '.') }}</td>
+                                    <td class="text-right">+{{ number_format($akun->masuk, 0, ',', '.') }}</td>
+                                    <td class="text-right">-{{ number_format($akun->keluar, 0, ',', '.') }}</td>
+                                    <td class="text-right"><strong>{{ number_format($akun->saldo_akhir, 0, ',', '.') }}</strong></td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="5">Belum ada akun kas.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+
     <div class="detail-head">
         <table>
             <tr>

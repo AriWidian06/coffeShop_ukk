@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Pembayaran;
 use App\Models\Transaksi;
+use App\Services\KasService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PembayaranController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request, KasService $kas)
     {
         $request->validate([
             'transaksi_id' => 'required|exists:transaksis,id',
@@ -43,16 +45,21 @@ class PembayaranController extends Controller
 
         $kembalian = $request->metode_pembayaran === 'cash' ? ($request->jumlah_bayar - $transaksi->total_harga) : 0;
 
-        $pembayaran = Pembayaran::create([
-            'transaksi_id' => $transaksi->id,
-            'jumlah_bayar' => $request->jumlah_bayar,
-            'metode_pembayaran' => $request->metode_pembayaran,
-            'status_pembayaran' => 'paid',
-            'kembalian' => $kembalian,
-            'waktu_pembayaran' => now(),
-        ]);
+        $pembayaran = DB::transaction(function () use ($request, $transaksi, $kembalian, $kas) {
+            $pembayaran = Pembayaran::create([
+                'transaksi_id' => $transaksi->id,
+                'jumlah_bayar' => $request->jumlah_bayar,
+                'metode_pembayaran' => $request->metode_pembayaran,
+                'status_pembayaran' => 'paid',
+                'kembalian' => $kembalian,
+                'waktu_pembayaran' => now(),
+            ]);
 
-        $transaksi->update(['status_pesanan' => 'completed']);
+            $kas->catatPenjualan($pembayaran->load('transaksi'));
+            $transaksi->update(['status_pesanan' => 'completed']);
+
+            return $pembayaran;
+        });
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([

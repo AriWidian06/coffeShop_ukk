@@ -236,7 +236,7 @@
                                     </div>
                                     <div class="p-3 pt-0 flex items-center justify-between border-t border-slate-100 mt-2">
                                         <span class="font-bold text-primary-600 text-sm">Rp {{ number_format($produk->harga_jual, 0, ',', '.') }}</span>
-                                        <span class="text-xs font-semibold text-primary-600 bg-primary-50 px-2.5 py-1 rounded-lg">Pilih & kustomisasi</span>
+                                        <span class="text-xs font-semibold text-primary-600 bg-primary-50 px-2.5 py-1 rounded-lg">{{ $produk->opsis->isNotEmpty() ? 'Pilih & kustomisasi' : 'Tambah' }}</span>
                                     </div>
                                 </article>
                             @endforeach
@@ -612,34 +612,79 @@
                 modalProductPlaceholder.classList.remove('hidden');
             }
 
-            // Render options from DB
+            // Render options from DB, grouped by category (single = radio, multiple = checkbox)
             modalOptionsContainer.replaceChildren();
             if (currentModalProduct.options.length > 0) {
+                const groups = {};
                 currentModalProduct.options.forEach(opt => {
-                    const label = document.createElement('label');
-                    label.className = 'text-xs flex items-center justify-between p-2.5 rounded-xl border border-slate-200 cursor-pointer bg-slate-50 hover:bg-slate-100 transition';
+                    const category = opt.kategori || 'Pilihan Tambahan';
+                    if (!groups[category]) {
+                        groups[category] = {
+                            tipe: opt.tipe === 'single' ? 'single' : 'multiple',
+                            required: false,
+                            items: [],
+                        };
+                    }
+                    if (Number(opt.is_required)) groups[category].required = true;
+                    groups[category].items.push(opt);
+                });
 
-                    const leftDiv = document.createElement('div');
-                    leftDiv.className = 'flex items-center gap-2';
+                Object.entries(groups).forEach(([category, group], groupIndex) => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'col-span-2 space-y-1.5';
 
-                    const input = document.createElement('input');
-                    input.type = 'checkbox';
-                    input.value = opt.nama_opsi;
-                    input.dataset.extra = opt.harga_tambahan || 0;
-                    input.className = 'rounded text-primary-600 focus:ring-primary-500';
+                    const header = document.createElement('div');
+                    header.className = 'flex items-center justify-between';
+                    const title = document.createElement('span');
+                    title.className = 'text-[11px] font-extrabold text-slate-700 uppercase tracking-wider';
+                    title.textContent = category;
+                    header.appendChild(title);
+                    if (group.required) {
+                        const requiredBadge = document.createElement('span');
+                        requiredBadge.className = 'text-[9px] font-bold text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded';
+                        requiredBadge.textContent = 'Wajib';
+                        header.appendChild(requiredBadge);
+                    }
+                    wrapper.appendChild(header);
 
-                    const span = document.createElement('span');
-                    span.className = 'font-semibold text-slate-800';
-                    span.textContent = opt.nama_opsi;
+                    const optionsWrap = document.createElement('div');
+                    optionsWrap.className = 'grid grid-cols-2 gap-2';
 
-                    leftDiv.append(input, span);
+                    group.items.forEach((opt, optionIndex) => {
+                        const label = document.createElement('label');
+                        label.className = 'text-xs flex items-center justify-between p-2.5 rounded-xl border border-slate-200 cursor-pointer bg-slate-50 hover:bg-slate-100 transition';
 
-                    const priceSpan = document.createElement('span');
-                    priceSpan.className = 'text-[11px] font-bold text-primary-600';
-                    priceSpan.textContent = Number(opt.harga_tambahan) > 0 ? `+${currency.format(opt.harga_tambahan)}` : 'Gratis';
+                        const leftDiv = document.createElement('div');
+                        leftDiv.className = 'flex items-center gap-2';
 
-                    label.append(leftDiv, priceSpan);
-                    modalOptionsContainer.append(label);
+                        const input = document.createElement('input');
+                        input.type = group.tipe === 'single' ? 'radio' : 'checkbox';
+                        input.name = `modal-option-group-${groupIndex}`;
+                        input.value = opt.nama_opsi;
+                        input.dataset.extra = opt.harga_tambahan || 0;
+                        input.dataset.group = category;
+                        input.dataset.required = group.required ? '1' : '0';
+                        if (group.tipe === 'single' && group.required && optionIndex === 0) {
+                            input.required = true;
+                        }
+                        input.className = 'rounded text-primary-600 focus:ring-primary-500';
+
+                        const span = document.createElement('span');
+                        span.className = 'font-semibold text-slate-800';
+                        span.textContent = opt.nama_opsi;
+
+                        leftDiv.append(input, span);
+
+                        const priceSpan = document.createElement('span');
+                        priceSpan.className = 'text-[11px] font-bold text-primary-600';
+                        priceSpan.textContent = Number(opt.harga_tambahan) > 0 ? `+${currency.format(opt.harga_tambahan)}` : 'Gratis';
+
+                        label.append(leftDiv, priceSpan);
+                        optionsWrap.appendChild(label);
+                    });
+
+                    wrapper.appendChild(optionsWrap);
+                    modalOptionsContainer.append(wrapper);
                 });
             } else {
                 modalOptionsContainer.innerHTML = '<span class="text-xs text-slate-400 italic col-span-2">Tidak ada opsi kustomisasi untuk menu ini.</span>';
@@ -676,9 +721,21 @@
         modalAddBtn?.addEventListener('click', () => {
             if (!currentModalProduct) return;
 
+            const requiredGroups = [...new Set(
+                Array.from(modalOptionsContainer.querySelectorAll('input[data-required="1"]'))
+                    .map(input => input.dataset.group)
+            )];
+
+            const checkedInputs = Array.from(modalOptionsContainer.querySelectorAll('input:checked'));
+            const missingGroup = requiredGroups.find(group => !checkedInputs.some(input => input.dataset.group === group));
+            if (missingGroup) {
+                showToast(`Pilih ${missingGroup} terlebih dahulu.`, 'error');
+                return;
+            }
+
             const selectedOpts = [];
             let extraPrice = 0;
-            modalOptionsContainer.querySelectorAll('input:checked').forEach(cb => {
+            checkedInputs.forEach(cb => {
                 selectedOpts.push(cb.value);
                 extraPrice += Number(cb.dataset.extra || 0);
             });

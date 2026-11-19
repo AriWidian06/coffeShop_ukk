@@ -174,6 +174,36 @@
             </div>
         </div>
 
+        <!-- RINGKASAN ARUS KAS & LABA RUGI -->
+        <div class="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                <div>
+                    <h3 class="font-bold text-slate-900 text-sm sm:text-base">Arus Kas &amp; Laba Rugi</h3>
+                    <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">Periode {{ $periodeLabel }} • pengeluaran disetujui</p>
+                </div>
+                <a href="{{ route('kas.laporan', ['start_date' => $start->toDateString(), 'end_date' => $end->toDateString()]) }}" class="px-3 py-2 bg-primary-50 text-primary-700 rounded-lg text-[11px] sm:text-xs font-bold hover:bg-primary-100">Lihat Laporan Kas</a>
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <div class="bg-slate-50 rounded-xl p-3">
+                    <p class="text-[10px] sm:text-[11px] text-slate-500 font-bold uppercase tracking-wider">Saldo Kas Saat Ini</p>
+                    <p class="text-base sm:text-lg font-bold text-slate-900 mt-1">Rp {{ number_format($totalSaldoKas, 0, ',', '.') }}</p>
+                </div>
+                <div class="bg-red-50 rounded-xl p-3">
+                    <p class="text-[10px] sm:text-[11px] text-red-500 font-bold uppercase tracking-wider">Pengeluaran Periode</p>
+                    <p class="text-base sm:text-lg font-bold text-red-700 mt-1">Rp {{ number_format($pengeluaranPeriode, 0, ',', '.') }}</p>
+                </div>
+                <div class="bg-emerald-50 rounded-xl p-3">
+                    <p class="text-[10px] sm:text-[11px] text-emerald-600 font-bold uppercase tracking-wider">Laba Kotor</p>
+                    <p class="text-base sm:text-lg font-bold text-emerald-700 mt-1">Rp {{ number_format($labaKotorPeriode, 0, ',', '.') }}</p>
+                </div>
+                <div class="bg-slate-900 rounded-xl p-3">
+                    <p class="text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-wider">Laba Bersih</p>
+                    <p class="text-base sm:text-lg font-bold text-white mt-1">Rp {{ number_format($labaBersihPeriode, 0, ',', '.') }}</p>
+                </div>
+            </div>
+            <p class="text-[10px] sm:text-[11px] text-slate-400 mt-3">Menunggu persetujuan pengeluaran: Rp {{ number_format($pengeluaranPending, 0, ',', '.') }}</p>
+        </div>
+
         <!-- CHARTS SECTION -->
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
             <!-- Kurva Penjualan -->

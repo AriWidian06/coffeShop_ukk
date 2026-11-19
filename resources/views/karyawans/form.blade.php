@@ -7,13 +7,6 @@
         @error('nama_karyawan') <p class="text-red-500 text-xs mt-1 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>{{ $message }}</p> @enderror
     </div>
 
-    <!-- Jabatan -->
-    <div>
-        <label for="jabatan" class="form-label">Jabatan / Posisi <span class="text-red-500">*</span></label>
-        <input type="text" id="jabatan" name="jabatan" value="{{ old('jabatan', $karyawan->jabatan ?? '') }}" required placeholder="Contoh: Head Barista, Supervisor" class="form-input @error('jabatan') border-red-300 focus:ring-red-500 focus:border-red-500 @enderror">
-        @error('jabatan') <p class="text-red-500 text-xs mt-1 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>{{ $message }}</p> @enderror
-    </div>
-
     <!-- Role / Hak Akses -->
     <div>
         <label for="role" class="form-label">Hak Akses Sistem (Role) <span class="text-red-500">*</span></label>
@@ -23,6 +16,7 @@
             <option value="manager" @selected(old('role', $karyawan->role ?? '') === 'manager')>Manager (Operasional & Laporan)</option>
             <option value="kasir" @selected(old('role', $karyawan->role ?? '') === 'kasir')>Kasir (Hanya POS)</option>
         </select>
+        <p class="text-xs text-slate-500 mt-1">Jabatan akan otomatis mengikuti hak akses yang dipilih.</p>
         @error('role') <p class="text-red-500 text-xs mt-1 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>{{ $message }}</p> @enderror
     </div>
 
@@ -43,7 +37,7 @@
                 <span class="text-red-500">*</span>
             @endif
         </label>
-        <input type="password" id="password" name="password" {{ isset($karyawan) ? '' : 'required' }} placeholder="Minimal 8 karakter" class="form-input @error('password') border-red-300 focus:ring-red-500 focus:border-red-500 @enderror">
+        <input type="password" id="password" name="password" {{ isset($karyawan) ? '' : 'required' }} placeholder="Minimal 6 karakter" class="form-input @error('password') border-red-300 focus:ring-red-500 focus:border-red-500 @enderror">
         @error('password') <p class="text-red-500 text-xs mt-1 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>{{ $message }}</p> @enderror
     </div>
 

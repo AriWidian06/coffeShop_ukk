@@ -14,11 +14,11 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="antialiased bg-slate-50 font-sans">
+<body class="kasir-ui antialiased bg-slate-50 font-sans">
     <div class="min-h-screen lg:flex">
 
         <!-- MOBILE TOP BAR -->
-        <header class="lg:hidden sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200">
+        <header class="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200">
             <div class="flex items-center justify-between gap-3 px-4 py-3">
                 <div class="flex items-center gap-2.5 min-w-0">
                     <button type="button" id="kasir-sidebar-open" aria-label="Buka menu navigasi"
@@ -56,7 +56,6 @@
         <aside id="kasir-sidebar" class="app-sidebar kasir-sidebar w-72 max-w-[85vw] bg-white border-r border-slate-200 fixed inset-y-0 left-0 h-full z-50 flex flex-col lg:w-64 lg:max-w-none lg:z-30">
             <!-- Logo & Outlet Info -->
             <div class="relative overflow-hidden h-20 flex items-center justify-between gap-2 px-5 sm:px-6 border-b border-slate-200 shrink-0">
-                <div class="absolute -top-12 -right-10 w-36 h-36 rounded-full bg-primary-100/70 blur-3xl pointer-events-none"></div>
                 <div class="relative flex items-center gap-3 min-w-0">
                     <div class="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
                         <img src="{{ asset('images/logo.jpeg') }}" alt="Logo Bagi Kopi" class="w-full h-full object-cover"
@@ -83,9 +82,9 @@
 
             <!-- Outlet Info -->
             <div class="p-4 pb-2 shrink-0">
-                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-3.5">
+                <div class="rounded-2xl border border-primary-100 bg-primary-50/70 p-3.5">
                     <p class="text-[9px] text-slate-500 font-bold uppercase tracking-[0.16em] flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,.6)]"></span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         Outlet Aktif
                     </p>
                     <p class="text-sm font-bold text-slate-900 mt-1.5">Soreang, Bandung</p>
@@ -137,11 +136,29 @@
                     </span>
                     <span>Riwayat Transaksi</span>
                 </a>
+
+                <a href="{{ route('pengeluarans.index') }}" class="sidebar-link {{ request()->routeIs('pengeluarans.*') ? 'active' : 'inactive' }}">
+                    <span class="kasir-nav-icon">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                    </span>
+                    <span>Pengeluaran</span>
+                </a>
+
+                <a href="{{ route('kas.index') }}" class="sidebar-link {{ request()->routeIs('kas.index') || request()->routeIs('kas.mutasi') || request()->routeIs('kas.tutup-hari') ? 'active' : 'inactive' }}">
+                    <span class="kasir-nav-icon">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </span>
+                    <span>Saldo &amp; Kas</span>
+                </a>
             </nav>
 
             <!-- User Profile Bottom -->
             <div class="p-4 border-t border-slate-200 shrink-0">
-                <div class="flex items-center gap-3 p-3 rounded-2xl border border-slate-200 bg-slate-50">
+                <div class="flex items-center gap-3 p-3 rounded-2xl border border-primary-100 bg-primary-50/60">
                     <div class="relative w-10 h-10 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-extrabold text-sm shrink-0 ring-2 ring-white">
                         {{ substr(auth('karyawan')->user()->nama_karyawan, 0, 1) }}
                         <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-white"></span>
