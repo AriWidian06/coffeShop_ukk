@@ -143,15 +143,20 @@
                         </div>
                     </div>
                 </div>
-                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+                <div class="grid grid-cols-5 gap-3">
                     @php
                         $adminMejaStatus = \App\Models\Transaksi::whereIn('status_pesanan', ['pending', 'ready', 'prosesed'])
                                             ->whereNotNull('meja_id')
                                             ->pluck('meja_id')
                                             ->toArray();
                         $allMejas = \App\Models\Meja::where('status_aktif', true)->orderBy('nomor_meja')->get();
+                        $perPageMeja = 10;
+                        $mejaPage = max(1, (int) request('meja_page', 1));
+                        $totalMejaPages = max(1, (int) ceil($allMejas->count() / $perPageMeja));
+                        $mejaPage = min($mejaPage, $totalMejaPages);
+                        $pagedMejas = $allMejas->slice(($mejaPage - 1) * $perPageMeja, $perPageMeja);
                     @endphp
-                    @foreach($allMejas as $meja)
+                    @foreach($pagedMejas as $meja)
                         @php
                             $occupied = in_array($meja->id, $adminMejaStatus);
                             $mejaLink = $occupied
@@ -162,13 +167,31 @@
                                 : route('transaksis.create', ['meja_id' => $meja->id]);
                         @endphp
                         <a href="{{ $mejaLink }}" class="flex flex-col items-center justify-center group relative p-3 rounded-xl border-2 text-center transition-all cursor-pointer hover:scale-105 active:scale-95 {{ $occupied ? 'border-amber-200 bg-amber-50 hover:border-amber-400' : 'border-slate-100 bg-white hover:border-primary-300 hover:shadow-sm' }}">
-                            <span class="block text-[10px] font-bold text-slate-400 uppercase leading-tight">Meja {{ $meja->nomor_meja }}</span>
-                            <span class="text-[10px] font-black {{ $occupied ? 'text-amber-600' : 'text-emerald-600' }} uppercase tracking-tighter">
-                                {{ $occupied ? 'TERISI' : 'KOSONG' }}
+                            <span class="block text-sm font-extrabold text-slate-700 leading-tight">Meja {{ $meja->nomor_meja }}</span>
+                            <span class="mt-1 text-[11px] font-bold {{ $occupied ? 'text-amber-600' : 'text-emerald-600' }} uppercase tracking-wide">
+                                {{ $occupied ? 'Terisi' : 'Kosong' }}
                             </span>
                         </a>
                     @endforeach
                 </div>
+
+                @if($totalMejaPages > 1)
+                    <div class="mt-4 flex items-center justify-between gap-3 text-xs">
+                        <p class="text-slate-500">Halaman {{ $mejaPage }} dari {{ $totalMejaPages }} ({{ $allMejas->count() }} meja)</p>
+                        <div class="flex items-center gap-2">
+                            @if($mejaPage > 1)
+                                <a href="{{ route('dashboard', array_merge(request()->except('meja_page'), ['meja_page' => $mejaPage - 1])) }}" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold transition">← Sebelumnya</a>
+                            @else
+                                <span class="px-3 py-1.5 rounded-lg border border-slate-100 bg-slate-50 text-slate-300 font-semibold cursor-not-allowed">← Sebelumnya</span>
+                            @endif
+                            @if($mejaPage < $totalMejaPages)
+                                <a href="{{ route('dashboard', array_merge(request()->except('meja_page'), ['meja_page' => $mejaPage + 1])) }}" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold transition">Berikutnya →</a>
+                            @else
+                                <span class="px-3 py-1.5 rounded-lg border border-slate-100 bg-slate-50 text-slate-300 font-semibold cursor-not-allowed">Berikutnya →</span>
+                            @endif
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -179,7 +202,14 @@
                 <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
                     <div>
                         <h3 class="font-bold text-slate-900 text-lg">Penjualan Real-time per Jam</h3>
-                        <p class="text-xs text-slate-500">Omzet dan jumlah pesanan hari ini, WIB</p>
+                        <p id="chart-subtitle" class="text-xs text-slate-500">Omzet dan jumlah pesanan, WIB</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <div class="flex gap-1 rounded-lg bg-slate-100 p-1" role="group" aria-label="Pilih periode grafik">
+                        @foreach (['hari' => 'Hari', 'minggu' => 'Minggu', 'bulan' => 'Bulan', 'tahun' => 'Tahun'] as $key => $label)
+                            <button type="button" data-chart-period="{{ $key }}" aria-pressed="{{ $key === 'hari' ? 'true' : 'false' }}" class="min-h-9 cursor-pointer px-3 text-xs font-bold rounded-md transition {{ $key === 'hari' ? 'bg-white text-primary-700 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">{{ $label }}</button>
+                        @endforeach
                     </div>
                     <div class="flex gap-2" role="group" aria-label="Pilih data grafik">
                         <button type="button" data-chart-series="sales" aria-pressed="true" class="min-h-11 cursor-pointer px-4 bg-primary-50 text-primary-700 text-xs font-bold rounded-lg hover:bg-primary-100 active:bg-primary-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600">Nilai (Rp)</button>
@@ -187,29 +217,18 @@
                     </div>
                 </div>
 
-                <div id="sales-chart" data-endpoint="{{ route('dashboard.sales-chart') }}" data-series="sales" class="relative">
-                    <p id="chart-empty-state" class="hidden absolute inset-x-0 top-16 z-10 text-center text-sm text-slate-500" aria-live="polite">
+                @php
+                    $chartLabels = array_map(fn ($h) => str_pad((string) $h, 2, '0', STR_PAD_LEFT), range(0, 23));
+                @endphp
+                <div id="sales-chart" data-endpoint="{{ route('dashboard.sales-chart') }}" data-period="hari" data-series="sales" class="relative">
+                    <p id="chart-empty-state" class="hidden absolute inset-x-0 top-12 z-10 text-center text-sm text-slate-500" aria-live="polite">
                         Belum ada transaksi hari ini. Grafik diperbarui otomatis.
                     </p>
-                    <div class="manager-chart-scroll overflow-x-auto -mx-2 px-2">
-                        <div id="chart-bars" role="img" aria-label="Grafik omzet per jam hari ini" class="flex items-end justify-between gap-2 sm:gap-4 h-48 min-w-[640px] px-2 sm:px-4 border-b border-slate-200">
-                            @php
-                                $maxSales = max($salesByHour->max() ?? 0, 1);
-                            @endphp
-                            @for ($hour = 0; $hour < 24; $hour++)
-                                @php
-                                    $value = $salesByHour->get($hour, 0);
-                                    $height = ($value / $maxSales) * 100;
-                                    $isPeak = ($hour === $peakHour);
-                                @endphp
-                                <div class="hour-column flex-1 h-full flex flex-col items-center justify-end gap-2 group relative" data-hour="{{ $hour }}">
-                                    <div class="hour-bar w-full {{ $isPeak ? 'bg-primary-600' : 'bg-primary-200' }} rounded-t-sm hover:bg-primary-400" style="height: {{ $height }}%" title="Jam {{ sprintf('%02d', $hour) }}: Rp {{ number_format($value, 0, ',', '.') }}"></div>
-                                    <span class="text-[10px] text-slate-500 font-semibold">{{ sprintf('%02d', $hour) }}</span>
-                                </div>
-                            @endfor
+                    <div class="manager-chart-scroll overflow-x-auto -mx-2 px-2 pt-10">
+                        <div id="chart-bars" role="img" aria-label="Grafik omzet per jam" class="flex items-end justify-between gap-2 sm:gap-4 h-36 min-w-[640px] px-2 sm:px-4 border-b border-slate-200 relative">
                         </div>
                     </div>
-                    <p id="chart-update-status" class="mt-2 text-right text-xs text-slate-500" aria-live="polite">Diperbarui {{ $chartUpdatedAt }} WIB</p>
+                    <p id="chart-update-status" class="mt-2 text-right text-xs text-slate-500" aria-live="polite"></p>
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-4 border-t border-slate-200">
@@ -374,28 +393,46 @@
                     </span>
                 </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                @foreach($karyawans as $karyawan)
+            @php
+                $perPageKaryawan = 5;
+                $karyawanPage = max(1, (int) request('karyawan_page', 1));
+                $totalKaryawanPages = max(1, (int) ceil($karyawans->count() / $perPageKaryawan));
+                $karyawanPage = min($karyawanPage, $totalKaryawanPages);
+                $pagedKaryawans = $karyawans->slice(($karyawanPage - 1) * $perPageKaryawan, $perPageKaryawan);
+            @endphp
+            <div class="grid grid-cols-5 gap-4">
+                @foreach($pagedKaryawans as $karyawan)
                     <div class="p-4 rounded-xl border border-slate-200 hover:border-primary-300 hover:shadow-md transition-all">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-sm">
+                        <div class="flex flex-col items-center text-center gap-2">
+                            <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-sm">
                                 {{ strtoupper(substr($karyawan->nama_karyawan, 0, 2)) }}
                             </div>
                             <div>
                                 <h4 class="font-bold text-slate-900 text-sm">{{ $karyawan->nama_karyawan }}</h4>
-                                <p class="text-xs text-slate-500">{{ $karyawan->role }}</p>
+                                <p class="text-xs text-slate-500 capitalize">{{ $karyawan->role }}</p>
                             </div>
-                        </div>
-                        <div class="flex items-center gap-1.5 text-xs">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            <span class="text-slate-600"><strong class="text-slate-900">{{ $karyawan->completed_orders }} Pesanan Selesai</strong></span>
-                        </div>
-                        <div class="flex items-center gap-1.5 text-xs mt-1">
-                            <span class="text-slate-500">Omzet: <strong class="text-slate-900">Rp {{ number_format($karyawan->total_revenue, 0, ',', '.') }}</strong></span>
                         </div>
                     </div>
                 @endforeach
             </div>
+
+            @if($totalKaryawanPages > 1)
+                <div class="mt-4 flex items-center justify-between gap-3 text-xs">
+                    <p class="text-slate-500">Halaman {{ $karyawanPage }} dari {{ $totalKaryawanPages }} ({{ $karyawans->count() }} karyawan)</p>
+                    <div class="flex items-center gap-2">
+                        @if($karyawanPage > 1)
+                            <a href="{{ route('dashboard', array_merge(request()->except('karyawan_page'), ['karyawan_page' => $karyawanPage - 1])) }}" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold transition">← Sebelumnya</a>
+                        @else
+                            <span class="px-3 py-1.5 rounded-lg border border-slate-100 bg-slate-50 text-slate-300 font-semibold cursor-not-allowed">← Sebelumnya</span>
+                        @endif
+                        @if($karyawanPage < $totalKaryawanPages)
+                            <a href="{{ route('dashboard', array_merge(request()->except('karyawan_page'), ['karyawan_page' => $karyawanPage + 1])) }}" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold transition">Berikutnya →</a>
+                        @else
+                            <span class="px-3 py-1.5 rounded-lg border border-slate-100 bg-slate-50 text-slate-300 font-semibold cursor-not-allowed">Berikutnya →</span>
+                        @endif
+                    </div>
+                </div>
+            @endif
         </div>
     </main>
 </div>
@@ -421,84 +458,279 @@
         const chart = document.getElementById('sales-chart');
         if (!chart) return;
 
-        const bars = [...chart.querySelectorAll('.hour-column')];
-        const buttons = [...document.querySelectorAll('[data-chart-series]')];
+        let bars = [];
+        const seriesButtons = [...document.querySelectorAll('[data-chart-series]')];
+        const periodButtons = [...document.querySelectorAll('[data-chart-period]')];
         const emptyState = document.getElementById('chart-empty-state');
         const updateStatus = document.getElementById('chart-update-status');
+        const subtitle = document.getElementById('chart-subtitle');
         let chartData = {
             sales: @json(array_values($salesByHour->all())),
             volume: @json(array_values($volumeByHour)),
+            labels: @json($chartLabels),
             peakHour: @json($peakHour),
         };
+        chartData.peakHourVolume = null;
+        const computeVolumePeak = () => {
+            const v = chartData.volume || [];
+            let best = -1, bestVal = 0;
+            v.forEach((val, i) => { if (val > bestVal) { bestVal = val; best = i; } });
+            chartData.peakHourVolume = bestVal > 0 ? best : null;
+        };
+        computeVolumePeak();
         let activeSeries = 'sales';
+        let activePeriod = chart.dataset.period || 'hari';
+
+        const periodLabels = { hari: 'Hari ini', minggu: 'Minggu ini', bulan: 'Bulan ini', tahun: 'Tahun ini' };
 
         const formatRupiah = (value) => 'Rp ' + new Intl.NumberFormat('id-ID', {
             maximumFractionDigits: 0,
         }).format(value);
 
+        const compactRupiah = (value) => {
+            if (value >= 1000000) return (value / 1000000).toFixed(1).replace(/\.0$/, '') + 'jt';
+            if (value >= 1000) return Math.round(value / 1000) + 'rb';
+            return String(Math.round(value));
+        };
+
+        const drawOverlay = () => {
+            const container = document.getElementById('chart-bars');
+            if (!container) return;
+            const previous = container.querySelector('.chart-overlay-svg');
+            if (previous) previous.remove();
+
+            const width = Math.max(container.scrollWidth, container.clientWidth);
+            const height = container.clientHeight;
+            if (width === 0 || height === 0) return;
+
+            const values = chartData[activeSeries];
+            const maxValue = Math.max(...values, 0);
+            const hasData = maxValue > 0;
+            const isVolume = activeSeries === 'volume';
+            const lineColor = isVolume ? '#10b981' : '#2563eb';
+            const dotColor = isVolume ? '#10b981' : '#2563eb';
+            const labelColor = isVolume ? '#047857' : '#1d4ed8';
+
+            const cols = [...container.querySelectorAll('.hour-column')];
+            const pts = cols.map((col, hour) => {
+                const barFill = col.querySelector('.hour-bar');
+                const colRect = col.getBoundingClientRect();
+                const barRect = barFill.getBoundingClientRect();
+                const contRect = container.getBoundingClientRect();
+                const x = (colRect.left - contRect.left) + colRect.width / 2;
+                const y = (values[hour] > 0 && maxValue > 0) ? (barRect.top - contRect.top) : height;
+                return { hour, x, y, value: values[hour] };
+            });
+
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('class', 'chart-overlay-svg absolute top-0 left-0 pointer-events-none');
+            svg.setAttribute('width', width);
+            svg.setAttribute('height', height);
+            svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+            svg.style.overflow = 'visible';
+            container.appendChild(svg);
+
+            let run = [];
+            const flushRun = () => {
+                if (run.length < 2) { run = []; return; }
+                const pl = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+                pl.setAttribute('points', run.map((p) => `${p.x},${Math.max(2, p.y)}`).join(' '));
+                pl.setAttribute('fill', 'none');
+                pl.setAttribute('stroke', lineColor);
+                pl.setAttribute('stroke-width', '3');
+                pl.setAttribute('stroke-linejoin', 'round');
+                pl.setAttribute('stroke-linecap', 'round');
+                pl.setAttribute('opacity', '0.9');
+                svg.appendChild(pl);
+                run = [];
+            };
+            pts.forEach((p) => { if (p.value > 0) run.push(p); else flushRun(); });
+            flushRun();
+
+            let lastLabelX = -100;
+            pts.forEach((p) => {
+                if (p.value <= 0 || !hasData) return;
+                const cx = p.x;
+                const cy = Math.max(2, p.y);
+
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', String(cx));
+                circle.setAttribute('cy', String(cy));
+                circle.setAttribute('r', '4.5');
+                circle.setAttribute('fill', dotColor);
+                circle.setAttribute('stroke', '#ffffff');
+                circle.setAttribute('stroke-width', '1.5');
+                svg.appendChild(circle);
+
+                const labelText = isVolume ? String(p.value) : compactRupiah(p.value);
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', String(cx));
+                const labelY = Math.abs(cx - lastLabelX) < 22
+                    ? Math.min(height - 4, cy + 12)
+                    : Math.max(10, cy - 6);
+                text.setAttribute('y', String(labelY));
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('font-size', '12');
+                text.setAttribute('font-weight', '800');
+                text.setAttribute('fill', labelColor);
+                text.setAttribute('stroke', '#ffffff');
+                text.setAttribute('stroke-width', '3');
+                text.setAttribute('paint-order', 'stroke fill');
+                text.setAttribute('stroke-linejoin', 'round');
+                text.textContent = labelText;
+                svg.appendChild(text);
+                try {
+                    const bbox = text.getBBox();
+                    const padX = 4, padY = 2;
+                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    rect.setAttribute('x', String(cx - bbox.width / 2 - padX));
+                    rect.setAttribute('y', String(labelY - bbox.height + padY - 1));
+                    rect.setAttribute('width', String(bbox.width + padX * 2));
+                    rect.setAttribute('height', String(bbox.height + padY * 2));
+                    rect.setAttribute('rx', '4');
+                    rect.setAttribute('fill', '#ffffff');
+                    rect.setAttribute('fill-opacity', '0.9');
+                    rect.setAttribute('stroke', labelColor);
+                    rect.setAttribute('stroke-width', '0.6');
+                    svg.insertBefore(rect, text);
+                } catch (e) {}
+                lastLabelX = cx;
+            });
+        };
+
         const renderChart = () => {
             const values = chartData[activeSeries];
-            const maxValue = Math.max(...values);
+            const labels = chartData.labels || [];
+            const maxValue = Math.max(...values, 0);
             const hasData = maxValue > 0;
+            const scaleMax = activeSeries === 'volume' ? Math.max(maxValue, 3) : Math.max(maxValue, 1);
             emptyState.classList.toggle('hidden', hasData);
             chart.setAttribute('data-series', activeSeries);
-            document.getElementById('chart-bars').setAttribute(
-                'aria-label',
-                activeSeries === 'sales' ? 'Grafik omzet per jam hari ini' : 'Grafik jumlah pesanan per jam hari ini'
-            );
+            const container = document.getElementById('chart-bars');
+            container.style.minWidth = Math.max(320, labels.length * 44) + 'px';
+            container.innerHTML = '';
+            bars = [];
+            labels.forEach((label, hour) => {
+                const col = document.createElement('div');
+                col.className = 'hour-column flex-1 h-full flex flex-col items-center justify-end gap-2 group relative';
+                col.dataset.hour = hour;
+                const barFill = document.createElement('div');
+                barFill.className = 'hour-bar w-full rounded-t-sm hover:bg-primary-400';
+                barFill.style.height = '0%';
+                const span = document.createElement('span');
+                span.className = 'text-[10px] text-slate-500 font-semibold';
+                span.textContent = label;
+                col.appendChild(barFill);
+                col.appendChild(span);
+                container.appendChild(col);
+                bars.push(col);
+            });
 
             bars.forEach((bar, hour) => {
-                const value = values[hour];
-                const fill = maxValue > 0 ? (value / maxValue) * 100 : 0;
+                const value = values[hour] || 0;
+                const fill = maxValue > 0 ? (value / scaleMax) * 100 : 0;
                 const barFill = bar.querySelector('.hour-bar');
                 const isPeak = activeSeries === 'sales' && hour === chartData.peakHour;
                 barFill.style.height = fill + '%';
-                barFill.classList.toggle('bg-primary-600', isPeak);
-                barFill.classList.toggle('bg-primary-200', !isPeak);
+                barFill.className = 'hour-bar w-full rounded-t-sm hover:bg-primary-400';
+                if (activeSeries === 'volume') {
+                    barFill.classList.add('bg-emerald-500');
+                } else if (isPeak) {
+                    barFill.classList.add('bg-primary-600');
+                } else {
+                    barFill.classList.add('bg-primary-200');
+                }
+                const lbl = labels[hour];
                 barFill.title = activeSeries === 'sales'
-                    ? `Jam ${String(hour).padStart(2, '0')}: ${formatRupiah(value)}`
-                    : `Jam ${String(hour).padStart(2, '0')}: ${value} pesanan`;
+                    ? `${lbl} : ${formatRupiah(value)}`
+                    : `${lbl} : ${value} pesanan`;
             });
 
-            buttons.forEach((button) => {
+            seriesButtons.forEach((button) => {
                 const selected = button.dataset.chartSeries === activeSeries;
                 button.setAttribute('aria-pressed', String(selected));
                 button.classList.toggle('bg-primary-50', selected);
                 button.classList.toggle('text-primary-700', selected);
                 button.classList.toggle('text-slate-600', !selected);
             });
+
+            const peakLabelEl = document.getElementById('peak-hour-label');
+            if (peakLabelEl) {
+                const ph = activeSeries === 'volume' ? chartData.peakHourVolume : chartData.peakHour;
+                const lbls = chartData.labels || [];
+                if (ph !== null && lbls[ph] !== undefined) {
+                    if (activePeriod === 'hari') {
+                        const h = Number(lbls[ph]);
+                        const h2 = (h + 1) % 24;
+                        peakLabelEl.textContent = String(h).padStart(2, '0') + ':00 - ' + String(h2).padStart(2, '0') + ':00 WIB';
+                    } else {
+                        peakLabelEl.textContent = String(lbls[ph]);
+                    }
+                } else {
+                    peakLabelEl.textContent = 'Belum ada data';
+                }
+            }
+
+            requestAnimationFrame(drawOverlay);
         };
 
-        buttons.forEach((button) => {
+        seriesButtons.forEach((button) => {
             button.addEventListener('click', () => {
                 activeSeries = button.dataset.chartSeries;
                 renderChart();
             });
         });
 
+        periodButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                activePeriod = button.dataset.chartPeriod;
+                chart.dataset.period = activePeriod;
+                periodButtons.forEach((b) => {
+                    const sel = b.dataset.chartPeriod === activePeriod;
+                    b.setAttribute('aria-pressed', String(sel));
+                    b.classList.toggle('bg-white', sel);
+                    b.classList.toggle('text-primary-700', sel);
+                    b.classList.toggle('shadow-sm', sel);
+                    b.classList.toggle('text-slate-500', !sel);
+                });
+                updateDateInputVisibility();
+                activeDate = getActiveDate();
+                if (subtitle) {
+                    subtitle.textContent = 'Omzet dan jumlah pesanan (' + (periodLabels[activePeriod] || '') + '), WIB';
+                }
+                refreshChart();
+            });
+        });
+
+        const updateDateInputVisibility = () => {};
+        const getActiveDate = () => '';
+        let activeDate = '';
+
         const refreshChart = async () => {
             if (document.hidden) return;
 
-            updateStatus.textContent = 'Memperbarui grafik...';
+            updateStatus.textContent = '';
             try {
-                const response = await fetch(chart.dataset.endpoint, {
+                const url = chart.dataset.endpoint + '?periode=' + encodeURIComponent(activePeriod) + '&tanggal=' + encodeURIComponent(activeDate);
+                const response = await fetch(url, {
                     headers: { Accept: 'application/json' },
                     credentials: 'same-origin',
                 });
                 if (!response.ok) throw new Error('Chart request failed');
 
                 const data = await response.json();
-                if (!Array.isArray(data.sales) || !Array.isArray(data.volume) || data.sales.length !== 24 || data.volume.length !== 24) {
+                if (!Array.isArray(data.sales) || !Array.isArray(data.volume) || !Array.isArray(data.labels) || data.sales.length === 0 || data.sales.length !== data.volume.length || data.sales.length !== data.labels.length) {
                     throw new Error('Invalid chart response');
                 }
 
                 chartData = {
                     sales: data.sales.map(Number),
                     volume: data.volume.map(Number),
+                    labels: data.labels,
                     peakHour: data.peak_hour,
                 };
-                document.getElementById('peak-hour-label').textContent = data.peak_hour_label;
-                updateStatus.textContent = `Diperbarui ${data.updated_at} WIB`;
+                computeVolumePeak();
+                updateStatus.textContent = '';
                 renderChart();
             } catch (error) {
                 console.error('Gagal memperbarui grafik penjualan admin.', error);
@@ -506,6 +738,11 @@
         };
 
         renderChart();
+        let resizeTimer = null;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(drawOverlay, 150);
+        });
         setInterval(refreshChart, 30000);
     })();
 </script>

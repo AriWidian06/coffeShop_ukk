@@ -699,7 +699,7 @@
 
                     if (group.tipe === 'single' && group.items.length === 2) {
                         btn.className = `py-3 px-4 rounded-xl border-2 font-bold text-sm transition-all ${isSelected ? 'border-primary-600 bg-primary-50 text-primary-700' : 'border-slate-200 bg-white text-slate-600'}`;
-                        btn.innerHTML = `<span class="block text-center w-full">${opt.nama_opsi}</span>`;
+                        btn.innerHTML = `<span class="block text-center w-full">${opt.nama_opsi}</span>${priceText ? `<span class="block text-center w-full text-[10px] font-bold mt-0.5">${priceText}</span>` : ''}`;
                     } else {
                         btn.className = `w-full py-3 px-4 rounded-xl border-2 text-left flex items-center justify-between transition-all ${isSelected ? 'border-primary-600 bg-primary-50 text-primary-700' : 'border-slate-200 bg-white text-slate-600'}`;
                         btn.innerHTML = `
@@ -1236,14 +1236,17 @@
                 if (paymentMethod === 'QRIS' && order.qris && order.qris.qr_url) {
                     document.getElementById('receipt-qris-img').src = order.qris.qr_url;
                     qrisSection.classList.remove('hidden');
+                    disablePaidButton();
                     startQrisPolling(order.id, order.qris.order_id);
                 } else if (paymentMethod === 'QRIS') {
                     document.getElementById('receipt-qris-img').src = '';
                     qrisSection.classList.remove('hidden');
                     qrisStatus.textContent = order.qris_error || 'QRIS otomatis tidak tersedia. Silakan bayar di kasir.';
                     qrisStatus.className = 'text-[10px] font-bold text-red-700';
+                    disablePaidButton();
                 } else {
                     qrisSection.classList.add('hidden');
+                    enablePaidButton();
                 }
 
                 const notesDisplay = document.getElementById('receipt-notes-display');
@@ -1276,6 +1279,28 @@
             }
         }
 
+        function enablePaidButton() {
+            const btn = document.getElementById('paid-btn');
+            const hint = document.getElementById('paid-hint');
+            if (btn) {
+                btn.disabled = false;
+                btn.classList.remove('bg-slate-300', 'text-slate-500', 'cursor-not-allowed');
+                btn.classList.add('bg-primary-600', 'text-white', 'hover:bg-primary-700', 'shadow-lg', 'shadow-primary-600/30');
+            }
+            if (hint) hint.textContent = 'Pembayaran terkonfirmasi. Silakan lanjut.';
+        }
+
+        function disablePaidButton() {
+            const btn = document.getElementById('paid-btn');
+            const hint = document.getElementById('paid-hint');
+            if (btn) {
+                btn.disabled = true;
+                btn.classList.add('bg-slate-300', 'text-slate-500', 'cursor-not-allowed');
+                btn.classList.remove('bg-primary-600', 'text-white', 'hover:bg-primary-700', 'shadow-lg', 'shadow-primary-600/30');
+            }
+            if (hint) hint.textContent = 'Menunggu konfirmasi pembayaran...';
+        }
+
         function startQrisPolling(transaksiId, orderId) {
             stopQrisPolling();
             const statusEl = document.getElementById('receipt-qris-status');
@@ -1295,6 +1320,7 @@
                         statusEl.textContent = 'Pembayaran Lunas ✓';
                         statusEl.className = 'text-[10px] font-bold text-emerald-700';
                         stopQrisPolling();
+                        enablePaidButton();
                     } else {
                         statusEl.textContent = 'Menunggu pembayaran...';
                     }
@@ -1304,6 +1330,7 @@
 
         function closeReceipt() {
             stopQrisPolling();
+            disablePaidButton();
             document.getElementById('receipt-modal').classList.add('hidden');
             document.getElementById('receipt-modal').classList.remove('flex');
             document.body.style.overflow = '';

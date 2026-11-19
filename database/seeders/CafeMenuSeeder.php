@@ -520,8 +520,13 @@ class CafeMenuSeeder extends Seeder
                 'harga_beli' => 9000,
                 'satuan' => 'pcs',
                 'stock' => 24,
-                'customizable' => false,
-                'opsi' => [],
+                'customizable' => true,
+                'opsi' => [
+                    ['kategori' => 'Pemanas', 'tipe' => 'single', 'is_required' => 1, 'nama_opsi' => 'Hangat', 'harga_tambahan' => 0],
+                    ['kategori' => 'Pemanas', 'tipe' => 'single', 'is_required' => 1, 'nama_opsi' => 'Dingin', 'harga_tambahan' => 0],
+                    ['kategori' => 'Topping', 'tipe' => 'multiple', 'is_required' => 0, 'nama_opsi' => 'Extra Butter', 'harga_tambahan' => 3000],
+                    ['kategori' => 'Topping', 'tipe' => 'multiple', 'is_required' => 0, 'nama_opsi' => 'Keju Parut', 'harga_tambahan' => 4000],
+                ],
             ],
             [
                 'nama' => 'Pain au Chocolat',
@@ -531,8 +536,12 @@ class CafeMenuSeeder extends Seeder
                 'harga_beli' => 10000,
                 'satuan' => 'pcs',
                 'stock' => 24,
-                'customizable' => false,
-                'opsi' => [],
+                'customizable' => true,
+                'opsi' => [
+                    ['kategori' => 'Pemanas', 'tipe' => 'single', 'is_required' => 1, 'nama_opsi' => 'Hangat', 'harga_tambahan' => 0],
+                    ['kategori' => 'Pemanas', 'tipe' => 'single', 'is_required' => 1, 'nama_opsi' => 'Dingin', 'harga_tambahan' => 0],
+                    ['kategori' => 'Topping', 'tipe' => 'multiple', 'is_required' => 0, 'nama_opsi' => 'Extra Cokelat', 'harga_tambahan' => 4000],
+                ],
             ],
             [
                 'nama' => 'Cinnamon Roll',
@@ -542,8 +551,12 @@ class CafeMenuSeeder extends Seeder
                 'harga_beli' => 9000,
                 'satuan' => 'pcs',
                 'stock' => 24,
-                'customizable' => false,
-                'opsi' => [],
+                'customizable' => true,
+                'opsi' => [
+                    ['kategori' => 'Pemanas', 'tipe' => 'single', 'is_required' => 1, 'nama_opsi' => 'Hangat', 'harga_tambahan' => 0],
+                    ['kategori' => 'Pemanas', 'tipe' => 'single', 'is_required' => 1, 'nama_opsi' => 'Dingin', 'harga_tambahan' => 0],
+                    ['kategori' => 'Topping', 'tipe' => 'multiple', 'is_required' => 0, 'nama_opsi' => 'Extra Cream Cheese', 'harga_tambahan' => 5000],
+                ],
             ],
             [
                 'nama' => 'Banana Cake',
@@ -553,8 +566,13 @@ class CafeMenuSeeder extends Seeder
                 'harga_beli' => 8000,
                 'satuan' => 'pcs',
                 'stock' => 24,
-                'customizable' => false,
-                'opsi' => [],
+                'customizable' => true,
+                'opsi' => [
+                    ['kategori' => 'Pemanas', 'tipe' => 'single', 'is_required' => 1, 'nama_opsi' => 'Hangat', 'harga_tambahan' => 0],
+                    ['kategori' => 'Pemanas', 'tipe' => 'single', 'is_required' => 1, 'nama_opsi' => 'Dingin', 'harga_tambahan' => 0],
+                    ['kategori' => 'Topping', 'tipe' => 'multiple', 'is_required' => 0, 'nama_opsi' => 'Extra Pisang', 'harga_tambahan' => 4000],
+                    ['kategori' => 'Topping', 'tipe' => 'multiple', 'is_required' => 0, 'nama_opsi' => 'Es Krim', 'harga_tambahan' => 6000],
+                ],
             ],
         ];
     }

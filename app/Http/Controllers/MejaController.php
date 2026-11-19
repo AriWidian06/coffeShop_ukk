@@ -96,4 +96,69 @@ class MejaController extends Controller
         $meja->delete();
         return redirect()->route('mejas.index')->with('success', 'Meja berhasil dihapus.');
     }
+
+    /**
+     * Buat SVG QR code secara lokal (tanpa GD, Imagick, atau API eksternal).
+     */
+    private function generateQrSvg(string $data, int $size = 600): string
+    {
+        $renderer = new \BaconQrCode\Renderer\ImageRenderer(
+            new \BaconQrCode\Renderer\RendererStyle\RendererStyle($size, 4),
+            new \BaconQrCode\Renderer\Image\SvgImageBackEnd()
+        );
+        $qrCode = \BaconQrCode\Encoder\Encoder::encode($data, \BaconQrCode\Common\ErrorCorrectionLevel::H());
+
+        return $renderer->render($qrCode);
+    }
+
+    /**
+     * Sajikan gambar QR meja (inline, untuk ditampilkan di halaman).
+     */
+    public function qrImage(Meja $meja)
+    {
+        $qrUrl = route('welcome', ['meja_id' => $meja->id]);
+
+        return response($this->generateQrSvg($qrUrl, 300), 200)->header('Content-Type', 'image/svg+xml');
+    }
+
+    /**
+     * Unduh QR code meja sebagai file SVG (bisa dibuka di browser & editor).
+     */
+    public function downloadQr(Meja $meja)
+    {
+        $qrUrl = route('welcome', ['meja_id' => $meja->id]);
+        $svg = $this->generateQrSvg($qrUrl, 600);
+        $filename = 'QR-Meja-' . $meja->nomor_meja . '.svg';
+
+        return response($svg, 200)
+            ->header('Content-Type', 'image/svg+xml')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->header('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+
+    /**
+     * Unduh semua QR code meja aktif dalam satu file ZIP (SVG).
+     */
+    public function downloadAllQr()
+    {
+        $mejas = Meja::where('status_aktif', true)->orderBy('nomor_meja')->get();
+
+        if ($mejas->isEmpty()) {
+            return back()->with('error', 'Tidak ada meja aktif untuk diunduh.');
+        }
+
+        $zipPath = tempnam(sys_get_temp_dir(), 'qr-meja-') . '.zip';
+        $zip = new \ZipArchive();
+        $zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+
+        foreach ($mejas as $meja) {
+            $qrUrl = route('welcome', ['meja_id' => $meja->id]);
+            $zip->addFromString('QR-Meja-' . $meja->nomor_meja . '.svg', $this->generateQrSvg($qrUrl, 400));
+        }
+        $zip->close();
+
+        return response()->download($zipPath, 'QR-Semua-Meja.zip', [
+            'Content-Type' => 'application/zip',
+        ])->deleteFileAfterSend(true);
+    }
 }

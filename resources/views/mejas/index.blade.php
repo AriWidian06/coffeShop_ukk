@@ -14,12 +14,12 @@
                 </p>
             </div>
             <div class="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
-                <button class="btn-navbar-secondary">
+                <a href="{{ route('mejas.qr-download-all') }}" class="btn-navbar-secondary">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
-                    Unduh Semua QR (ZIP/PDF)
-                </button>
+                    Unduh Semua QR (ZIP)
+                </a>
                 @can('access-admin-panel')
                     <a href="{{ route('mejas.create') }}" class="btn-navbar-primary">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -209,7 +209,7 @@
                     <!-- QR Code -->
                     <div class="bg-slate-50 rounded-xl p-5 flex flex-col items-center justify-center border border-slate-200 mb-3 {{ !$meja->status_aktif ? 'opacity-60' : '' }}">
                         <div class="bg-white p-3 rounded-lg shadow-sm border border-slate-200">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data={{ $qrUrl }}" 
+                            <img src="{{ route('mejas.qr-image', $meja) }}" 
                                  alt="QR Code Meja {{ $meja->nomor_meja }}" 
                                  class="w-32 h-32 object-contain">
                         </div>
@@ -231,12 +231,12 @@
 
                     <!-- Action Buttons -->
                     <div class="flex flex-wrap items-center gap-2">
-                        <button type="button" class="flex-1 px-3 py-2 bg-primary-50 text-primary-700 rounded-lg text-xs font-bold hover:bg-primary-100 transition flex items-center justify-center gap-1.5">
+                        <a href="{{ route('mejas.qr-download', $meja) }}" class="flex-1 px-3 py-2 bg-primary-50 text-primary-700 rounded-lg text-xs font-bold hover:bg-primary-100 transition flex items-center justify-center gap-1.5">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                             </svg>
                             Unduh QR
-                        </button>
+                        </a>
                         @can('access-admin-panel')
                             <a href="{{ route('mejas.edit', $meja) }}" class="px-3 py-2 bg-slate-100 text-slate-700 rounded-lg text-xs font-bold hover:bg-slate-200 transition flex items-center justify-center" title="Edit Meja">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -201,7 +201,7 @@
                         <p id="manager-chart-empty-state" class="hidden py-12 text-center text-xs text-slate-500" aria-live="polite">
                             Belum ada transaksi pada periode ini.
                         </p>
-                        <div id="manager-chart-bars" role="img" aria-label="Grafik omzet per jam WIB" class="flex items-end gap-px sm:gap-2 h-32 sm:h-40 px-0.5 sm:px-1">
+                        <div id="manager-chart-bars" role="img" aria-label="Grafik omzet per jam WIB" class="flex items-end gap-px sm:gap-2 h-32 sm:h-40 px-0.5 sm:px-1 relative">
                             @for ($hour = 0; $hour < 24; $hour++)
                                 @php
                                     $omzet = (float) $salesByHour->get($hour, 0);
@@ -470,11 +470,127 @@
             peakHour: @json($peakHour),
         };
         let activeSeries = 'sales';
+        chartData.peakHourVolume = null;
+        const computeVolumePeak = () => {
+            const v = chartData.volume || [];
+            let best = -1, bestVal = 0;
+            v.forEach((val, i) => { if (val > bestVal) { bestVal = val; best = i; } });
+            chartData.peakHourVolume = bestVal > 0 ? best : null;
+        };
+        computeVolumePeak();
+
+        const compactRupiah = (value) => {
+            if (value >= 1000000) return (value / 1000000).toFixed(1).replace(/\.0$/, '') + 'jt';
+            if (value >= 1000) return Math.round(value / 1000) + 'rb';
+            return String(Math.round(value));
+        };
+
+        const drawOverlay = () => {
+            const container = document.getElementById('manager-chart-bars');
+            if (!container) return;
+            const previous = container.querySelector('.chart-overlay-svg');
+            if (previous) previous.remove();
+            const width = Math.max(container.scrollWidth, container.clientWidth);
+            const height = container.clientHeight;
+            if (width === 0 || height === 0) return;
+
+            const values = chartData[activeSeries];
+            const maxValue = Math.max(...values, 0);
+            const hasData = maxValue > 0;
+            const isVolume = activeSeries === 'volume';
+            const lineColor = isVolume ? '#10b981' : '#2563eb';
+            const dotColor = isVolume ? '#10b981' : '#2563eb';
+            const labelColor = isVolume ? '#047857' : '#1d4ed8';
+
+            const pts = columns.map((col, hour) => {
+                const bar = col.querySelector('.manager-hour-bar');
+                const colRect = col.getBoundingClientRect();
+                const barRect = bar.getBoundingClientRect();
+                const contRect = container.getBoundingClientRect();
+                const x = (colRect.left - contRect.left) + colRect.width / 2;
+                const y = (values[hour] > 0 && maxValue > 0) ? (barRect.top - contRect.top) : height;
+                return { hour, x, y, value: values[hour] };
+            });
+
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('class', 'chart-overlay-svg absolute top-0 left-0 pointer-events-none');
+            svg.setAttribute('width', width);
+            svg.setAttribute('height', height);
+            svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+            svg.style.overflow = 'visible';
+            container.appendChild(svg);
+
+            let run = [];
+            const flushRun = () => {
+                if (run.length < 2) { run = []; return; }
+                const pl = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+                pl.setAttribute('points', run.map((p) => `${p.x},${Math.max(2, p.y)}`).join(' '));
+                pl.setAttribute('fill', 'none');
+                pl.setAttribute('stroke', lineColor);
+                pl.setAttribute('stroke-width', '3');
+                pl.setAttribute('stroke-linejoin', 'round');
+                pl.setAttribute('stroke-linecap', 'round');
+                pl.setAttribute('opacity', '0.9');
+                svg.appendChild(pl);
+                run = [];
+            };
+            pts.forEach((p) => { if (p.value > 0) run.push(p); else flushRun(); });
+            flushRun();
+
+            let lastLabelX = -100;
+            pts.forEach((p) => {
+                if (p.value <= 0 || !hasData) return;
+                const cx = p.x;
+                const cy = Math.max(2, p.y);
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', String(cx));
+                circle.setAttribute('cy', String(cy));
+                circle.setAttribute('r', '4');
+                circle.setAttribute('fill', dotColor);
+                circle.setAttribute('stroke', '#ffffff');
+                circle.setAttribute('stroke-width', '1.5');
+                svg.appendChild(circle);
+
+                const labelText = isVolume ? String(p.value) : compactRupiah(p.value);
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', String(cx));
+                const labelY = Math.abs(cx - lastLabelX) < 18 ? Math.min(height - 4, cy + 11) : Math.max(9, cy - 5);
+                text.setAttribute('y', String(labelY));
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('font-size', '11');
+                text.setAttribute('font-weight', '800');
+                text.setAttribute('fill', labelColor);
+                text.setAttribute('stroke', '#ffffff');
+                text.setAttribute('stroke-width', '3');
+                text.setAttribute('paint-order', 'stroke fill');
+                text.setAttribute('stroke-linejoin', 'round');
+                text.textContent = labelText;
+                svg.appendChild(text);
+                try {
+                    const bbox = text.getBBox();
+                    const padX = 3, padY = 2;
+                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    rect.setAttribute('x', String(cx - bbox.width / 2 - padX));
+                    rect.setAttribute('y', String(labelY - bbox.height + padY - 1));
+                    rect.setAttribute('width', String(bbox.width + padX * 2));
+                    rect.setAttribute('height', String(bbox.height + padY * 2));
+                    rect.setAttribute('rx', '3');
+                    rect.setAttribute('fill', '#ffffff');
+                    rect.setAttribute('fill-opacity', '0.9');
+                    rect.setAttribute('stroke', labelColor);
+                    rect.setAttribute('stroke-width', '0.6');
+                    svg.insertBefore(rect, text);
+                } catch (e) {}
+                lastLabelX = cx;
+            });
+        };
 
         const renderChart = () => {
             const values = chartData[activeSeries];
-            const maxValue = Math.max(...values);
+            const maxValue = Math.max(...values, 0);
             const hasData = maxValue > 0;
+            const scaleMax = activeSeries === 'volume' ? Math.max(maxValue, 3) : maxValue;
+            bars.style.minWidth = Math.max(320, columns.length * 30) + 'px';
             emptyState.classList.toggle('hidden', hasData);
             bars.classList.toggle('hidden', !hasData);
             chart.setAttribute('data-series', activeSeries);
@@ -490,7 +606,7 @@
                 const value = values[hour];
                 const bar = column.querySelector('.manager-hour-bar');
                 const isPeak = activeSeries === 'sales' && hour === chartData.peakHour;
-                bar.style.height = maxValue > 0 ? `${(value / maxValue) * 100}%` : '0%';
+                bar.style.height = maxValue > 0 ? `${(value / scaleMax) * 100}%` : '0%';
                 bar.classList.toggle('bg-primary-600', isPeak);
                 bar.classList.toggle('bg-primary-300', activeSeries === 'sales' && !isPeak);
                 bar.classList.toggle('group-hover:bg-primary-400', activeSeries === 'sales' && !isPeak);
@@ -521,6 +637,15 @@
                 button.classList.toggle('text-primary-700', selected);
                 button.classList.toggle('text-slate-600', !selected);
             });
+
+            if (peakLabel) {
+                const ph = activeSeries === 'volume' ? chartData.peakHourVolume : chartData.peakHour;
+                peakLabel.textContent = ph !== null
+                    ? `Peak: ${String(ph).padStart(2, '0')}:00 - ${String((ph + 1) % 24).padStart(2, '0')}:00 WIB`
+                    : 'Peak: Belum ada data';
+            }
+
+            requestAnimationFrame(drawOverlay);
         };
 
         buttons.forEach((button) => {
@@ -551,8 +676,8 @@
                     volume: data.volume.map(Number),
                     peakHour: data.peak_hour,
                 };
+                computeVolumePeak();
                 updateStatus.textContent = `Diperbarui ${data.updated_at} WIB`;
-                peakLabel.textContent = `Peak: ${data.peak_hour_label}`;
                 renderChart();
             } catch (error) {
                 console.error('Gagal memperbarui grafik penjualan manager.', error);
