@@ -78,6 +78,7 @@
 
     <!-- Main Content Area -->
     <main class="mx-auto max-w-7xl px-4 py-5 space-y-5 sm:px-6 lg:px-8 lg:py-8 lg:space-y-8">
+        @include('partials.alerts', ['class' => ''])
 
         <!-- ================= TAB PESAN (KATALOG MENU) ================= -->
         <div id="tab-pesan" class="space-y-5">
@@ -1379,8 +1380,12 @@
                         enablePaidButton();
                     } else {
                         statusEl.textContent = 'Menunggu pembayaran...';
+                        statusEl.className = 'text-[10px] font-bold text-amber-700';
                     }
-                } catch (pollError) {}
+                } catch (pollError) {
+                    statusEl.textContent = 'Gagal memeriksa status. Mencoba lagi...';
+                    statusEl.className = 'text-[10px] font-bold text-red-600';
+                }
             }, 3000);
         }
 

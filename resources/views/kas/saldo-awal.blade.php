@@ -37,6 +37,7 @@
         <div>
             <label class="text-sm font-bold text-slate-800">Catatan <span class="font-normal text-slate-400">(opsional)</span></label>
             <input type="text" name="catatan" maxlength="255" value="{{ old('catatan') }}" class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm">
+            @error('catatan') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
         <button type="submit" class="px-4 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-bold hover:bg-primary-700">Simpan Saldo Awal</button>
     </form>

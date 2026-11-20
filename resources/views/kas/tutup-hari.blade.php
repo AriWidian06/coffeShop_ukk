@@ -56,6 +56,7 @@
                     <div>
                         <label class="text-xs font-bold text-slate-700">Saldo Fisik (Rp)</label>
                         <input type="number" name="saldo_fisik" required min="0" step="0.01" value="{{ old('saldo_fisik', $account->closing ? (float) $account->closing->saldo_fisik : (float) $r['saldo_buku']) }}" class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm">
+                        @error('saldo_fisik') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="text-xs font-bold text-slate-700">Catatan <span class="font-normal text-slate-400">(wajib bila ada selisih)</span></label>

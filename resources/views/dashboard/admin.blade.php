@@ -764,9 +764,12 @@
                 };
                 computeVolumePeak();
                 updateStatus.textContent = '';
+                updateStatus.className = 'mt-2 text-right text-xs text-slate-500';
                 renderChart();
             } catch (error) {
                 console.error('Gagal memperbarui grafik penjualan admin.', error);
+                updateStatus.textContent = 'Gagal memuat grafik terbaru. Menampilkan data terakhir.';
+                updateStatus.className = 'mt-2 text-right text-xs font-semibold text-red-600';
             }
         };
 

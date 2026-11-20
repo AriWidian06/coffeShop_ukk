@@ -84,7 +84,7 @@
             <div class="p-4 border-b border-slate-200 shrink-0">
                 <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
                     <p class="text-[10px] text-slate-500 font-semibold uppercase mb-1">Unit Cabang</p>
-                    <p class="text-sm font-bold text-slate-900">Senopati - Cabang Utama</p>
+                    <p class="text-sm font-bold text-slate-900">Soreang,bandung</p>
                 </div>
             </div>
 
@@ -165,6 +165,7 @@
 
         <!-- MAIN CONTENT -->
         <div class="flex-1 min-w-0 lg:ml-64">
+            @include('partials.alerts')
             @yield('content')
         </div>
     </div>

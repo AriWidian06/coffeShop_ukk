@@ -1392,7 +1392,8 @@
 
             const data = await res.json();
             if (!res.ok || !data.success) {
-                showToast(data.message || 'Gagal mengubah status pesanan.', 'error');
+                const firstError = data.errors ? Object.values(data.errors).flat()[0] : null;
+                showToast(firstError || data.message || 'Gagal mengubah status pesanan.', 'error');
                 return;
             }
 
@@ -1512,7 +1513,8 @@
 
             const data = await res.json();
             if (!res.ok || !data.success) {
-                showToast(data.message || 'Pembayaran gagal.', 'error');
+                const firstError = data.errors ? Object.values(data.errors).flat()[0] : null;
+                showToast(firstError || data.message || 'Pembayaran gagal.', 'error');
                 btn.disabled = false;
                 btn.innerHTML = initialText;
                 return;
@@ -1628,9 +1630,14 @@
                 if (manual) {
                     showToast('Pesanan berhasil disinkronkan.');
                 }
+            } else if (manual) {
+                showToast(data.message || 'Gagal memuat pesanan aktif.', 'error');
             }
         } catch (err) {
             console.error('Failed to sync active orders', err);
+            if (manual) {
+                showToast('Gagal menyinkronkan pesanan. Periksa koneksi Anda.', 'error');
+            }
         } finally {
             isFetchingActive = false;
             if (manual && syncIcon) {

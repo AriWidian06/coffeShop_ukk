@@ -1,9 +1,4 @@
 <!-- Form Fields -->
-@if ($errors->any())
-    <div class="md:col-span-2 rounded-xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm font-medium">
-        {{ $errors->first() }}
-    </div>
-@endif
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
     <!-- Nama Produk -->

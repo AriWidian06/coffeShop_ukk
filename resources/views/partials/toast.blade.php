@@ -47,11 +47,6 @@
         toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
     };
 
-    document.addEventListener('DOMContentLoaded', () => {
-        @if (session('success'))
-            window.showAppToast(@json(session('success')));
-        @elseif (session('error'))
-            window.showAppToast(@json(session('error')), 'error');
-        @endif
-    });
+    // Pesan flash server (success/error/warning/status) ditampilkan oleh
+    // partials.alerts agar tetap terlihat sampai ditutup pengguna.
 </script>

@@ -46,7 +46,7 @@
                 </h1>
 
                 <p class="text-slate-600 text-sm leading-relaxed max-w-md">
-                    Sistem manajemen internal untuk mengelola proses produksi, pemesanan, dan penjualan kopi di Karsa Pemanggangan & Pasokan. Didesain untuk efisiensi operasional dan pengalaman pengguna yang optimal.
+                    Sistem manajemen internal untuk mengelola proses produksi, pemesanan, dan penjualan kopi di Bagi Kopi. Didesain untuk efisiensi operasional dan pengalaman pengguna yang optimal.
                 </p>
             </div>
 
@@ -66,6 +66,7 @@
         <!-- PANEL KANAN: Form Login (Putih) -->
         <!-- ============================================ -->
         <div class="lg:w-7/12 p-6 sm:p-10 lg:p-12 bg-white">
+            @include('partials.alerts', ['class' => 'mb-6', 'showValidationErrors' => false])
 
             <!-- Badge Akses -->
             <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-50 border border-primary-200 text-xs font-bold text-primary-700 mb-6">

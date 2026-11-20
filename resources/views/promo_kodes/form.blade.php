@@ -32,6 +32,7 @@
             <div>
                 <label class="text-sm font-bold text-slate-800">Nama Promo / Penjelasan</label>
                 <input type="text" name="nama_promo" value="{{ old('nama_promo', $promoKode->nama_promo ?? '') }}" class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary-500">
+                @error('nama_promo') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -43,6 +44,7 @@
                 <div>
                     <label class="text-sm font-bold text-slate-800">Minimal Belanja</label>
                     <input type="number" min="0" name="min_belanja" value="{{ old('min_belanja', isset($promoKode) ? (float) $promoKode->min_belanja : 0) }}" class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary-500">
+                    @error('min_belanja') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
 
@@ -50,10 +52,12 @@
                 <div>
                     <label class="text-sm font-bold text-slate-800">Maksimal Diskon (opsional)</label>
                     <input type="number" min="0" name="maks_diskon" value="{{ old('maks_diskon', isset($promoKode) && $promoKode->maks_diskon !== null ? (float) $promoKode->maks_diskon : '') }}" class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary-500">
+                    @error('maks_diskon') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-800">Kuota (opsional)</label>
                     <input type="number" min="0" name="kuota" value="{{ old('kuota', $promoKode->kuota ?? '') }}" class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary-500">
+                    @error('kuota') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
 
@@ -61,10 +65,12 @@
                 <div>
                     <label class="text-sm font-bold text-slate-800">Tanggal Mulai <span class="text-xs font-normal text-slate-500">(WIB)</span></label>
                     <input type="datetime-local" name="tanggal_mulai" value="{{ old('tanggal_mulai', isset($promoKode) && $promoKode->tanggal_mulai ? $promoKode->tanggal_mulai->copy()->timezone('Asia/Jakarta')->format('Y-m-d\TH:i') : '') }}" class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary-500">
+                    @error('tanggal_mulai') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="text-sm font-bold text-slate-800">Tanggal Berakhir <span class="text-xs font-normal text-slate-500">(WIB)</span></label>
                     <input type="datetime-local" name="tanggal_berakhir" value="{{ old('tanggal_berakhir', isset($promoKode) && $promoKode->tanggal_berakhir ? $promoKode->tanggal_berakhir->copy()->timezone('Asia/Jakarta')->format('Y-m-d\TH:i') : '') }}" class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary-500">
+                    @error('tanggal_berakhir') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
 

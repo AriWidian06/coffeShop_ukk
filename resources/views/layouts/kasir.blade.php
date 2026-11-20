@@ -182,6 +182,7 @@
 
         <!-- MAIN CONTENT -->
         <div class="flex-1 min-w-0 lg:ml-64">
+            @include('partials.alerts')
             @yield('content')
         </div>
     </div>

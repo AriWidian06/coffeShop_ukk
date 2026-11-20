@@ -708,9 +708,12 @@
                 };
                 computeVolumePeak();
                 updateStatus.textContent = `Diperbarui ${data.updated_at} WIB`;
+                updateStatus.className = 'mt-2 text-right text-xs text-slate-500';
                 renderChart();
             } catch (error) {
                 console.error('Gagal memperbarui grafik penjualan manager.', error);
+                updateStatus.textContent = 'Gagal memuat grafik terbaru. Menampilkan data terakhir.';
+                updateStatus.className = 'mt-2 text-right text-xs font-semibold text-red-600';
             }
         };
 
