@@ -50,10 +50,10 @@
                 </div>
                 <div class="min-w-0">
                     <div class="flex items-center gap-2">
-                        <h1 class="text-lg sm:text-xl font-extrabold text-slate-900 whitespace-nowrap tracking-tight">Terminal POS</h1>
+                        <h1 class="text-lg sm:text-xl font-extrabold text-slate-900 whitespace-nowrap tracking-tight">Terminal Kasir</h1>
                         <span class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[9px] sm:text-[10px] font-extrabold whitespace-nowrap">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            LIVE
+                            Aktif
                         </span>
                     </div>
                     <p class="text-[10px] sm:text-xs text-slate-500 mt-0.5 truncate">Shift {{ $shift }} · Siap menerima pesanan</p>
@@ -501,7 +501,7 @@
                 <div class="flex items-center gap-2 min-w-0 max-w-full">
                     <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-primary-50 border border-primary-100 text-[10px] font-bold text-primary-700 shrink-0">
                         <span class="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse"></span>
-                        LIVE
+                        Aktif
                     </span>
                     <div class="flex items-center gap-1.5 overflow-x-auto hide-scrollbar max-w-full pb-0.5">
                     <button type="button" onclick="filterActiveOrders('all')"
@@ -624,7 +624,7 @@
                                         @else
                                             <span class="inline-flex items-center gap-1 font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
-                                                Take Away
+                                                Dibawa Pulang
                                             </span>
                                         @endif
                                     </div>
@@ -712,7 +712,7 @@
                                                     Selesaikan
                                                 </button>
                                             @else
-                                                <button type="button" onclick="openQuickPayModal({{ $order->id }}, {{ $order->total_harga }}, '{{ $order->meja ? 'Meja ' . $order->meja->nomor_meja : 'Take Away' }}')"
+                                                <button type="button" onclick="openQuickPayModal({{ $order->id }}, {{ $order->total_harga }}, '{{ $order->meja ? 'Meja ' . $order->meja->nomor_meja : 'Dibawa Pulang' }}')"
                                                     class="flex-1 py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v2a2 2 0 002 2h6a2 2 0 002-2v-1" /></svg>
                                                     Bayar & Selesai
@@ -722,7 +722,7 @@
 
                                         {{-- Extra Pay Button (if unpaid and not yet ready) --}}
                                         @if (!$isPaid && $status !== 'ready')
-                                            <button type="button" onclick="openQuickPayModal({{ $order->id }}, {{ $order->total_harga }}, '{{ $order->meja ? 'Meja ' . $order->meja->nomor_meja : 'Take Away' }}')"
+                                            <button type="button" onclick="openQuickPayModal({{ $order->id }}, {{ $order->total_harga }}, '{{ $order->meja ? 'Meja ' . $order->meja->nomor_meja : 'Dibawa Pulang' }}')"
                                                 class="py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer"
                                                 title="Bayar Langsung">
                                                 <span>💵 Bayar</span>
@@ -1672,7 +1672,7 @@
                 prosesed: 'bg-purple-400',
                 ready: 'bg-blue-400',
             }[status] || 'bg-slate-300';
-            const tableLabel = order.meja ? `Meja ${order.meja.nomor_meja}` : 'Take Away';
+            const tableLabel = order.meja ? `Meja ${order.meja.nomor_meja}` : 'Dibawa Pulang';
             const sourceBadge = order.sumber_pesanan === 'web'
                 ? '<span class="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-md text-[10px] font-bold">Web</span>'
                 : '<span class="px-2 py-0.5 bg-purple-50 text-purple-700 border border-purple-200 rounded-md text-[10px] font-bold">POS</span>';
@@ -1708,7 +1708,7 @@
                    </span>`
                 : `<span class="inline-flex items-center gap-1 font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
-                     Take Away
+                     Dibawa Pulang
                    </span>`;
 
             let itemsHtml = '';

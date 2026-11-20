@@ -69,7 +69,7 @@
                     </div>
                     <div class="min-w-0">
                         <h1 class="font-extrabold text-slate-900 text-sm leading-tight truncate tracking-tight">Bagi Kopi</h1>
-                        <p class="text-[9px] text-slate-500 font-bold uppercase tracking-[0.18em] truncate mt-0.5">Kasir Console</p>
+                        <p class="text-[9px] text-slate-500 font-bold uppercase tracking-[0.18em] truncate mt-0.5">Konsol Kasir</p>
                     </div>
                 </div>
                 <button type="button" id="kasir-sidebar-close" aria-label="Tutup menu navigasi"
@@ -174,7 +174,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                         </svg>
-                        <span>Keluar / Log Out</span>
+                        <span>Keluar</span>
                     </button>
                 </form>
             </div>

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('breadcrumb', 'Operasional Outlet / <span class="text-primary-600">Layanan Mandiri</span>')
-@section('page-title', 'Pengaturan Meja & QR Code Self-Order')
+@section('page-title', 'Pengaturan Meja & QR Pemesanan Mandiri')
 
 @section('content')
 <div class="min-h-screen bg-slate-50">
@@ -179,7 +179,7 @@
                         </svg>
                         <span>Kapasitas: <strong class="text-slate-900">{{ $meja->kapasitas }} Orang</strong></span>
                         <span class="text-slate-400">•</span>
-                        <span>Non-Smoking</span>
+                        <span>Bebas Rokok</span>
                     </div>
 
                     <!-- Status Badge -->
@@ -292,7 +292,7 @@
                 </svg>
             </div>
             <div class="flex-1">
-                <h3 class="font-bold text-slate-900 text-base mb-1">Standar Cetak Acrylic Stand Karsa Roastery</h3>
+                <h3 class="font-bold text-slate-900 text-base mb-1">Standar Cetak Stand Akrilik Karsa</h3>
                 <p class="text-sm text-slate-600 leading-relaxed">
                     Ukuran standar akrilik meja: A6 (105 × 148 mm) dengan resolusi 300 DPI. 
                     Disarankan menggunakan laminasi doff tahan gores dan anti-glare agar kamera smartphone mudah memindai dalam segala kondisi pencahayaan kafe.

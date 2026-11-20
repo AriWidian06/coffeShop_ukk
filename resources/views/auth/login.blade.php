@@ -20,7 +20,7 @@
         <!-- ============================================ -->
         <!-- PANEL KIRI: Branding & Informasi (Biru) -->
         <!-- ============================================ -->
-        <div class="login-blue-panel lg:w-5/12 p-6 sm:p-10 lg:p-12 text-white flex flex-col justify-between relative z-10">
+        <div class="login-blue-panel lg:w-5/12 p-6 sm:p-10 lg:p-12 text-slate-900 flex flex-col justify-between relative z-10">
 
             <!-- Logo -->
             <div class="flex items-center gap-3">
@@ -30,35 +30,35 @@
                 </div>
                 <div>
                     <h2 class="font-bold text-lg leading-tight">BAGI KOPI</h2>
-                    <p class="text-[10px] font-semibold uppercase tracking-widest text-blue-100">Roastery & Supply</p>
+                    <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-600">Pemanggangan & Pasokan</p>
                 </div>
             </div>
 
             <!-- Konten Tengah -->
             <div class="my-8 lg:my-0">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-xs font-semibold mb-6">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200 text-xs font-semibold mb-6">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    KONSOL ROASTERY V1.0
+                    KONSOL PEMANGGANGAN V1.0
                 </div>
 
                 <h1 class="font-bold text-2xl sm:text-3xl lg:text-4xl leading-tight mb-4">
-                    System Pengelolaan<br> internal roastery & supply
+                    Sistem Pengelolaan<br> internal pemanggangan & pasokan
                 </h1>
 
-                <p class="text-blue-100 text-sm leading-relaxed max-w-md">
-                    Sistem manajemen internal untuk mengelola proses produksi, pemesanan, dan penjualan kopi di Karsa Roastery & Supply. Didesain untuk efisiensi operasional dan pengalaman pengguna yang optimal.
+                <p class="text-slate-600 text-sm leading-relaxed max-w-md">
+                    Sistem manajemen internal untuk mengelola proses produksi, pemesanan, dan penjualan kopi di Karsa Pemanggangan & Pasokan. Didesain untuk efisiensi operasional dan pengalaman pengguna yang optimal.
                 </p>
             </div>
 
             <!-- Card Bawah: Statistik -->
-            <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-2">
+            <div class="bg-white border border-slate-200 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-2">
                 <div class="flex items-center gap-3">
-                    <svg class="w-5 h-5 text-blue-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                     <span class="text-sm font-semibold">Sistem Internal</span>
                 </div>
-                <span class="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2.5 py-1 rounded-md">v1.0</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-primary-50 px-2.5 py-1 rounded-md">v1.0</span>
             </div>
         </div>
 
@@ -109,7 +109,7 @@
                 <div>
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
                         <label for="username" class="text-sm font-bold text-slate-700">
-                            Email Pegawai / Akun Roaster
+                            Email Pegawai / Akun Manajemen
                         </label>
                         <span class="text-xs text-slate-400">Format: username Anda</span>
                     </div>

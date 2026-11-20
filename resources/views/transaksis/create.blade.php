@@ -26,7 +26,7 @@
                         <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Terminal Kasir</h1>
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold whitespace-nowrap">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
-                            Station #01
+                            Terminal #01
                         </span>
                     </div>
                     <p class="text-sm text-slate-500">Pilih menu, atur kustomisasi, lalu simpan pesanan.</p>

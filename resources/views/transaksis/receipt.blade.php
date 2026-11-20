@@ -90,11 +90,11 @@
         </div>
         <div class="info-row">
             <span>Kasir:</span>
-            <span>{{ $transaksi->karyawan->nama_karyawan ?? 'Web Order' }}</span>
+            <span>{{ $transaksi->karyawan->nama_karyawan ?? 'Pesanan Web' }}</span>
         </div>
         <div class="info-row">
             <span>Meja:</span>
-            <span>{{ $transaksi->meja ? $transaksi->meja->nomor_meja : 'Take Away' }}</span>
+            <span>{{ $transaksi->meja ? $transaksi->meja->nomor_meja : 'Dibawa Pulang' }}</span>
         </div>
 
         <div class="divider"></div>

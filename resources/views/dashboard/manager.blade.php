@@ -19,7 +19,7 @@
             <div class="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
                 <div class="min-w-0">
                     <div class="flex flex-wrap items-center gap-2 mb-1">
-                        <span class="text-[11px] sm:text-xs text-slate-500 font-semibold">Bagi Kopi • Manager Console</span>
+                        <span class="text-[11px] sm:text-xs text-slate-500 font-semibold">Bagi Kopi • Konsol Manager</span>
                         <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full">Data WIB</span>
                     </div>
                     <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Laporan Penjualan</h1>
@@ -35,7 +35,7 @@
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>
-                        <span>Export PDF</span>
+                        <span>Ekspor PDF</span>
                     </a>
                 </div>
             </div>

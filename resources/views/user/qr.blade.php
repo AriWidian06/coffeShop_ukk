@@ -19,7 +19,7 @@
                             </svg>
                         </div>
                         <div>
-                            <h1 id="receipt-title" class="font-extrabold text-sm text-slate-900 leading-tight">Qris Payment</h1>
+                            <h1 id="receipt-title" class="font-extrabold text-sm text-slate-900 leading-tight">Pembayaran QRIS</h1>
                             <p class="text-[10px] text-slate-500 font-bold tracking-wider">BAGI KOPI</p>
                         </div>
                     </div>

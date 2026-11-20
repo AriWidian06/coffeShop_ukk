@@ -57,7 +57,7 @@
                         <h3 id="status-current-label" class="text-lg font-extrabold leading-tight">Memuat...</h3>
                         <p id="status-current-desc" class="text-xs text-blue-100/90 mt-0.5 leading-relaxed">Mohon tunggu sebentar.</p>
                     </div>
-                    <span id="status-order-type" class="self-start px-2.5 py-1 bg-white/20 border border-white/30 rounded-lg text-[10px] font-extrabold uppercase tracking-wide">Dine-in</span>
+                    <span id="status-order-type" class="self-start px-2.5 py-1 bg-white/20 border border-white/30 rounded-lg text-[10px] font-extrabold uppercase tracking-wide">Makan di Tempat</span>
                 </div>
 
                 <!-- Progress Card -->

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $title ?? 'Manager Console - Bagi Kopi' }}</title>
+    <title>{{ $title ?? 'Konsol Manager - Bagi Kopi' }}</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,7 +40,7 @@
                     </div>
                     <div class="min-w-0">
                         <p class="text-sm font-bold text-slate-900 leading-tight truncate">Bagi Kopi</p>
-                        <p class="text-[9px] text-primary-600 font-semibold uppercase tracking-wider truncate">Manager Console</p>
+                        <p class="text-[9px] text-primary-600 font-semibold uppercase tracking-wider truncate">Konsol Manager</p>
                     </div>
                 </div>
                 <div class="w-9 h-9 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-bold text-sm shrink-0">
@@ -69,7 +69,7 @@
                     </div>
                     <div class="min-w-0">
                         <h1 class="font-bold text-slate-900 text-sm leading-tight truncate">Bagi Kopi</h1>
-                        <p class="text-[9px] text-primary-600 font-semibold uppercase tracking-wider truncate">Manager Console</p>
+                        <p class="text-[9px] text-primary-600 font-semibold uppercase tracking-wider truncate">Konsol Manager</p>
                     </div>
                 </div>
                 <button type="button" id="manager-sidebar-close" aria-label="Tutup menu navigasi"
@@ -83,8 +83,8 @@
             <!-- Branch Selector -->
             <div class="p-4 border-b border-slate-200 shrink-0">
                 <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
-                    <p class="text-[10px] text-slate-500 font-semibold uppercase mb-1">Branch Unit</p>
-                    <p class="text-sm font-bold text-slate-900">Senopati Flagship</p>
+                    <p class="text-[10px] text-slate-500 font-semibold uppercase mb-1">Unit Cabang</p>
+                    <p class="text-sm font-bold text-slate-900">Senopati - Cabang Utama</p>
                 </div>
             </div>
 
@@ -157,7 +157,7 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                         </svg>
-                        <span>Keluar / Log Out</span>
+                        <span>Keluar</span>
                     </button>
                 </form>
             </div>

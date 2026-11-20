@@ -9,7 +9,7 @@
         <div class="flex shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 py-3 lg:px-6">
             <div>
                 <p class="text-[10px] font-extrabold uppercase tracking-wider text-primary-600">Pesanan Anda</p>
-                <h2 class="text-base font-extrabold text-slate-900">Keranjang & Checkout</h2>
+                <h2 class="text-base font-extrabold text-slate-900">Keranjang & Pemesanan</h2>
             </div>
             <button type="button" onclick="toggleCart()" aria-label="Tutup keranjang"
                     class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition hover:bg-slate-200">
@@ -34,10 +34,10 @@
                         <div class="space-y-3">
                             <div class="grid grid-cols-2 gap-2">
                                 <button type="button" onclick="setOrderType('dine-in')" id="btn-dine-in" class="order-type-btn active py-3 px-4 rounded-xl border-2 border-primary-600 bg-primary-50 text-primary-700 font-bold text-sm shadow-sm transition-all">
-                                    Dine-in
+                                    Makan di Tempat
                                 </button>
                                 <button type="button" onclick="setOrderType('take-away')" id="btn-take-away" class="order-type-btn py-3 px-4 rounded-xl border-2 border-slate-200 text-slate-600 font-bold text-sm bg-white hover:border-primary-300 transition-all">
-                                    Takeaway
+                                    Dibawa Pulang
                                 </button>
                             </div>
 

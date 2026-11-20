@@ -33,7 +33,7 @@
                 <!-- Notes -->
                 <div class="mt-8 mb-6">
                     <label class="text-sm font-bold text-slate-900 flex items-center gap-2 mb-2">Catatan</label>
-                    <textarea id="mobile-custom-notes" rows="3" placeholder="Cth: Less ice batu..." class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"></textarea>
+                    <textarea id="mobile-custom-notes" rows="3" placeholder="Contoh: Kurang es..." class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"></textarea>
                 </div>
             </div>
 

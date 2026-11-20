@@ -1059,9 +1059,9 @@
                             @else
                                 Tanpa Meja
                             @endif
-                            <span class="soft">&bull; {{ $transaksi->tipe_pesanan === 'take-away' ? 'Take-away' : 'Dine-in' }}</span>
+                            <span class="soft">&bull; {{ $transaksi->tipe_pesanan === 'take-away' ? 'Dibawa Pulang' : 'Makan di Tempat' }}</span>
                         </td>
-                        <td>{{ $transaksi->karyawan?->nama_karyawan ?? ($transaksi->sumber_pesanan === 'web' ? 'Web Order' : 'Kasir') }}</td>
+                        <td>{{ $transaksi->karyawan?->nama_karyawan ?? ($transaksi->sumber_pesanan === 'web' ? 'Pesanan Web' : 'Kasir') }}</td>
                         <td class="text-right">{{ $itemCount }}</td>
                         <td class="text-right">{{ $transaksi->diskon > 0 ? '-Rp ' . number_format((float) $transaksi->diskon, 0, ',', '.') : '-' }}</td>
                         <td class="text-right"><strong>Rp {{ number_format((float) $transaksi->total_harga, 0, ',', '.') }}</strong></td>

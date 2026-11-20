@@ -13,7 +13,7 @@
             </span>
             <h2 class="text-xl sm:text-2xl font-black text-slate-900 mt-2 break-words">Struk Transaksi #{{ $transaksi->id }}</h2>
             <p class="text-xs text-slate-500 mt-1">
-                Meja: {{ $transaksi->meja->nomor_meja ?? 'Takeaway' }} • Kasir: {{ auth('karyawan')->user()->nama_karyawan ?? 'Kasir' }}
+                Meja: {{ $transaksi->meja->nomor_meja ?? 'Dibawa Pulang' }} • Kasir: {{ auth('karyawan')->user()->nama_karyawan ?? 'Kasir' }}
             </p>
         </div>
 

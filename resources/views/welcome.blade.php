@@ -29,7 +29,7 @@
                     </div>
                     <div>
                         <h1 id="header-title" class="font-extrabold text-base text-slate-900 leading-tight">Bagi Kopi</h1>
-                        <p id="header-subtitle" class="text-[10px] text-slate-500 font-bold tracking-wider">ARTISANAL BREW • CATALOG</p>
+                        <p id="header-subtitle" class="text-[10px] text-slate-500 font-bold tracking-wider">KOPI ARTISANAL • KATALOG</p>
                     </div>
                 </div>
 
@@ -92,7 +92,7 @@
                     <div>
                         <div class="flex items-center gap-2">
                             <h3 class="font-bold text-slate-900">Meja #{{ $mejaAktif->nomor_meja }}</h3>
-                            <span class="px-2 py-0.5 bg-primary-600 text-white text-[10px] font-extrabold rounded-md">DINE-IN</span>
+                            <span class="px-2 py-0.5 bg-primary-600 text-white text-[10px] font-extrabold rounded-md">MAKAN DI TEMPAT</span>
                         </div>
                         <p class="text-xs text-slate-500 mt-0.5">Bagi Kopi Main Hall • Lantai 1</p>
                         <p class="text-xs text-slate-500 font-semibold mt-1">
@@ -140,10 +140,10 @@
                         $badge = null;
                         $badgeColor = 'bg-blue-600';
                         if (str_contains(strtolower($produk->nama_produk), 'aren latte')) {
-                            $badge = 'BEST SELLER';
+                            $badge = 'TERLARIS';
                             $badgeColor = 'bg-blue-600';
                         } elseif (str_contains(strtolower($produk->kategoriProduk->nama_kategori ?? ''), 'manual')) {
-                            $badge = 'MANUAL BREW';
+                            $badge = 'KOPI MANUAL';
                             $badgeColor = 'bg-amber-600';
                         } elseif ($produk->stock < 5 && $produk->stock > 0) {
                             $badge = 'SISA ' . $produk->stock . ' BOTOL';
@@ -523,14 +523,14 @@
             };
             const meta = statusMap[order.status_pesanan] || statusMap.pending;
             const isTakeAway = order.tipe_pesanan === 'take-away';
-            const tableLabel = order.nomor_meja ? 'Meja ' + order.nomor_meja : 'Take Away';
+            const tableLabel = order.nomor_meja ? 'Meja ' + order.nomor_meja : 'Dibawa Pulang';
 
             titleEl.textContent = 'Status Pesanan (' + tableLabel + ')';
             subtitleEl.textContent = '#' + order.id + ' • ' + order.status_label;
             document.getElementById('status-current-label').textContent = order.status_label;
             document.getElementById('status-current-desc').textContent = meta.desc;
             document.getElementById('status-current-icon').innerHTML = meta.icon;
-            document.getElementById('status-order-type').textContent = isTakeAway ? 'Take Away' : 'Dine-in';
+            document.getElementById('status-order-type').textContent = isTakeAway ? 'Dibawa Pulang' : 'Makan di Tempat';
             document.getElementById('status-live-dot').classList.toggle('hidden', order.status_pesanan === 'completed');
 
             applyStatusStep(order.status_step || 1, order.status_pesanan);
@@ -605,8 +605,8 @@
 
             headerTitle.textContent = 'Bagi Kopi';
             headerSubtitle.textContent = isStatus
-                ? 'ARTISANAL BREW • ORDER STATUS'
-                : 'ARTISANAL BREW • CATALOG';
+                ? 'KOPI ARTISANAL • STATUS PESANAN'
+                : 'KOPI ARTISANAL • KATALOG';
 
             navPesan.classList.toggle('text-primary-600', !isStatus);
             navPesan.classList.toggle('text-slate-400', isStatus);
@@ -898,8 +898,8 @@
             if (currentOrderType === 'dine-in') {
                 if (btnDineIn) btnDineIn.className = activeClasses;
                 if (btnTakeAway) btnTakeAway.className = inactiveClasses;
-                if (btnDineIn) btnDineIn.innerHTML = '<span>Dine-in</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>';
-                if (btnTakeAway) btnTakeAway.innerHTML = '<span>Takeaway</span>';
+                if (btnDineIn) btnDineIn.innerHTML = '<span>Makan di Tempat</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>';
+                if (btnTakeAway) btnTakeAway.innerHTML = '<span>Dibawa Pulang</span>';
                 if (tableContainer) tableContainer.classList.remove('hidden');
                 if (tableSelect) {
                     tableSelect.disabled = false;
@@ -911,8 +911,8 @@
             } else {
                 if (btnTakeAway) btnTakeAway.className = activeClasses;
                 if (btnDineIn) btnDineIn.className = inactiveClasses;
-                if (btnTakeAway) btnTakeAway.innerHTML = '<span>Takeaway</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>';
-                if (btnDineIn) btnDineIn.innerHTML = '<span>Dine-in</span>';
+                if (btnTakeAway) btnTakeAway.innerHTML = '<span>Dibawa Pulang</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>';
+                if (btnDineIn) btnDineIn.innerHTML = '<span>Makan di Tempat</span>';
                 if (tableContainer) tableContainer.classList.add('hidden');
                 if (tableSelect) {
                     tableSelect.value = '';
@@ -921,7 +921,7 @@
             }
 
             const typeLabel = document.getElementById('active-order-type-label');
-            if (typeLabel) typeLabel.textContent = currentOrderType === 'dine-in' ? 'Dine-in' : 'Takeaway';
+            if (typeLabel) typeLabel.textContent = currentOrderType === 'dine-in' ? 'Makan di Tempat' : 'Dibawa Pulang';
             typeLabel?.parentElement?.classList.toggle('hidden', false);
 
             updatePaymentMethodUI();
@@ -1206,7 +1206,7 @@
                 const order = result.data || result.transaksi;
                 document.getElementById('receipt-date').textContent = new Date(order.waktu_transaksi).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }) + ' WIB';
                 document.getElementById('receipt-number').textContent = `#${order.id}`;
-                document.getElementById('receipt-order-type').textContent = currentOrderType === 'dine-in' ? 'Dine-in' : 'Takeaway';
+                document.getElementById('receipt-order-type').textContent = currentOrderType === 'dine-in' ? 'Makan di Tempat' : 'Dibawa Pulang';
 
                 let targetText = 'BAWA PULANG';
                 if (currentOrderType === 'dine-in' && tableSelect.value) {
