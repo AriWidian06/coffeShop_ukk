@@ -483,6 +483,35 @@ class FunctionalReportTest extends TestCase
         $this->assertStringStartsWith('%PDF', $response->getContent());
     }
 
+    public function test_admin_pdf_export_allows_up_to_one_month_range(): void
+    {
+        $admin = $this->makeKaryawan('admin', 'adminPdf');
+        $kasir = $this->makeKaryawan('kasir', 'kasirPdf');
+        $transaksi = $this->makeTransaksi($kasir, 40000);
+        $transaksi->update(['status_pesanan' => 'completed']);
+
+        $start = now('Asia/Jakarta')->startOfMonth()->toDateString();
+        $end = now('Asia/Jakarta')->endOfMonth()->toDateString();
+
+        $response = $this->actingAs($admin, 'karyawan')
+            ->get('/laporan/export?start_date=' . $start . '&end_date=' . $end);
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'application/pdf');
+        $this->assertStringStartsWith('%PDF', $response->getContent());
+    }
+
+    public function test_admin_pdf_export_rejects_range_longer_than_one_month(): void
+    {
+        $admin = $this->makeKaryawan('admin', 'adminPdfRange');
+
+        $response = $this->actingAs($admin, 'karyawan')
+            ->get('/laporan/export?start_date=2026-01-01&end_date=2026-12-31');
+
+        $response->assertRedirect(route('dashboard'));
+        $response->assertSessionHas('error');
+    }
+
     public function test_tc_err_01_custom_404_and_500_pages(): void
     {
         $this->get('/halaman-tidak-ada')

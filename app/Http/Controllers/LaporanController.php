@@ -16,6 +16,8 @@ class LaporanController extends Controller
 {
     public function export(Request $request)
     {
+        $this->raiseExportLimits();
+
         $tz = 'Asia/Jakarta';
         Carbon::setLocale('id');
 
@@ -79,6 +81,16 @@ class LaporanController extends Controller
                 $periodeLabel = $start->translatedFormat('F Y');
             }
 
+            // Dompdf memuat seluruh dokumen ke memori. Rentang yang terlalu
+            // panjang membuat proses kehabisan memori, jadi batasi maksimal
+            // satu bulan dan tampilkan pesan yang jelas ke pengguna.
+            if ($start->diffInDays($end) > 31) {
+                return redirect()->route('dashboard')->with(
+                    'error',
+                    'Rentang ekspor PDF maksimal 1 bulan (31 hari). Silakan pilih tanggal mulai dan selesai yang lebih singkat.'
+                );
+            }
+
             $fileTag = $start->format('Y-m-d') . '_sd_' . $end->format('Y-m-d');
         }
 
@@ -96,7 +108,11 @@ class LaporanController extends Controller
         $totalPendapatan = (float) $transaksis->sum('total_harga');
         $totalTransaksi = $transaksis->count();
         $totalDiskon = (float) $transaksis->sum('diskon');
-        $totalItem = (int) $transaksis->flatMap->detail_transaksis->sum('QTY');
+
+        // Simpan detail sekali saja; sebelumnya flatMap dipanggil berulang
+        // untuk total item, produk terlaris, dan HPP.
+        $details = $transaksis->flatMap->detail_transaksis;
+        $totalItem = (int) $details->sum('QTY');
         $averageTransactionValue = $totalTransaksi > 0 ? round($totalPendapatan / $totalTransaksi) : 0;
 
         $paymentStats = $transaksis
@@ -109,8 +125,7 @@ class LaporanController extends Controller
             ->sortByDesc('total')
             ->values();
 
-        $topProducts = $transaksis
-            ->flatMap->detail_transaksis
+        $topProducts = $details
             ->groupBy('produk_id')
             ->map(fn ($details) => (object) [
                 'nama_produk' => $details->first()->produk?->nama_produk ?? 'Produk dihapus',
@@ -149,7 +164,7 @@ class LaporanController extends Controller
                 ];
             });
 
-        $hpp = (float) $transaksis->flatMap->detail_transaksis->sum(
+        $hpp = (float) $details->sum(
             fn ($detail) => (int) $detail->QTY * (float) ($detail->produk->harga_beli ?? 0)
         );
         $labaKotor = round($totalPendapatan - $hpp, 2);
@@ -228,5 +243,23 @@ class LaporanController extends Controller
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
             'Cache-Control' => 'private, max-age=0, must-revalidate',
         ]);
+    }
+
+    /**
+     * Dompdf merender seluruh dokumen di memori. Default PHP pada image
+     * php:8.2-apache hanya 128 MB dan batas waktunya 30 detik, sedangkan
+     * laporan bulanan bisa memakai lebih dari 200 MB.
+     */
+    private function raiseExportLimits(): void
+    {
+        $memoryLimit = ini_parse_quantity((string) ini_get('memory_limit'));
+        if ($memoryLimit !== -1 && $memoryLimit < ini_parse_quantity('512M')) {
+            ini_set('memory_limit', '512M');
+        }
+
+        $maxExecutionTime = (int) ini_get('max_execution_time');
+        if ($maxExecutionTime > 0 && $maxExecutionTime < 180) {
+            set_time_limit(180);
+        }
     }
 }
