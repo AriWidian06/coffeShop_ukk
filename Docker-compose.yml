@@ -68,7 +68,7 @@ services:
     image: mysql:8.0
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD:-1234}"
+      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD:-demopass123}"
       MYSQL_DATABASE: "${DB_DATABASE:-db_perkoci}"
       TZ: "${TZ:-Asia/Jakarta}"
     volumes:
