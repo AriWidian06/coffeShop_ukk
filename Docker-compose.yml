@@ -9,7 +9,7 @@ services:
     container_nama: bagikopi
     restart: unless-stopped
     ports:
-      - "${APP_PORT:-1106}:80"
+      - "${APP_PORT:-1108}:80"
     environment:
       APP_NAME: "${APP_NAME:-BagiKopi}"
       APP_ENV: production
