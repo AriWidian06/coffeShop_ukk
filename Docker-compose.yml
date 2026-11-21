@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_nama: bagikopi
+    container_name: bagikopi
     restart: unless-stopped
     ports:
       - "${APP_PORT:-1108}:80"
