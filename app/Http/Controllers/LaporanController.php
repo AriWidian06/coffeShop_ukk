@@ -7,6 +7,7 @@ use App\Models\KasMovement;
 use App\Models\Pengeluaran;
 use App\Models\Transaksi;
 use App\Services\KasService;
+use App\Services\LaporanPdfDetailService;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -187,8 +188,42 @@ class LaporanController extends Controller
             'completed' => 'Selesai',
         ];
 
+        $dicetakOleh = $user?->nama_karyawan ?? 'Sistem';
+
+        $completedCount = $transaksis->where('status_pesanan', 'completed')->count();
+        $unpaidCount = $transaksis->filter(fn ($transaksi) => ! $transaksi->pembayaran)->count();
+        $promoCount = $transaksis->where('diskon', '>', 0)->count();
+
+        // Rincian transaksi digambar langsung ke canvas PDF oleh
+        // LaporanPdfDetailService. Merender ribuan baris sebagai HTML
+        // membuat Dompdf kehabisan memori.
+        $detailRows = $transaksis->values()->map(function ($transaksi) use ($statusLabels) {
+            $waktuWib = $transaksi->waktu_transaksi?->copy()->timezone('Asia/Jakarta');
+            $statusKey = (string) $transaksi->status_pesanan;
+            $metode = (string) ($transaksi->pembayaran?->metode_pembayaran ?? '');
+
+            return [
+                'waktu' => $waktuWib ? $waktuWib->format('d/m/Y H:i') : '-',
+                'tiket' => '#'.$transaksi->id,
+                'meja_tipe' => ($transaksi->meja ? 'Meja '.$transaksi->meja->nomor_meja : 'Tanpa Meja')
+                    .' • '.($transaksi->tipe_pesanan === 'take-away' ? 'Dibawa Pulang' : 'Makan di Tempat'),
+                'kasir' => $transaksi->karyawan?->nama_karyawan
+                    ?? ($transaksi->sumber_pesanan === 'web' ? 'Pesanan Web' : 'Kasir'),
+                'item' => (string) (int) $transaksi->detail_transaksis->sum('QTY'),
+                'diskon' => $transaksi->diskon > 0
+                    ? '-Rp '.number_format((float) $transaksi->diskon, 0, ',', '.')
+                    : '-',
+                'total' => 'Rp '.number_format((float) $transaksi->total_harga, 0, ',', '.'),
+                'lunas' => $transaksi->pembayaran !== null,
+                'metode' => $metode === '' ? '' : ($metode === 'QRIS' ? 'QRIS' : ucfirst($metode)),
+                'status_key' => $statusKey,
+                'status_label' => $statusLabels[$statusKey] ?? ucfirst($statusKey),
+            ];
+        })->all();
+
+        unset($transaksis);
+
         $html = view('laporan.pdf', [
-            'transaksis' => $transaksis,
             'totalPendapatan' => $totalPendapatan,
             'totalTransaksi' => $totalTransaksi,
             'totalDiskon' => $totalDiskon,
@@ -210,9 +245,10 @@ class LaporanController extends Controller
             'end' => $end,
             'nowWib' => $nowWib,
             'logoData' => $logoData,
-            'statusLabels' => $statusLabels,
-            'dicetakOleh' => $user?->nama_karyawan ?? 'Sistem',
-            'isManager' => $isManager,
+            'dicetakOleh' => $dicetakOleh,
+            'completedCount' => $completedCount,
+            'unpaidCount' => $unpaidCount,
+            'promoCount' => $promoCount,
         ])->render();
 
         $options = new Options();
@@ -224,6 +260,14 @@ class LaporanController extends Controller
         $dompdf->loadHtml($html, 'UTF-8');
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
+
+        app(LaporanPdfDetailService::class)->append($dompdf, $detailRows, [
+            'periodeLabel' => $periodeLabel,
+            'rangeLabel' => $start->translatedFormat('d M Y') . ' – ' . $end->translatedFormat('d M Y'),
+            'printedLabel' => $nowWib->translatedFormat('d M Y, H:i'),
+            'dicetakOleh' => $dicetakOleh,
+            'logoPath' => is_file($logoPath) ? $logoPath : null,
+        ]);
 
         $canvas = $dompdf->getCanvas();
         $pageFont = $dompdf->getFontMetrics()->getFont('DejaVu Sans', 'normal');

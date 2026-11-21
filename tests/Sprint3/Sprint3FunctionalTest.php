@@ -185,7 +185,7 @@ class Sprint3FunctionalTest extends TestCase
     {
         $roles = [
             ['admin_uji', $this->admin, 'Dashboard'],
-            ['kasir_uji', $this->kasir, 'Terminal POS'],
+            ['kasir_uji', $this->kasir, 'Terminal Kasir'],
             ['manager_uji', $this->manager, 'Laporan Penjualan'],
         ];
 

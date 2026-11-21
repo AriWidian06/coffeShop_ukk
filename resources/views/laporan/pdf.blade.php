@@ -719,9 +719,6 @@
 </head>
 <body>
     @php
-        $completedCount = $transaksis->where('status_pesanan', 'completed')->count();
-        $unpaidCount = $transaksis->filter(fn ($transaksi) => ! $transaksi->pembayaran)->count();
-        $promoCount = $transaksis->where('diskon', '>', 0)->count();
         $activeDays = (int) floor($start->diffInDays($end)) + 1;
         $averagePerDay = $totalTransaksi > 0 ? $totalPendapatan / max(1, $activeDays) : 0;
         $peakSale = (float) max($hourlySales);
@@ -1008,83 +1005,6 @@
         </table>
     </div>
 
-    <div class="detail-head">
-        <table>
-            <tr>
-                <td>
-                    <div class="section-kicker">Buku Kas &amp; Transaksi</div>
-                    <div class="section-title">Rincian Transaksi</div>
-                    <div class="section-subtitle">{{ $totalTransaksi }} transaksi pada {{ $periodeLabel }} &bull; waktu disajikan dalam WIB</div>
-                </td>
-                <td width="24%" class="text-right">
-                    <span class="count-pill">{{ number_format($totalTransaksi, 0, ',', '.') }} Transaksi</span>
-                </td>
-            </tr>
-        </table>
-
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th width="4%">No</th>
-                    <th width="12%">Waktu (WIB)</th>
-                    <th width="6%">Tiket</th>
-                    <th width="12%">Meja / Tipe</th>
-                    <th width="15%">Kasir</th>
-                    <th width="5%" class="text-right">Item</th>
-                    <th width="10%" class="text-right">Diskon</th>
-                    <th width="12%" class="text-right">Total</th>
-                    <th width="13%">Pembayaran</th>
-                    <th width="11%">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($transaksis as $index => $transaksi)
-                    @php
-                        $waktuWib = $transaksi->waktu_transaksi?->copy()->timezone('Asia/Jakarta');
-                        $itemCount = (int) $transaksi->detail_transaksis->sum('QTY');
-                        $statusClass = match ($transaksi->status_pesanan) {
-                            'prosesed' => 'badge-prosesed',
-                            'ready' => 'badge-ready',
-                            'completed' => 'badge-completed',
-                            default => 'badge-pending',
-                        };
-                    @endphp
-                    <tr>
-                        <td class="soft">{{ $index + 1 }}</td>
-                        <td>{{ $waktuWib ? $waktuWib->format('d/m/Y H:i') : '-' }}</td>
-                        <td><span class="ticket">#{{ $transaksi->id }}</span></td>
-                        <td>
-                            @if($transaksi->meja)
-                                Meja {{ $transaksi->meja->nomor_meja }}
-                            @else
-                                Tanpa Meja
-                            @endif
-                            <span class="soft">&bull; {{ $transaksi->tipe_pesanan === 'take-away' ? 'Dibawa Pulang' : 'Makan di Tempat' }}</span>
-                        </td>
-                        <td>{{ $transaksi->karyawan?->nama_karyawan ?? ($transaksi->sumber_pesanan === 'web' ? 'Pesanan Web' : 'Kasir') }}</td>
-                        <td class="text-right">{{ $itemCount }}</td>
-                        <td class="text-right">{{ $transaksi->diskon > 0 ? '-Rp ' . number_format((float) $transaksi->diskon, 0, ',', '.') : '-' }}</td>
-                        <td class="text-right"><strong>Rp {{ number_format((float) $transaksi->total_harga, 0, ',', '.') }}</strong></td>
-                        <td>
-                            @if($transaksi->pembayaran)
-                                <span class="badge badge-paid">Lunas</span>&nbsp;<span class="muted">{{ $transaksi->pembayaran->metode_pembayaran === 'QRIS' ? 'QRIS' : ucfirst($transaksi->pembayaran->metode_pembayaran) }}</span>
-                            @else
-                                <span class="badge badge-unpaid">Belum Lunas</span>
-                            @endif
-                        </td>
-                        <td>
-                            <span class="badge {{ $statusClass }}">{{ $statusLabels[$transaksi->status_pesanan] ?? ucfirst($transaksi->status_pesanan) }}</span>
-                        </td>
-                    </tr>
-                @empty
-                    <tr class="empty-row">
-                        <td colspan="10">Belum ada transaksi pada periode ini.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
     <div class="closing-box">
         <div class="closing-title">Rangkuman Akhir &amp; Otorisasi</div>
         <div class="closing-sub">Konsolidasi periode {{ $periodeLabel }} &bull; seluruh nilai dalam Rupiah</div>
@@ -1122,7 +1042,7 @@
             </tr>
         </table>
         <div class="closing-note">
-            Catatan: Data diambil langsung dari database Bagi Kopi pada rentang WIB yang dipilih. Nilai pendapatan merupakan omzet bersih setelah potongan promo. Laporan ini sah tanpa tanda tangan basah.
+            Catatan: Data diambil langsung dari database Bagi Kopi pada rentang WIB yang dipilih. Nilai pendapatan merupakan omzet bersih setelah potongan promo. Rincian seluruh transaksi pada periode ini dilampirkan pada halaman berikutnya. Laporan ini sah tanpa tanda tangan basah.
         </div>
     </div>
 </body>
